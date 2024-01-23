@@ -3,4 +3,4 @@
 
 yarn lint
 yarn lint-staged
-# yarn test // TODO: need to specify the "all" flag as cl arg
+yarn test
