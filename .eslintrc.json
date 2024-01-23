@@ -5,10 +5,11 @@
     "project": "./tsconfig.json"
   },
   "ignorePatterns": ["node_modules/", "build/", "*.config.js"],
-  "plugins": ["@typescript-eslint", "import"],
+  "plugins": ["@typescript-eslint", "prettier", "import"],
   "extends": [
     "eslint:recommended", 
     "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript"
