@@ -2,9 +2,9 @@ import { ChessBoard } from "components";
 
 function App() {
   return (
-    <div>
+    <>
       <ChessBoard />
-    </div>
+    </>
   );
 }
 
