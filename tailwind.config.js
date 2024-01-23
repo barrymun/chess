@@ -4,7 +4,12 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'chess-board': '#769656',
+        'chess-tile': '#eeeed2',
+      },
+    },
   },
   plugins: [],
 }
