@@ -1,10 +1,10 @@
 import { createContext, useContext, useMemo, useState } from "react";
 
-import { defaultBoard } from "utils";
+import { SanPiece, defaultBoard } from "utils";
 
 const GameStateContext = createContext(
   {} as {
-    board: string[];
+    board: SanPiece[];
   },
 );
 
@@ -13,7 +13,7 @@ interface GameStateProviderProps {
 }
 
 const GameStateProvider = ({ children }: GameStateProviderProps) => {
-  const [board, setBoard] = useState<string[]>(defaultBoard);
+  const [board, setBoard] = useState<SanPiece[]>(defaultBoard);
 
   const value = useMemo(
     () => ({
