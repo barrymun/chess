@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       colors: {
         'chess-board': '#769656',
-        'chess-tile': '#eeeed2',
+        'chess-tile-light': '#eeeed2',
       },
       height: {
         '100': '100px',
