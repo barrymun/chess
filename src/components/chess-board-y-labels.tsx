@@ -5,7 +5,7 @@ const ChessBoardYLabels = () => {
     <div className="text-white">
       {[...yLabels].reverse().map((x) => {
         return (
-          <div key={x} className="w-8 h-100 flex justify-center items-center">
+          <div key={x} className="w-8 h-100 flex justify-center items-center select-none">
             {x}
           </div>
         );

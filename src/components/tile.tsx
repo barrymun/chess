@@ -1,18 +1,19 @@
-import { useEffect } from "react";
+import { FC, RefObject, useEffect } from "react";
 
 import { useGameState } from "hooks";
 import { TileColor, assetSanPieceMap, pieceSize } from "utils";
 
 interface TileProps {
   position: number;
+  innerRef: RefObject<HTMLDivElement | null>;
 }
 
 let isMouseDown: boolean = false;
 let selectedPosition: number | undefined = undefined;
 let selectedPiece: HTMLDivElement | undefined = undefined;
 
-const Tile = (props: TileProps) => {
-  const { position } = props;
+const Tile: FC<TileProps> = (props) => {
+  const { position, innerRef } = props;
   const { board } = useGameState();
   const tileColor: TileColor = (Math.floor(position / 8) + position) % 2 === 0 ? "light" : "dark";
   const imgSrc = board[position] !== " " ? `assets/img/${assetSanPieceMap[board[position]]}.png` : undefined;
@@ -28,18 +29,32 @@ const Tile = (props: TileProps) => {
   };
 
   const movePiece = (e: MouseEvent) => {
-    console.log(selectedPosition);
     if (!isMouseDown || !selectedPiece) {
       return;
     }
     const { clientX, clientY } = e;
+    const maxLeft = innerRef.current!.offsetLeft;
+    const maxRight = innerRef.current!.offsetLeft + innerRef.current!.offsetWidth;
+    const maxTop = innerRef.current!.offsetTop;
+    const maxBottom = innerRef.current!.offsetTop + innerRef.current!.offsetHeight;
+    // don't allow piece to be dragged outside of board
+    if (clientX < maxLeft + pieceSize / 4 || clientX > maxRight - pieceSize / 4) {
+      selectedPiece.style.top = `${clientY - pieceSize / 2}px`;
+      return;
+    }
+    if (clientY < maxTop + pieceSize / 4 || clientY > maxBottom - pieceSize / 4) {
+      selectedPiece.style.left = `${clientX - pieceSize / 2}px`;
+      return;
+    }
     selectedPiece.style.left = `${clientX - pieceSize / 2}px`;
     selectedPiece.style.top = `${clientY - pieceSize / 2}px`;
   };
 
-  const dropPiece = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const target = e.target as HTMLDivElement;
-    target.style.position = "";
+  const dropPiece = (_e: MouseEvent) => {
+    if (!selectedPiece) {
+      return;
+    }
+    selectedPiece.style.position = "";
     isMouseDown = false;
     selectedPosition = undefined;
     selectedPiece = undefined;
@@ -47,8 +62,10 @@ const Tile = (props: TileProps) => {
 
   useEffect(() => {
     document.addEventListener("mousemove", movePiece);
+    document.addEventListener("mouseup", dropPiece);
     return () => {
       document.removeEventListener("mousemove", movePiece);
+      document.removeEventListener("mouseup", dropPiece);
     };
   }, []);
 
@@ -61,7 +78,6 @@ const Tile = (props: TileProps) => {
           }}
           className="bg-no-repeat w-100 h-100 bg-contain bg-center hover:cursor-grab"
           onMouseDown={grabPiece(position)}
-          onMouseUp={dropPiece}
         />
       )}
     </div>
