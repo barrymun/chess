@@ -30,3 +30,4 @@ export const assetSanPieceMap: Record<SanPiece, string> = {
   k: "king-b",
   " ": "empty",
 };
+export const pieceSize: number = 100;
