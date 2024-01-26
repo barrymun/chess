@@ -5,6 +5,7 @@ import { SanPiece, defaultBoard } from "utils";
 const GameStateContext = createContext(
   {} as {
     board: SanPiece[];
+    setBoard: React.Dispatch<React.SetStateAction<SanPiece[]>>;
   },
 );
 
