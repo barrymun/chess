@@ -1,3 +1,4 @@
+export type Player = "white" | "black";
 export type TileColor = "light" | "dark";
 export type SanPawnWhite = "P";
 export type SanKnightWhite = "N";

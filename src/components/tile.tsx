@@ -1,7 +1,7 @@
 import { FC } from "react";
 
 import { useGameState } from "hooks";
-import { TileColor, assetSanPieceMap } from "utils";
+import { TileColor, assetSanPieceMap, tilesPerRow } from "utils";
 
 interface TileProps {
   position: number;
@@ -11,7 +11,7 @@ interface TileProps {
 const Tile: FC<TileProps> = (props) => {
   const { position, grabPiece } = props;
   const { board } = useGameState();
-  const tileColor: TileColor = (Math.floor(position / 8) + position) % 2 === 0 ? "light" : "dark";
+  const tileColor: TileColor = (Math.floor(position / tilesPerRow) + position) % 2 === 0 ? "light" : "dark";
   const imgSrc = board[position] !== " " ? `assets/img/${assetSanPieceMap[board[position]]}.png` : undefined;
 
   return (

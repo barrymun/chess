@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { Tile } from "components";
 import { useGameState } from "hooks";
-import { pieceSize } from "utils";
+import { isValidMove, pieceSize } from "utils";
 
 let isMouseDown: boolean = false;
 let selectedPosition: number | undefined = undefined;
@@ -73,6 +73,16 @@ const ChessBoard = () => {
       }
     });
     if (!closestIndex || !closestChild) {
+      clearSelectionContext();
+      return;
+    }
+    const valid = isValidMove({
+      piece: board[selectedPosition],
+      board,
+      origin: selectedPosition,
+      destination: closestIndex!,
+    });
+    if (!valid) {
       clearSelectionContext();
       return;
     }
