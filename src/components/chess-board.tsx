@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
 import { useGameState } from "hooks";
@@ -53,60 +53,63 @@ const ChessBoard = () => {
     selectedPiece = undefined;
   };
 
-  const dropPiece = (e: MouseEvent) => {
-    if (!selectedPosition || !selectedPiece) {
-      return;
-    }
-    const { clientX, clientY } = e;
-    let closestIndex: number | undefined = undefined;
-    let closestChild: HTMLDivElement | undefined = undefined;
-    let closestDistance: number = Number.MAX_SAFE_INTEGER;
-    Array.from(boardRef.current?.children ?? []).forEach((child, index) => {
-      const { left, top, width, height } = child.getBoundingClientRect();
-      const childX = left + width / 2;
-      const childY = top + height / 2;
-      const distance = Math.sqrt((clientX - childX) ** 2 + (clientY - childY) ** 2);
-      if (distance < closestDistance) {
-        closestIndex = index;
-        closestChild = child as HTMLDivElement;
-        closestDistance = distance;
+  const dropPiece = useCallback(
+    (e: MouseEvent) => {
+      if (!selectedPosition || !selectedPiece) {
+        return;
       }
-    });
-    if (!closestIndex || !closestChild) {
-      clearSelectionContext();
-      return;
-    }
-    const valid = isValidMove({
-      piece: board[selectedPosition],
-      board,
-      origin: selectedPosition,
-      destination: closestIndex!,
-    });
-    if (!valid) {
-      clearSelectionContext();
-      return;
-    }
-    setBoard((prevBoard) => {
-      const newBoard = [...prevBoard];
-      const temp = newBoard[closestIndex!];
-      newBoard[closestIndex!] = newBoard[selectedPosition!];
-      newBoard[selectedPosition!] = temp;
-      return newBoard;
-    });
-  };
+      const { clientX, clientY } = e;
+      let closestIndex: number | undefined = undefined;
+      let closestChild: HTMLDivElement | undefined = undefined;
+      let closestDistance: number = Number.MAX_SAFE_INTEGER;
+      Array.from(boardRef.current?.children ?? []).forEach((child, index) => {
+        const { left, top, width, height } = child.getBoundingClientRect();
+        const childX = left + width / 2;
+        const childY = top + height / 2;
+        const distance = Math.sqrt((clientX - childX) ** 2 + (clientY - childY) ** 2);
+        if (distance < closestDistance) {
+          closestIndex = index;
+          closestChild = child as HTMLDivElement;
+          closestDistance = distance;
+        }
+      });
+      if (!closestIndex || !closestChild) {
+        clearSelectionContext();
+        return;
+      }
+      const valid = isValidMove({
+        piece: board[selectedPosition],
+        board,
+        origin: selectedPosition,
+        destination: closestIndex!,
+      });
+      if (!valid) {
+        clearSelectionContext();
+        return;
+      }
+      setBoard((prevBoard) => {
+        const newBoard = [...prevBoard];
+        const temp = newBoard[closestIndex!];
+        newBoard[closestIndex!] = newBoard[selectedPosition!];
+        newBoard[selectedPosition!] = temp;
+        return newBoard;
+      });
+    },
+    [board],
+  );
 
   useEffect(() => {
     clearSelectionContext();
   }, [board]);
 
   useEffect(() => {
-    document.addEventListener("mousemove", movePiece);
-    document.addEventListener("mouseup", dropPiece);
+    window.addEventListener("mousemove", movePiece);
+    window.addEventListener("mouseup", dropPiece);
     return () => {
-      document.removeEventListener("mousemove", movePiece);
-      document.removeEventListener("mouseup", dropPiece);
+      window.removeEventListener("mousemove", movePiece);
+      window.removeEventListener("mouseup", dropPiece);
     };
-  }, []);
+  }, [board]);
 
   return (
     <div className="bg-chess-board rounded-md truncate">
