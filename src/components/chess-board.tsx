@@ -77,13 +77,13 @@ const ChessBoard = () => {
         clearSelectionContext();
         return;
       }
-      const valid = isValidMove({
+      const { isValid, isCaptured } = isValidMove({
         piece: board[selectedPosition],
         board,
         origin: selectedPosition,
         destination: closestIndex!,
       });
-      if (!valid) {
+      if (!isValid) {
         clearSelectionContext();
         return;
       }
@@ -91,7 +91,7 @@ const ChessBoard = () => {
         const newBoard = [...prevBoard];
         const temp = newBoard[closestIndex!];
         newBoard[closestIndex!] = newBoard[selectedPosition!];
-        newBoard[selectedPosition!] = temp;
+        newBoard[selectedPosition!] = isCaptured ? " " : temp;
         return newBoard;
       });
     },

@@ -2,7 +2,7 @@ import { Player, SanPiece, tilesPerRow } from "utils";
 
 const isValidPawnMove = ({
   player,
-  // board,
+  board,
   origin,
   destination,
 }: {
@@ -10,31 +10,66 @@ const isValidPawnMove = ({
   board: SanPiece[];
   origin: number;
   destination: number;
-}): boolean => {
-  // console.log(origin, destination);
-  let res: boolean = false;
+}): {
+  isValid: boolean;
+  isCaptured: boolean;
+} => {
+  let isValid: boolean = false;
+  let isCaptured: boolean = false;
   if (player === "white") {
-    if (origin - 2 * tilesPerRow === destination) {
-      // handle white first move
-      console.log("white first move");
-      res = true;
-    } else if (origin - tilesPerRow === destination) {
+    if (
+      origin - 2 * tilesPerRow === destination &&
+      origin >= 6 * tilesPerRow &&
+      origin <= 7 * tilesPerRow &&
+      board[destination] === " " &&
+      board[destination + tilesPerRow] === " "
+    ) {
+      // handle white special first move
+      isValid = true;
+    } else if (origin - tilesPerRow === destination && board[destination] === " ") {
       // handle white normal move
-      console.log("white normal move");
-      res = true;
+      isValid = true;
+    } else if (origin - tilesPerRow - 1 === destination && origin % tilesPerRow !== 0 && board[destination] !== " ") {
+      // handle white capture left
+      isValid = true;
+      isCaptured = true;
+    } else if (
+      origin - tilesPerRow + 1 === destination &&
+      origin % tilesPerRow !== tilesPerRow - 1 &&
+      board[destination] !== " "
+    ) {
+      // handle white capture right
+      isValid = true;
+      isCaptured = true;
     }
   } else {
-    if (origin + 2 * tilesPerRow === destination) {
-      // handle black first move
-      console.log("black first move");
-      res = true;
-    } else if (origin + tilesPerRow === destination) {
+    if (
+      origin + 2 * tilesPerRow === destination &&
+      origin <= 2 * tilesPerRow &&
+      origin >= tilesPerRow &&
+      board[destination] === " " &&
+      board[destination - tilesPerRow] === " "
+    ) {
+      // handle black special first move
+      isValid = true;
+    } else if (origin + tilesPerRow === destination && board[destination] === " ") {
       // handle black normal move
-      console.log("black normal move");
-      res = true;
+      isValid = true;
+    } else if (origin + tilesPerRow - 1 === destination && origin % tilesPerRow !== 0 && board[destination] !== " ") {
+      // handle black capture left
+      isValid = true;
+      isCaptured = true;
+    } else if (
+      origin + tilesPerRow + 1 === destination &&
+      origin % tilesPerRow !== tilesPerRow - 1 &&
+      board[destination] !== " "
+    ) {
+      // handle black capture right
+      isValid = true;
+      isCaptured = true;
     }
   }
-  return res;
+  return { isValid, isCaptured };
 };
 
 export const isValidMove = ({
@@ -47,48 +82,53 @@ export const isValidMove = ({
   board: SanPiece[];
   origin: number;
   destination: number;
-}): boolean => {
-  let res: boolean = false;
+}): {
+  isValid: boolean;
+  isCaptured: boolean;
+} => {
+  let isValid: boolean = false;
+  let isCaptured: boolean = false;
   switch (piece) {
     case "P":
-      res = isValidPawnMove({ player: "white", board, origin, destination });
+      ({ isValid, isCaptured } = isValidPawnMove({ player: "white", board, origin, destination }));
       break;
     case "N":
-      // res = isValidKnightMove({ board, origin, destination });
+      // isValid = isValidKnightMove({ board, origin, destination });
       break;
     case "B":
-      // res = isValidBishopMove({ board, origin, destination });
+      // isValid = isValidBishopMove({ board, origin, destination });
       break;
     case "R":
-      // res = isValidRookMove({ board, origin, destination });
+      // isValid = isValidRookMove({ board, origin, destination });
       break;
     case "Q":
-      // res = isValidQueenMove({ board, origin, destination });
+      // isValid = isValidQueenMove({ board, origin, destination });
       break;
     case "K":
-      // res = isValidKingMove({ board, origin, destination });
+      // isValid = isValidKingMove({ board, origin, destination });
       break;
     case "p":
-      res = isValidPawnMove({ player: "black", board, origin, destination });
+      ({ isValid, isCaptured } = isValidPawnMove({ player: "black", board, origin, destination }));
       break;
     case "n":
-      // res = isValidKnightMove({ board, origin, destination });
+      // isValid = isValidKnightMove({ board, origin, destination });
       break;
     case "b":
-      // res = isValidBishopMove({ board, origin, destination });
+      // isValid = isValidBishopMove({ board, origin, destination });
       break;
     case "r":
-      // res = isValidRookMove({ board, origin, destination });
+      // isValid = isValidRookMove({ board, origin, destination });
       break;
     case "q":
-      // res = isValidQueenMove({ board, origin, destination });
+      // isValid = isValidQueenMove({ board, origin, destination });
       break;
     case "k":
-      // res = isValidKingMove({ board, origin, destination });
+      // isValid = isValidKingMove({ board, origin, destination });
       break;
     default:
-      res = false;
+      isValid = false;
+      isCaptured = false;
       break;
   }
-  return res;
+  return { isValid, isCaptured };
 };
