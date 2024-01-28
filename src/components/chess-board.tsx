@@ -77,12 +77,12 @@ const ChessBoard = () => {
         clearSelectionContext();
         return;
       }
-      const { isValid, isCaptured } = isValidMove({
+      const { isValid, isCaptured, isEnPassantCapured, enPassantCapturePieceIndex } = isValidMove({
         piece: board[originIndex],
         board,
         playerTurn,
         origin: originIndex,
-        destination: destinationIndex!,
+        destination: destinationIndex,
       });
       if (!isValid) {
         clearSelectionContext();
@@ -92,6 +92,8 @@ const ChessBoard = () => {
         originIndex,
         destinationIndex,
         isCaptured,
+        isEnPassantCapured,
+        enPassantCapturePieceIndex,
       });
     },
     [board, playerTurn],

@@ -11,10 +11,14 @@ const GameStateContext = createContext(
       originIndex,
       destinationIndex,
       isCaptured,
+      isEnPassantCapured,
+      enPassantCapturePieceIndex,
     }: {
       originIndex: number;
       destinationIndex: number;
       isCaptured: boolean;
+      isEnPassantCapured: boolean;
+      enPassantCapturePieceIndex: number | undefined;
     }) => void;
     setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
   },
@@ -32,17 +36,27 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     originIndex,
     destinationIndex,
     isCaptured,
+    isEnPassantCapured,
+    enPassantCapturePieceIndex,
   }: {
     originIndex: number;
     destinationIndex: number;
     isCaptured: boolean;
+    isEnPassantCapured: boolean;
+    enPassantCapturePieceIndex: number | undefined;
   }) => {
-    console.log("updateBoard");
     setBoard((prevBoard) => {
       const newBoard = [...prevBoard];
       const temp = newBoard[destinationIndex];
       newBoard[destinationIndex] = newBoard[originIndex];
-      newBoard[originIndex] = isCaptured ? " " : temp;
+      if (isEnPassantCapured && enPassantCapturePieceIndex) {
+        newBoard[enPassantCapturePieceIndex] = " ";
+        newBoard[originIndex] = " ";
+      } else if (isCaptured) {
+        newBoard[originIndex] = " ";
+      } else {
+        newBoard[originIndex] = temp;
+      }
       return newBoard;
     });
   };

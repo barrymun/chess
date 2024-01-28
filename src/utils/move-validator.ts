@@ -1,5 +1,9 @@
 import { Player, SanPiece, tilesPerRow } from "utils";
 
+let isLastMoveVulnerableToEnPassant: boolean = false;
+let enPassantCapturePieceIndex: number | undefined = undefined;
+// let lastMoveDestinationIndex: number | undefined = undefined;
+
 const isValidPawnMove = ({
   player,
   board,
@@ -13,9 +17,11 @@ const isValidPawnMove = ({
 }): {
   isValid: boolean;
   isCaptured: boolean;
+  isEnPassantCapured: boolean;
 } => {
   let isValid: boolean = false;
   let isCaptured: boolean = false;
+  let isEnPassantCapured: boolean = false;
   const multiplier = player === "white" ? -1 : 1;
   const specialFirstMoveLowerBounds = player === "white" ? 6 * tilesPerRow : 1 * tilesPerRow;
   const specialFirstMoveUpperBounds = player === "white" ? 7 * tilesPerRow : 2 * tilesPerRow;
@@ -28,9 +34,14 @@ const isValidPawnMove = ({
   ) {
     // handle special first move
     isValid = true;
+    console.log("special first move");
+    isLastMoveVulnerableToEnPassant = true;
+    enPassantCapturePieceIndex = destination;
   } else if (origin + multiplier * tilesPerRow === destination && board[destination] === " ") {
     // handle normal move
     isValid = true;
+    isLastMoveVulnerableToEnPassant = false;
+    enPassantCapturePieceIndex = undefined;
   } else if (
     origin + multiplier * tilesPerRow - 1 === destination &&
     origin % tilesPerRow !== 0 &&
@@ -39,6 +50,8 @@ const isValidPawnMove = ({
     // handle capture left
     isValid = true;
     isCaptured = true;
+    isLastMoveVulnerableToEnPassant = false;
+    enPassantCapturePieceIndex = undefined;
   } else if (
     origin + multiplier * tilesPerRow + 1 === destination &&
     origin % tilesPerRow !== tilesPerRow - 1 &&
@@ -47,8 +60,38 @@ const isValidPawnMove = ({
     // handle capture right
     isValid = true;
     isCaptured = true;
+  } else if (isLastMoveVulnerableToEnPassant) {
+    console.log(isLastMoveVulnerableToEnPassant);
+    console.log(board[enPassantCapturePieceIndex!]);
+    // TODO: something wrong with en passant; can capture even if the enPassantCapturePieceIndex does not match
+    if (
+      origin + multiplier * tilesPerRow - 1 === destination &&
+      origin - 1 === enPassantCapturePieceIndex &&
+      origin % tilesPerRow !== 0 &&
+      board[destination] === " " &&
+      board[enPassantCapturePieceIndex] === (player === "white" ? "p" : "P")
+    ) {
+      // handle en passant left
+      isValid = true;
+      isCaptured = true;
+      isEnPassantCapured = true;
+      isLastMoveVulnerableToEnPassant = false;
+    } else if (
+      origin + multiplier * tilesPerRow + 1 === destination &&
+      origin + 1 === enPassantCapturePieceIndex &&
+      origin % tilesPerRow !== tilesPerRow - 1 &&
+      board[destination] === " " &&
+      board[enPassantCapturePieceIndex] === (player === "white" ? "p" : "P")
+    ) {
+      // handle en passant right
+      isValid = true;
+      isCaptured = true;
+      isEnPassantCapured = true;
+      isLastMoveVulnerableToEnPassant = false;
+    }
   }
-  return { isValid, isCaptured };
+  // lastMoveDestinationIndex = destination;
+  return { isValid, isCaptured, isEnPassantCapured };
 };
 
 export const isValidMove = ({
@@ -66,13 +109,21 @@ export const isValidMove = ({
 }): {
   isValid: boolean;
   isCaptured: boolean;
+  isEnPassantCapured: boolean;
+  enPassantCapturePieceIndex: number | undefined;
 } => {
   let isValid: boolean = false;
   let isCaptured: boolean = false;
+  let isEnPassantCapured: boolean = false;
   switch (piece) {
     case "P":
       if (playerTurn === "white") {
-        ({ isValid, isCaptured } = isValidPawnMove({ player: "white", board, origin, destination }));
+        ({ isValid, isCaptured, isEnPassantCapured } = isValidPawnMove({
+          player: "white",
+          board,
+          origin,
+          destination,
+        }));
       }
       break;
     case "N":
@@ -92,7 +143,12 @@ export const isValidMove = ({
       break;
     case "p":
       if (playerTurn === "black") {
-        ({ isValid, isCaptured } = isValidPawnMove({ player: "black", board, origin, destination }));
+        ({ isValid, isCaptured, isEnPassantCapured } = isValidPawnMove({
+          player: "black",
+          board,
+          origin,
+          destination,
+        }));
       }
       break;
     case "n":
@@ -111,9 +167,10 @@ export const isValidMove = ({
       // isValid = isValidKingMove({ board, origin, destination });
       break;
     default:
-      isValid = false;
-      isCaptured = false;
       break;
   }
-  return { isValid, isCaptured };
+  if (isValid) {
+    console.log({ isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex });
+  }
+  return { isValid, isCaptured, isEnPassantCapured, enPassantCapturePieceIndex };
 };
