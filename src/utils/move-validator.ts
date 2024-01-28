@@ -16,58 +16,37 @@ const isValidPawnMove = ({
 } => {
   let isValid: boolean = false;
   let isCaptured: boolean = false;
-  if (player === "white") {
-    if (
-      origin - 2 * tilesPerRow === destination &&
-      origin >= 6 * tilesPerRow &&
-      origin <= 7 * tilesPerRow &&
-      board[destination] === " " &&
-      board[destination + tilesPerRow] === " "
-    ) {
-      // handle white special first move
-      isValid = true;
-    } else if (origin - tilesPerRow === destination && board[destination] === " ") {
-      // handle white normal move
-      isValid = true;
-    } else if (origin - tilesPerRow - 1 === destination && origin % tilesPerRow !== 0 && board[destination] !== " ") {
-      // handle white capture left
-      isValid = true;
-      isCaptured = true;
-    } else if (
-      origin - tilesPerRow + 1 === destination &&
-      origin % tilesPerRow !== tilesPerRow - 1 &&
-      board[destination] !== " "
-    ) {
-      // handle white capture right
-      isValid = true;
-      isCaptured = true;
-    }
-  } else {
-    if (
-      origin + 2 * tilesPerRow === destination &&
-      origin <= 2 * tilesPerRow &&
-      origin >= tilesPerRow &&
-      board[destination] === " " &&
-      board[destination - tilesPerRow] === " "
-    ) {
-      // handle black special first move
-      isValid = true;
-    } else if (origin + tilesPerRow === destination && board[destination] === " ") {
-      // handle black normal move
-      isValid = true;
-    } else if (origin + tilesPerRow - 1 === destination && origin % tilesPerRow !== 0 && board[destination] !== " ") {
-      // handle black capture left
-      isValid = true;
-      isCaptured = true;
-    } else if (
-      origin + tilesPerRow + 1 === destination &&
-      origin % tilesPerRow !== tilesPerRow - 1 &&
-      board[destination] !== " "
-    ) {
-      // handle black capture right
-      isValid = true;
-      isCaptured = true;
-    }
+  const multiplier = player === "white" ? -1 : 1;
+  const specialFirstMoveLowerBounds = player === "white" ? 6 * tilesPerRow : 1 * tilesPerRow;
+  const specialFirstMoveUpperBounds = player === "white" ? 7 * tilesPerRow : 2 * tilesPerRow;
+  if (
+    origin + multiplier * 2 * tilesPerRow === destination &&
+    origin >= specialFirstMoveLowerBounds &&
+    origin <= specialFirstMoveUpperBounds &&
+    board[destination] === " " &&
+    board[destination + tilesPerRow] === " "
+  ) {
+    // handle special first move
+    isValid = true;
+  } else if (origin + multiplier * tilesPerRow === destination && board[destination] === " ") {
+    // handle normal move
+    isValid = true;
+  } else if (
+    origin + multiplier * tilesPerRow - 1 === destination &&
+    origin % tilesPerRow !== 0 &&
+    board[destination] !== " "
+  ) {
+    // handle capture left
+    isValid = true;
+    isCaptured = true;
+  } else if (
+    origin + multiplier * tilesPerRow + 1 === destination &&
+    origin % tilesPerRow !== tilesPerRow - 1 &&
+    board[destination] !== " "
+  ) {
+    // handle capture right
+    isValid = true;
+    isCaptured = true;
   }
   return { isValid, isCaptured };
 };
