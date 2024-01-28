@@ -1,11 +1,22 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { isEqual } from "lodash";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { SanPiece, defaultBoard } from "utils";
+import { Player, SanPiece, defaultBoard } from "utils";
 
 const GameStateContext = createContext(
   {} as {
     board: SanPiece[];
-    setBoard: React.Dispatch<React.SetStateAction<SanPiece[]>>;
+    playerTurn: Player;
+    updateBoard: ({
+      originIndex,
+      destinationIndex,
+      isCaptured,
+    }: {
+      originIndex: number;
+      destinationIndex: number;
+      isCaptured: boolean;
+    }) => void;
+    setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
   },
 );
 
@@ -15,13 +26,42 @@ interface GameStateProviderProps {
 
 const GameStateProvider = ({ children }: GameStateProviderProps) => {
   const [board, setBoard] = useState<SanPiece[]>(defaultBoard);
+  const [playerTurn, setPlayerTurn] = useState<Player>("white");
+
+  const updateBoard = ({
+    originIndex,
+    destinationIndex,
+    isCaptured,
+  }: {
+    originIndex: number;
+    destinationIndex: number;
+    isCaptured: boolean;
+  }) => {
+    console.log("updateBoard");
+    setBoard((prevBoard) => {
+      const newBoard = [...prevBoard];
+      const temp = newBoard[destinationIndex];
+      newBoard[destinationIndex] = newBoard[originIndex];
+      newBoard[originIndex] = isCaptured ? " " : temp;
+      return newBoard;
+    });
+  };
+
+  useEffect(() => {
+    if (isEqual(board, defaultBoard)) {
+      return;
+    }
+    setPlayerTurn((prevPlayerTurn) => (prevPlayerTurn === "white" ? "black" : "white"));
+  }, [board]);
 
   const value = useMemo(
     () => ({
       board,
-      setBoard,
+      playerTurn,
+      updateBoard,
+      setPlayerTurn,
     }),
-    [board, setBoard],
+    [board, playerTurn, updateBoard, setPlayerTurn],
   );
 
   return <GameStateContext.Provider value={value}>{children}</GameStateContext.Provider>;

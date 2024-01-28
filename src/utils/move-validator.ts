@@ -24,7 +24,7 @@ const isValidPawnMove = ({
     origin >= specialFirstMoveLowerBounds &&
     origin <= specialFirstMoveUpperBounds &&
     board[destination] === " " &&
-    board[destination + tilesPerRow] === " "
+    board[destination - multiplier * tilesPerRow] === " "
   ) {
     // handle special first move
     isValid = true;
@@ -54,11 +54,13 @@ const isValidPawnMove = ({
 export const isValidMove = ({
   piece,
   board,
+  playerTurn,
   origin,
   destination,
 }: {
   piece: SanPiece;
   board: SanPiece[];
+  playerTurn: Player;
   origin: number;
   destination: number;
 }): {
@@ -69,7 +71,9 @@ export const isValidMove = ({
   let isCaptured: boolean = false;
   switch (piece) {
     case "P":
-      ({ isValid, isCaptured } = isValidPawnMove({ player: "white", board, origin, destination }));
+      if (playerTurn === "white") {
+        ({ isValid, isCaptured } = isValidPawnMove({ player: "white", board, origin, destination }));
+      }
       break;
     case "N":
       // isValid = isValidKnightMove({ board, origin, destination });
@@ -87,7 +91,9 @@ export const isValidMove = ({
       // isValid = isValidKingMove({ board, origin, destination });
       break;
     case "p":
-      ({ isValid, isCaptured } = isValidPawnMove({ player: "black", board, origin, destination }));
+      if (playerTurn === "black") {
+        ({ isValid, isCaptured } = isValidPawnMove({ player: "black", board, origin, destination }));
+      }
       break;
     case "n":
       // isValid = isValidKnightMove({ board, origin, destination });

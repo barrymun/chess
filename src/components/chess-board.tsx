@@ -5,12 +5,12 @@ import { useGameState } from "hooks";
 import { isValidMove, pieceSize } from "utils";
 
 let isMouseDown: boolean = false;
-let selectedPosition: number | undefined = undefined;
+let originIndex: number | undefined = undefined;
 let selectedPiece: HTMLDivElement | undefined = undefined;
 
 const ChessBoard = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const { board, setBoard } = useGameState();
+  const { board, playerTurn, updateBoard } = useGameState();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
@@ -18,7 +18,7 @@ const ChessBoard = () => {
     target.style.top = `${clientY - pieceSize / 2}px`;
     target.style.position = "absolute";
     isMouseDown = true;
-    selectedPosition = position;
+    originIndex = position;
     selectedPiece = target;
   };
 
@@ -49,17 +49,17 @@ const ChessBoard = () => {
       selectedPiece.style.position = "";
     }
     isMouseDown = false;
-    selectedPosition = undefined;
+    originIndex = undefined;
     selectedPiece = undefined;
   };
 
   const dropPiece = useCallback(
     (e: MouseEvent) => {
-      if (!selectedPosition || !selectedPiece) {
+      if (!originIndex || !selectedPiece) {
         return;
       }
       const { clientX, clientY } = e;
-      let closestIndex: number | undefined = undefined;
+      let destinationIndex: number | undefined = undefined;
       let closestChild: HTMLDivElement | undefined = undefined;
       let closestDistance: number = Number.MAX_SAFE_INTEGER;
       Array.from(boardRef.current?.children ?? []).forEach((child, index) => {
@@ -68,34 +68,33 @@ const ChessBoard = () => {
         const childY = top + height / 2;
         const distance = Math.sqrt((clientX - childX) ** 2 + (clientY - childY) ** 2);
         if (distance < closestDistance) {
-          closestIndex = index;
+          destinationIndex = index;
           closestChild = child as HTMLDivElement;
           closestDistance = distance;
         }
       });
-      if (!closestIndex || !closestChild) {
+      if (!destinationIndex || !closestChild) {
         clearSelectionContext();
         return;
       }
       const { isValid, isCaptured } = isValidMove({
-        piece: board[selectedPosition],
+        piece: board[originIndex],
         board,
-        origin: selectedPosition,
-        destination: closestIndex!,
+        playerTurn,
+        origin: originIndex,
+        destination: destinationIndex!,
       });
       if (!isValid) {
         clearSelectionContext();
         return;
       }
-      setBoard((prevBoard) => {
-        const newBoard = [...prevBoard];
-        const temp = newBoard[closestIndex!];
-        newBoard[closestIndex!] = newBoard[selectedPosition!];
-        newBoard[selectedPosition!] = isCaptured ? " " : temp;
-        return newBoard;
+      updateBoard({
+        originIndex,
+        destinationIndex,
+        isCaptured,
       });
     },
-    [board],
+    [board, playerTurn],
   );
 
   useEffect(() => {
@@ -109,7 +108,7 @@ const ChessBoard = () => {
       window.removeEventListener("mousemove", movePiece);
       window.removeEventListener("mouseup", dropPiece);
     };
-  }, [board]);
+  }, [board, playerTurn]);
 
   return (
     <div className="bg-chess-board rounded-md truncate">
