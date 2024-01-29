@@ -7,19 +7,7 @@ const GameStateContext = createContext(
   {} as {
     board: SanPiece[];
     playerTurn: Player;
-    updateBoard: ({
-      originIndex,
-      destinationIndex,
-      isCaptured,
-      isEnPassantCapured,
-      enPassantCapturePieceIndex,
-    }: {
-      originIndex: number;
-      destinationIndex: number;
-      isCaptured: boolean;
-      isEnPassantCapured: boolean;
-      enPassantCapturePieceIndex: number | undefined;
-    }) => void;
+    updateBoard: (boardUpdates: Record<number, SanPiece>) => void;
     setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
   },
 );
@@ -32,31 +20,12 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
   const [board, setBoard] = useState<SanPiece[]>(defaultBoard);
   const [playerTurn, setPlayerTurn] = useState<Player>("white");
 
-  const updateBoard = ({
-    originIndex,
-    destinationIndex,
-    isCaptured,
-    isEnPassantCapured,
-    enPassantCapturePieceIndex,
-  }: {
-    originIndex: number;
-    destinationIndex: number;
-    isCaptured: boolean;
-    isEnPassantCapured: boolean;
-    enPassantCapturePieceIndex: number | undefined;
-  }) => {
+  const updateBoard = (boardUpdates: Record<number, SanPiece>) => {
     setBoard((prevBoard) => {
       const newBoard = [...prevBoard];
-      const temp = newBoard[destinationIndex];
-      newBoard[destinationIndex] = newBoard[originIndex];
-      if (isEnPassantCapured && enPassantCapturePieceIndex) {
-        newBoard[enPassantCapturePieceIndex] = " ";
-        newBoard[originIndex] = " ";
-      } else if (isCaptured) {
-        newBoard[originIndex] = " ";
-      } else {
-        newBoard[originIndex] = temp;
-      }
+      Object.entries(boardUpdates).forEach(([index, piece]) => {
+        newBoard[Number(index)] = piece;
+      });
       return newBoard;
     });
   };

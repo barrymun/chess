@@ -4,6 +4,11 @@ let isLastMoveVulnerableToEnPassant: boolean = false;
 let enPassantCapturePieceIndex: number | undefined = undefined;
 // let lastMoveDestinationIndex: number | undefined = undefined;
 
+interface MoveValidatorResponse {
+  isValid: boolean;
+  boardUpdates: Record<number, SanPiece>;
+}
+
 const isValidPawnMove = ({
   player,
   board,
@@ -14,17 +19,15 @@ const isValidPawnMove = ({
   board: SanPiece[];
   origin: number;
   destination: number;
-}): {
-  isValid: boolean;
-  isCaptured: boolean;
-  isEnPassantCapured: boolean;
-} => {
+}): MoveValidatorResponse => {
   let isValid: boolean = false;
-  let isCaptured: boolean = false;
-  let isEnPassantCapured: boolean = false;
+  let boardUpdates: Record<number, SanPiece> = {};
   const multiplier = player === "white" ? -1 : 1;
   const specialFirstMoveLowerBounds = player === "white" ? 6 * tilesPerRow : 1 * tilesPerRow;
   const specialFirstMoveUpperBounds = player === "white" ? 7 * tilesPerRow : 2 * tilesPerRow;
+  const isNormalLeftCapture = origin + multiplier * tilesPerRow - 1 === destination && origin % tilesPerRow !== 0;
+  const isNormalRightCapture =
+    origin + multiplier * tilesPerRow + 1 === destination && origin % tilesPerRow !== tilesPerRow - 1;
   if (
     origin + multiplier * 2 * tilesPerRow === destination &&
     origin >= specialFirstMoveLowerBounds &&
@@ -34,7 +37,6 @@ const isValidPawnMove = ({
   ) {
     // handle special first move
     isValid = true;
-    console.log("special first move");
     isLastMoveVulnerableToEnPassant = true;
     enPassantCapturePieceIndex = destination;
   } else if (origin + multiplier * tilesPerRow === destination && board[destination] === " ") {
@@ -42,56 +44,37 @@ const isValidPawnMove = ({
     isValid = true;
     isLastMoveVulnerableToEnPassant = false;
     enPassantCapturePieceIndex = undefined;
-  } else if (
-    origin + multiplier * tilesPerRow - 1 === destination &&
-    origin % tilesPerRow !== 0 &&
-    board[destination] !== " "
-  ) {
-    // handle capture left
+  } else if ((isNormalLeftCapture || isNormalRightCapture) && board[destination] !== " ") {
+    // handle normal left/right capture
     isValid = true;
-    isCaptured = true;
     isLastMoveVulnerableToEnPassant = false;
     enPassantCapturePieceIndex = undefined;
-  } else if (
-    origin + multiplier * tilesPerRow + 1 === destination &&
-    origin % tilesPerRow !== tilesPerRow - 1 &&
-    board[destination] !== " "
-  ) {
-    // handle capture right
-    isValid = true;
-    isCaptured = true;
-  } else if (isLastMoveVulnerableToEnPassant) {
-    console.log(isLastMoveVulnerableToEnPassant);
-    console.log(board[enPassantCapturePieceIndex!]);
-    // TODO: something wrong with en passant; can capture even if the enPassantCapturePieceIndex does not match
-    if (
+  } else if (isLastMoveVulnerableToEnPassant && enPassantCapturePieceIndex) {
+    const isEnPassantLeftCapture =
       origin + multiplier * tilesPerRow - 1 === destination &&
       origin - 1 === enPassantCapturePieceIndex &&
-      origin % tilesPerRow !== 0 &&
-      board[destination] === " " &&
-      board[enPassantCapturePieceIndex] === (player === "white" ? "p" : "P")
-    ) {
-      // handle en passant left
-      isValid = true;
-      isCaptured = true;
-      isEnPassantCapured = true;
-      isLastMoveVulnerableToEnPassant = false;
-    } else if (
+      origin % tilesPerRow !== 0;
+    const isEnPassantRightCapture =
       origin + multiplier * tilesPerRow + 1 === destination &&
       origin + 1 === enPassantCapturePieceIndex &&
-      origin % tilesPerRow !== tilesPerRow - 1 &&
+      origin % tilesPerRow !== tilesPerRow - 1;
+    if (
+      (isEnPassantLeftCapture || isEnPassantRightCapture) &&
       board[destination] === " " &&
       board[enPassantCapturePieceIndex] === (player === "white" ? "p" : "P")
     ) {
-      // handle en passant right
+      // handle en passant left/right capture
       isValid = true;
-      isCaptured = true;
-      isEnPassantCapured = true;
+      boardUpdates = { ...boardUpdates, [enPassantCapturePieceIndex]: " " };
       isLastMoveVulnerableToEnPassant = false;
+      enPassantCapturePieceIndex = undefined;
     }
   }
+  if (isValid) {
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "P" : "p" };
+  }
   // lastMoveDestinationIndex = destination;
-  return { isValid, isCaptured, isEnPassantCapured };
+  return { isValid, boardUpdates };
 };
 
 export const isValidMove = ({
@@ -106,19 +89,13 @@ export const isValidMove = ({
   playerTurn: Player;
   origin: number;
   destination: number;
-}): {
-  isValid: boolean;
-  isCaptured: boolean;
-  isEnPassantCapured: boolean;
-  enPassantCapturePieceIndex: number | undefined;
-} => {
+}): MoveValidatorResponse => {
   let isValid: boolean = false;
-  let isCaptured: boolean = false;
-  let isEnPassantCapured: boolean = false;
+  let boardUpdates: Record<number, SanPiece> = {};
   switch (piece) {
     case "P":
       if (playerTurn === "white") {
-        ({ isValid, isCaptured, isEnPassantCapured } = isValidPawnMove({
+        ({ isValid, boardUpdates } = isValidPawnMove({
           player: "white",
           board,
           origin,
@@ -143,7 +120,7 @@ export const isValidMove = ({
       break;
     case "p":
       if (playerTurn === "black") {
-        ({ isValid, isCaptured, isEnPassantCapured } = isValidPawnMove({
+        ({ isValid, boardUpdates } = isValidPawnMove({
           player: "black",
           board,
           origin,
@@ -169,8 +146,5 @@ export const isValidMove = ({
     default:
       break;
   }
-  if (isValid) {
-    console.log({ isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex });
-  }
-  return { isValid, isCaptured, isEnPassantCapured, enPassantCapturePieceIndex };
+  return { isValid, boardUpdates };
 };

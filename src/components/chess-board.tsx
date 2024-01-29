@@ -73,28 +73,22 @@ const ChessBoard = () => {
           closestDistance = distance;
         }
       });
-      if (!destinationIndex || !closestChild) {
+      if (destinationIndex === undefined || closestChild === undefined) {
         clearSelectionContext();
         return;
       }
-      const { isValid, isCaptured, isEnPassantCapured, enPassantCapturePieceIndex } = isValidMove({
+      const { isValid, boardUpdates } = isValidMove({
         piece: board[originIndex],
         board,
         playerTurn,
         origin: originIndex,
         destination: destinationIndex,
       });
-      if (!isValid) {
+      if (!isValid || Object.keys(boardUpdates).length === 0) {
         clearSelectionContext();
         return;
       }
-      updateBoard({
-        originIndex,
-        destinationIndex,
-        isCaptured,
-        isEnPassantCapured,
-        enPassantCapturePieceIndex,
-      });
+      updateBoard(boardUpdates);
     },
     [board, playerTurn],
   );
