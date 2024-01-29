@@ -5,8 +5,8 @@ import { useGameState } from "hooks";
 import { isValidMove, pieceSize } from "utils";
 
 let isMouseDown: boolean = false;
-let originIndex: number | undefined = undefined;
-let selectedPiece: HTMLDivElement | undefined = undefined;
+let originIndex: number | null = null;
+let selectedPiece: HTMLDivElement | null = null;
 
 const ChessBoard = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -23,7 +23,7 @@ const ChessBoard = () => {
   };
 
   const movePiece = (e: MouseEvent) => {
-    if (!isMouseDown || !selectedPiece) {
+    if (!isMouseDown || selectedPiece === null) {
       return;
     }
     const { clientX, clientY } = e;
@@ -49,18 +49,18 @@ const ChessBoard = () => {
       selectedPiece.style.position = "";
     }
     isMouseDown = false;
-    originIndex = undefined;
-    selectedPiece = undefined;
+    originIndex = null;
+    selectedPiece = null;
   };
 
   const dropPiece = useCallback(
     (e: MouseEvent) => {
-      if (!originIndex || !selectedPiece) {
+      if (originIndex === null || selectedPiece === null) {
         return;
       }
       const { clientX, clientY } = e;
-      let destinationIndex: number | undefined = undefined;
-      let closestChild: HTMLDivElement | undefined = undefined;
+      let destinationIndex: number | null = null;
+      let closestChild: HTMLDivElement | null = null;
       let closestDistance: number = Number.MAX_SAFE_INTEGER;
       Array.from(boardRef.current?.children ?? []).forEach((child, index) => {
         const { left, top, width, height } = child.getBoundingClientRect();
@@ -73,7 +73,7 @@ const ChessBoard = () => {
           closestDistance = distance;
         }
       });
-      if (destinationIndex === undefined || closestChild === undefined) {
+      if (destinationIndex === null || closestChild === null) {
         clearSelectionContext();
         return;
       }

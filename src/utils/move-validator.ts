@@ -1,8 +1,8 @@
 import { Player, SanPiece, tilesPerRow } from "utils";
 
 let isLastMoveVulnerableToEnPassant: boolean = false;
-let enPassantCapturePieceIndex: number | undefined = undefined;
-// let lastMoveDestinationIndex: number | undefined = undefined;
+let enPassantCapturePieceIndex: number | null = null;
+// let lastMoveDestinationIndex: number | null = null;
 
 interface MoveValidatorResponse {
   isValid: boolean;
@@ -43,12 +43,12 @@ const isValidPawnMove = ({
     // handle normal move
     isValid = true;
     isLastMoveVulnerableToEnPassant = false;
-    enPassantCapturePieceIndex = undefined;
+    enPassantCapturePieceIndex = null;
   } else if ((isNormalLeftCapture || isNormalRightCapture) && board[destination] !== " ") {
     // handle normal left/right capture
     isValid = true;
     isLastMoveVulnerableToEnPassant = false;
-    enPassantCapturePieceIndex = undefined;
+    enPassantCapturePieceIndex = null;
   } else if (isLastMoveVulnerableToEnPassant && enPassantCapturePieceIndex) {
     const isEnPassantLeftCapture =
       origin + multiplier * tilesPerRow - 1 === destination &&
@@ -67,7 +67,7 @@ const isValidPawnMove = ({
       isValid = true;
       boardUpdates = { ...boardUpdates, [enPassantCapturePieceIndex]: " " };
       isLastMoveVulnerableToEnPassant = false;
-      enPassantCapturePieceIndex = undefined;
+      enPassantCapturePieceIndex = null;
     }
   }
   if (isValid) {
