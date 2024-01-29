@@ -11,7 +11,7 @@ interface MoveValidatorResponse {
 
 const getPlayerMultiplier = (player: Player): number => (player === "white" ? -1 : 1);
 
-const isCapturingEnemyPiece = ({
+const getIsCapturingEnemyPiece = ({
   player,
   board,
   destination,
@@ -20,12 +20,58 @@ const isCapturingEnemyPiece = ({
   board: SanPiece[];
   destination: number;
 }): boolean => {
-  return player === "white"
-    ? blackSanPieces.includes(board[destination] as SanPieceBlack)
-    : whiteSanPieces.includes(board[destination] as SanPieceWhite);
+  const isCapturingEnemyPiece =
+    player === "white"
+      ? blackSanPieces.includes(board[destination] as SanPieceBlack)
+      : whiteSanPieces.includes(board[destination] as SanPieceWhite);
+  return isCapturingEnemyPiece && board[destination] !== " ";
 };
 
-const isValidPawnMove = ({
+const getIsDiagonalMove = ({ origin, destination }: { origin: number; destination: number }): boolean => {
+  return (
+    Math.abs(destination - origin) % (tilesPerRow - 1) === 0 || Math.abs(destination - origin) % (tilesPerRow + 1) === 0
+  );
+};
+
+const getIsDiagonalClear = ({
+  board,
+  origin,
+  destination,
+}: {
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): boolean => {
+  let mult = 1;
+  let start = origin;
+  let end = destination;
+  if (end < start) {
+    start = destination;
+    end = origin;
+    mult = -1;
+  }
+  let isDiagonalClearLeft: boolean = true;
+  for (let i = start; i <= end; i = i + tilesPerRow - 1 * mult) {
+    console.log(i);
+    if (board[i] !== " " && i !== origin && i !== destination) {
+      console.log("fail_left");
+      isDiagonalClearLeft = false;
+    }
+  }
+  console.log("=============");
+  let isDiagonalClearRight: boolean = true;
+  for (let i = start; i <= end; i = i + tilesPerRow + 1 * mult) {
+    console.log(i);
+    if (board[i] !== " " && i !== origin && i !== destination) {
+      console.log("fail_right");
+      isDiagonalClearRight = false;
+    }
+  }
+  const isDiagonalClear = isDiagonalClearLeft || isDiagonalClearRight;
+  return isDiagonalClear;
+};
+
+const getIsValidPawnMove = ({
   player,
   board,
   origin,
@@ -93,7 +139,7 @@ const isValidPawnMove = ({
   return { isValid, boardUpdates };
 };
 
-const isValidBishopMove = ({
+const getIsValidBishopMove = ({
   player,
   board,
   origin,
@@ -106,38 +152,13 @@ const isValidBishopMove = ({
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
-  const isDiagonalMove =
-    Math.abs(destination - origin) % (tilesPerRow - 1) === 0 ||
-    Math.abs(destination - origin) % (tilesPerRow + 1) === 0;
-
-  let mult = 1;
-  let start = origin;
-  let end = destination;
-  if (end < start) {
-    start = destination;
-    end = origin;
-    mult = -1;
+  if (origin === destination) {
+    return { isValid, boardUpdates };
   }
-  let isDiagonalMoveLeftValid: boolean = true;
-  for (let i = start; i <= end; i = i + tilesPerRow - 1 * mult) {
-    if (board[i] !== " " && i !== origin) {
-      isDiagonalMoveLeftValid = false;
-    }
-  }
-  let isDiagonalMoveRightValid: boolean = true;
-  for (let i = start; i <= end; i = i + tilesPerRow + 1 * mult) {
-    if (board[i] !== " " && i !== origin) {
-      isDiagonalMoveRightValid = false;
-    }
-  }
-
-  const isDiagonalMoveValid =
-    isDiagonalMove && (isDiagonalMoveLeftValid || isDiagonalMoveRightValid) && board[destination] === " ";
-  const isDiagonalCapture =
-    isDiagonalMove && board[destination] !== " " && isCapturingEnemyPiece({ player, board, destination });
-  if (isDiagonalMoveValid) {
-    isValid = true;
-  } else if (isDiagonalCapture) {
+  const isDiagonalMove = getIsDiagonalMove({ origin, destination });
+  const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
+  const isDiagonalCapture = getIsCapturingEnemyPiece({ player, board, destination });
+  if ((isDiagonalMove && isDiagonalClear) || (isDiagonalMove && isDiagonalClear && isDiagonalCapture)) {
     isValid = true;
   }
   if (isValid) {
@@ -146,7 +167,7 @@ const isValidBishopMove = ({
   return { isValid, boardUpdates };
 };
 
-export const isValidMove = ({
+export const getIsValidMove = ({
   piece,
   board,
   playerTurn,
@@ -164,7 +185,7 @@ export const isValidMove = ({
   switch (piece) {
     case "P":
       if (playerTurn === "white") {
-        ({ isValid, boardUpdates } = isValidPawnMove({
+        ({ isValid, boardUpdates } = getIsValidPawnMove({
           player: "white",
           board,
           origin,
@@ -173,25 +194,25 @@ export const isValidMove = ({
       }
       break;
     case "N":
-      // isValid = isValidKnightMove({ board, origin, destination });
+      // isValid = getIsValidKnightMove({ board, origin, destination });
       break;
     case "B":
       if (playerTurn === "white") {
-        ({ isValid, boardUpdates } = isValidBishopMove({ player: "white", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidBishopMove({ player: "white", board, origin, destination }));
       }
       break;
     case "R":
-      // isValid = isValidRookMove({ board, origin, destination });
+      // isValid = getIsValidRookMove({ board, origin, destination });
       break;
     case "Q":
-      // isValid = isValidQueenMove({ board, origin, destination });
+      // isValid = getIsValidQueenMove({ board, origin, destination });
       break;
     case "K":
-      // isValid = isValidKingMove({ board, origin, destination });
+      // isValid = getIsValidKingMove({ board, origin, destination });
       break;
     case "p":
       if (playerTurn === "black") {
-        ({ isValid, boardUpdates } = isValidPawnMove({
+        ({ isValid, boardUpdates } = getIsValidPawnMove({
           player: "black",
           board,
           origin,
@@ -200,21 +221,21 @@ export const isValidMove = ({
       }
       break;
     case "n":
-      // isValid = isValidKnightMove({ board, origin, destination });
+      // isValid = getIsValidKnightMove({ board, origin, destination });
       break;
     case "b":
       if (playerTurn === "black") {
-        ({ isValid, boardUpdates } = isValidBishopMove({ player: "black", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidBishopMove({ player: "black", board, origin, destination }));
       }
       break;
     case "r":
-      // isValid = isValidRookMove({ board, origin, destination });
+      // isValid = getIsValidRookMove({ board, origin, destination });
       break;
     case "q":
-      // isValid = isValidQueenMove({ board, origin, destination });
+      // isValid = getIsValidQueenMove({ board, origin, destination });
       break;
     case "k":
-      // isValid = isValidKingMove({ board, origin, destination });
+      // isValid = getIsValidKingMove({ board, origin, destination });
       break;
     default:
       break;
