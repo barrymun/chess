@@ -1,4 +1,4 @@
-import { SanPiece } from "utils";
+import { SanPiece, SanPieceBlack, SanPieceWhite } from "utils";
 
 export const xLabels = ["a", "b", "c", "d", "e", "f", "g", "h"];
 export const yLabels = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -31,4 +31,6 @@ export const assetSanPieceMap: Record<SanPiece, string> = {
   k: "king-b",
   " ": "empty",
 };
+export const whiteSanPieces: SanPieceWhite[] = ["P", "N", "B", "R", "Q", "K"];
+export const blackSanPieces: SanPieceBlack[] = ["p", "n", "b", "r", "q", "k"];
 export const pieceSize: number = 100;

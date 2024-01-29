@@ -27,3 +27,17 @@ export type SanPiece =
   | SanKingWhite
   | SanKingBlack
   | SanPieceEmpty;
+export type SanPieceWhite =
+  | SanPawnWhite
+  | SanKnightWhite
+  | SanBishopWhite
+  | SanRookWhite
+  | SanQueenWhite
+  | SanKingWhite;
+export type SanPieceBlack =
+  | SanPawnBlack
+  | SanKnightBlack
+  | SanBishopBlack
+  | SanRookBlack
+  | SanQueenBlack
+  | SanKingBlack;

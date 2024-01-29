@@ -1,4 +1,4 @@
-import { Player, SanPiece, tilesPerRow } from "utils";
+import { Player, SanPiece, SanPieceBlack, SanPieceWhite, blackSanPieces, tilesPerRow, whiteSanPieces } from "utils";
 
 let isLastMoveVulnerableToEnPassant: boolean = false;
 let enPassantCapturePieceIndex: number | null = null;
@@ -8,6 +8,22 @@ interface MoveValidatorResponse {
   isValid: boolean;
   boardUpdates: Record<number, SanPiece>;
 }
+
+const getPlayerMultiplier = (player: Player): number => (player === "white" ? -1 : 1);
+
+const isCapturingEnemyPiece = ({
+  player,
+  board,
+  destination,
+}: {
+  player: Player;
+  board: SanPiece[];
+  destination: number;
+}): boolean => {
+  return player === "white"
+    ? blackSanPieces.includes(board[destination] as SanPieceBlack)
+    : whiteSanPieces.includes(board[destination] as SanPieceWhite);
+};
 
 const isValidPawnMove = ({
   player,
@@ -22,7 +38,7 @@ const isValidPawnMove = ({
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
-  const multiplier = player === "white" ? -1 : 1;
+  const multiplier = getPlayerMultiplier(player);
   const specialFirstMoveLowerBounds = player === "white" ? 6 * tilesPerRow : 1 * tilesPerRow;
   const specialFirstMoveUpperBounds = player === "white" ? 7 * tilesPerRow : 2 * tilesPerRow;
   const isNormalLeftCapture = origin + multiplier * tilesPerRow - 1 === destination && origin % tilesPerRow !== 0;
@@ -77,6 +93,59 @@ const isValidPawnMove = ({
   return { isValid, boardUpdates };
 };
 
+const isValidBishopMove = ({
+  player,
+  board,
+  origin,
+  destination,
+}: {
+  player: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): MoveValidatorResponse => {
+  let isValid: boolean = false;
+  let boardUpdates: Record<number, SanPiece> = {};
+  const isDiagonalMove =
+    Math.abs(destination - origin) % (tilesPerRow - 1) === 0 ||
+    Math.abs(destination - origin) % (tilesPerRow + 1) === 0;
+
+  let mult = 1;
+  let start = origin;
+  let end = destination;
+  if (end < start) {
+    start = destination;
+    end = origin;
+    mult = -1;
+  }
+  let isDiagonalMoveLeftValid: boolean = true;
+  for (let i = start; i <= end; i = i + tilesPerRow - 1 * mult) {
+    if (board[i] !== " " && i !== origin) {
+      isDiagonalMoveLeftValid = false;
+    }
+  }
+  let isDiagonalMoveRightValid: boolean = true;
+  for (let i = start; i <= end; i = i + tilesPerRow + 1 * mult) {
+    if (board[i] !== " " && i !== origin) {
+      isDiagonalMoveRightValid = false;
+    }
+  }
+
+  const isDiagonalMoveValid =
+    isDiagonalMove && (isDiagonalMoveLeftValid || isDiagonalMoveRightValid) && board[destination] === " ";
+  const isDiagonalCapture =
+    isDiagonalMove && board[destination] !== " " && isCapturingEnemyPiece({ player, board, destination });
+  if (isDiagonalMoveValid) {
+    isValid = true;
+  } else if (isDiagonalCapture) {
+    isValid = true;
+  }
+  if (isValid) {
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "B" : "b" };
+  }
+  return { isValid, boardUpdates };
+};
+
 export const isValidMove = ({
   piece,
   board,
@@ -107,7 +176,9 @@ export const isValidMove = ({
       // isValid = isValidKnightMove({ board, origin, destination });
       break;
     case "B":
-      // isValid = isValidBishopMove({ board, origin, destination });
+      if (playerTurn === "white") {
+        ({ isValid, boardUpdates } = isValidBishopMove({ player: "white", board, origin, destination }));
+      }
       break;
     case "R":
       // isValid = isValidRookMove({ board, origin, destination });
@@ -132,7 +203,9 @@ export const isValidMove = ({
       // isValid = isValidKnightMove({ board, origin, destination });
       break;
     case "b":
-      // isValid = isValidBishopMove({ board, origin, destination });
+      if (playerTurn === "black") {
+        ({ isValid, boardUpdates } = isValidBishopMove({ player: "black", board, origin, destination }));
+      }
       break;
     case "r":
       // isValid = isValidRookMove({ board, origin, destination });
