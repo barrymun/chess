@@ -42,33 +42,141 @@ const getIsDiagonalClear = ({
   origin: number;
   destination: number;
 }): boolean => {
-  let mult = 1;
+  let direction: "up-left" | "up-right" | "down-left" | "down-right" | null = null;
+  if (origin < destination && (destination - origin) % (tilesPerRow - 1) === 0) {
+    direction = "down-left";
+  } else if (origin > destination && (destination - origin) % (tilesPerRow - 1) === 0) {
+    direction = "up-right";
+  } else if (origin < destination && (destination - origin) % (tilesPerRow + 1) === 0) {
+    direction = "down-right";
+  } else if (origin > destination && (destination - origin) % (tilesPerRow + 1) === 0) {
+    direction = "up-left";
+  }
+  if (direction === null) {
+    return false;
+  }
+  console.log(direction);
   let start = origin;
   let end = destination;
   if (end < start) {
     start = destination;
     end = origin;
-    mult = -1;
   }
-  let isDiagonalClearLeft: boolean = true;
-  for (let i = start; i <= end; i = i + tilesPerRow - 1 * mult) {
-    console.log(i);
-    if (board[i] !== " " && i !== origin && i !== destination) {
-      console.log("fail_left");
-      isDiagonalClearLeft = false;
-    }
+  let isDiagonalClear: boolean = true;
+  switch (direction) {
+    case "up-left":
+      for (let i = start; i <= end; i = i + tilesPerRow + 1) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isDiagonalClear = false;
+        }
+      }
+      break;
+    case "up-right":
+      for (let i = start; i <= end; i = i + tilesPerRow - 1) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isDiagonalClear = false;
+        }
+      }
+      break;
+    case "down-left":
+      for (let i = start; i <= end; i = i + tilesPerRow - 1) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isDiagonalClear = false;
+        }
+      }
+      break;
+    case "down-right":
+      for (let i = start; i <= end; i = i + tilesPerRow + 1) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isDiagonalClear = false;
+        }
+      }
+      break;
+    default:
+      break;
   }
-  console.log("=============");
-  let isDiagonalClearRight: boolean = true;
-  for (let i = start; i <= end; i = i + tilesPerRow + 1 * mult) {
-    console.log(i);
-    if (board[i] !== " " && i !== origin && i !== destination) {
-      console.log("fail_right");
-      isDiagonalClearRight = false;
-    }
-  }
-  const isDiagonalClear = isDiagonalClearLeft || isDiagonalClearRight;
   return isDiagonalClear;
+};
+
+const getIsStraightMove = ({ origin, destination }: { origin: number; destination: number }): boolean => {
+  return (
+    Math.abs(destination - origin) % tilesPerRow === 0 ||
+    Math.abs(destination - origin) <= tilesPerRow ||
+    Math.abs(destination - origin) % tilesPerRow === 0
+  );
+};
+
+const getIsStraightClear = ({
+  board,
+  origin,
+  destination,
+}: {
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): boolean => {
+  let direction: "up" | "down" | "left" | "right" | null = null;
+  if (origin < destination && (destination - origin) % tilesPerRow === 0) {
+    direction = "down";
+  } else if (origin > destination && (destination - origin) % tilesPerRow === 0) {
+    direction = "up";
+  } else if (origin < destination && destination < origin + tilesPerRow - 1) {
+    direction = "right";
+  } else if (origin > destination && destination < origin + tilesPerRow - 1) {
+    direction = "left";
+  }
+  console.log(direction);
+  if (direction === null) {
+    return false;
+  }
+  let start = origin;
+  let end = destination;
+  if (end < start) {
+    start = destination;
+    end = origin;
+  }
+  let isStraightClear: boolean = true;
+  switch (direction) {
+    case "up":
+      for (let i = start; i <= end; i += tilesPerRow) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isStraightClear = false;
+        }
+      }
+      break;
+    case "down":
+      for (let i = end; i >= start; i -= tilesPerRow) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isStraightClear = false;
+        }
+      }
+      break;
+    case "left":
+      for (let i = end; i >= start; i -= 1) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isStraightClear = false;
+        }
+      }
+      break;
+    case "right":
+      for (let i = start; i <= end; i += 1) {
+        console.log(i);
+        if (board[i] !== " " && i !== origin && i !== destination) {
+          isStraightClear = false;
+        }
+      }
+      break;
+    default:
+      break;
+  }
+  return isStraightClear;
 };
 
 const getIsValidPawnMove = ({
@@ -157,12 +265,54 @@ const getIsValidBishopMove = ({
   }
   const isDiagonalMove = getIsDiagonalMove({ origin, destination });
   const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
+  const destinationNotOccupiedByFriendlyPiece =
+    player === "white"
+      ? !whiteSanPieces.includes(board[destination] as SanPieceWhite)
+      : !blackSanPieces.includes(board[destination] as SanPieceBlack);
   const isDiagonalCapture = getIsCapturingEnemyPiece({ player, board, destination });
-  if ((isDiagonalMove && isDiagonalClear) || (isDiagonalMove && isDiagonalClear && isDiagonalCapture)) {
+  if (
+    (isDiagonalMove && isDiagonalClear && destinationNotOccupiedByFriendlyPiece) ||
+    (isDiagonalMove && isDiagonalClear && destinationNotOccupiedByFriendlyPiece && isDiagonalCapture)
+  ) {
     isValid = true;
   }
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "B" : "b" };
+  }
+  return { isValid, boardUpdates };
+};
+
+const getIsValidRookMove = ({
+  player,
+  board,
+  origin,
+  destination,
+}: {
+  player: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): MoveValidatorResponse => {
+  let isValid: boolean = false;
+  let boardUpdates: Record<number, SanPiece> = {};
+  if (origin === destination) {
+    return { isValid, boardUpdates };
+  }
+  const isStraightMove = getIsStraightMove({ origin, destination });
+  const isStraightClear = getIsStraightClear({ board, origin, destination });
+  const destinationNotOccupiedByFriendlyPiece =
+    player === "white"
+      ? !whiteSanPieces.includes(board[destination] as SanPieceWhite)
+      : !blackSanPieces.includes(board[destination] as SanPieceBlack);
+  const isStraightCapture = getIsCapturingEnemyPiece({ player, board, destination });
+  if (
+    (isStraightMove && isStraightClear && destinationNotOccupiedByFriendlyPiece) ||
+    (isStraightMove && isStraightClear && destinationNotOccupiedByFriendlyPiece && isStraightCapture)
+  ) {
+    isValid = true;
+  }
+  if (isValid) {
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "R" : "r" };
   }
   return { isValid, boardUpdates };
 };
@@ -202,7 +352,9 @@ export const getIsValidMove = ({
       }
       break;
     case "R":
-      // isValid = getIsValidRookMove({ board, origin, destination });
+      if (playerTurn === "white") {
+        ({ isValid, boardUpdates } = getIsValidRookMove({ player: "white", board, origin, destination }));
+      }
       break;
     case "Q":
       // isValid = getIsValidQueenMove({ board, origin, destination });
@@ -229,7 +381,9 @@ export const getIsValidMove = ({
       }
       break;
     case "r":
-      // isValid = getIsValidRookMove({ board, origin, destination });
+      if (playerTurn === "black") {
+        ({ isValid, boardUpdates } = getIsValidRookMove({ player: "black", board, origin, destination }));
+      }
       break;
     case "q":
       // isValid = getIsValidQueenMove({ board, origin, destination });
