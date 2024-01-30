@@ -11,6 +11,20 @@ interface MoveValidatorResponse {
 
 const getPlayerMultiplier = (player: Player): number => (player === "white" ? -1 : 1);
 
+const getIsDestinationOccupiedByFriendlyPiece = ({
+  player,
+  board,
+  destination,
+}: {
+  player: Player;
+  board: SanPiece[];
+  destination: number;
+}): boolean => {
+  return player === "white"
+    ? !whiteSanPieces.includes(board[destination] as SanPieceWhite)
+    : !blackSanPieces.includes(board[destination] as SanPieceBlack);
+};
+
 const getIsCapturingEnemyPiece = ({
   player,
   board,
@@ -263,16 +277,13 @@ const getIsValidBishopMove = ({
   if (origin === destination) {
     return { isValid, boardUpdates };
   }
+  const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
   const isDiagonalMove = getIsDiagonalMove({ origin, destination });
   const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
-  const destinationNotOccupiedByFriendlyPiece =
-    player === "white"
-      ? !whiteSanPieces.includes(board[destination] as SanPieceWhite)
-      : !blackSanPieces.includes(board[destination] as SanPieceBlack);
   const isDiagonalCapture = getIsCapturingEnemyPiece({ player, board, destination });
   if (
-    (isDiagonalMove && isDiagonalClear && destinationNotOccupiedByFriendlyPiece) ||
-    (isDiagonalMove && isDiagonalClear && destinationNotOccupiedByFriendlyPiece && isDiagonalCapture)
+    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalClear) ||
+    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalClear && isDiagonalCapture)
   ) {
     isValid = true;
   }
@@ -298,21 +309,55 @@ const getIsValidRookMove = ({
   if (origin === destination) {
     return { isValid, boardUpdates };
   }
+  const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
   const isStraightMove = getIsStraightMove({ origin, destination });
   const isStraightClear = getIsStraightClear({ board, origin, destination });
-  const destinationNotOccupiedByFriendlyPiece =
-    player === "white"
-      ? !whiteSanPieces.includes(board[destination] as SanPieceWhite)
-      : !blackSanPieces.includes(board[destination] as SanPieceBlack);
   const isStraightCapture = getIsCapturingEnemyPiece({ player, board, destination });
   if (
-    (isStraightMove && isStraightClear && destinationNotOccupiedByFriendlyPiece) ||
-    (isStraightMove && isStraightClear && destinationNotOccupiedByFriendlyPiece && isStraightCapture)
+    (isDestinationFriendlyFree && isStraightMove && isStraightClear) ||
+    (isDestinationFriendlyFree && isStraightMove && isStraightClear && isStraightCapture)
   ) {
     isValid = true;
   }
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "R" : "r" };
+  }
+  return { isValid, boardUpdates };
+};
+
+const getIsValidQueenMove = ({
+  player,
+  board,
+  origin,
+  destination,
+}: {
+  player: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): MoveValidatorResponse => {
+  let isValid: boolean = false;
+  let boardUpdates: Record<number, SanPiece> = {};
+  if (origin === destination) {
+    return { isValid, boardUpdates };
+  }
+  const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
+  const isDiagonalMove = getIsDiagonalMove({ origin, destination });
+  const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
+  const isDiagonalCapture = getIsCapturingEnemyPiece({ player, board, destination });
+  const isStraightMove = getIsStraightMove({ origin, destination });
+  const isStraightClear = getIsStraightClear({ board, origin, destination });
+  const isStraightCapture = getIsCapturingEnemyPiece({ player, board, destination });
+  if (
+    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalClear) ||
+    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalClear && isDiagonalCapture) ||
+    (isDestinationFriendlyFree && isStraightMove && isStraightClear) ||
+    (isDestinationFriendlyFree && isStraightMove && isStraightClear && isStraightCapture)
+  ) {
+    isValid = true;
+  }
+  if (isValid) {
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "Q" : "q" };
   }
   return { isValid, boardUpdates };
 };
@@ -357,7 +402,9 @@ export const getIsValidMove = ({
       }
       break;
     case "Q":
-      // isValid = getIsValidQueenMove({ board, origin, destination });
+      if (playerTurn === "white") {
+        ({ isValid, boardUpdates } = getIsValidQueenMove({ player: "white", board, origin, destination }));
+      }
       break;
     case "K":
       // isValid = getIsValidKingMove({ board, origin, destination });
@@ -386,7 +433,9 @@ export const getIsValidMove = ({
       }
       break;
     case "q":
-      // isValid = getIsValidQueenMove({ board, origin, destination });
+      if (playerTurn === "black") {
+        ({ isValid, boardUpdates } = getIsValidQueenMove({ player: "black", board, origin, destination }));
+      }
       break;
     case "k":
       // isValid = getIsValidKingMove({ board, origin, destination });
