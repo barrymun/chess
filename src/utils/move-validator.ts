@@ -261,6 +261,35 @@ const getIsValidPawnMove = ({
   return { isValid, boardUpdates };
 };
 
+const getIsValidKnightMove = ({
+  player,
+  board,
+  origin,
+  destination,
+}: {
+  player: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): MoveValidatorResponse => {
+  let isValid: boolean = false;
+  let boardUpdates: Record<number, SanPiece> = {};
+  const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
+  const isKnightMove =
+    Math.abs(destination - origin) === 2 * tilesPerRow + 1 ||
+    Math.abs(destination - origin) === 2 * tilesPerRow - 1 ||
+    Math.abs(destination - origin) === tilesPerRow + 2 ||
+    Math.abs(destination - origin) === tilesPerRow - 2;
+  const isKnightCapture = getIsCapturingEnemyPiece({ player, board, destination });
+  if ((isDestinationFriendlyFree && isKnightMove) || (isDestinationFriendlyFree && isKnightMove && isKnightCapture)) {
+    isValid = true;
+  }
+  if (isValid) {
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "N" : "n" };
+  }
+  return { isValid, boardUpdates };
+};
+
 const getIsValidBishopMove = ({
   player,
   board,
@@ -274,9 +303,6 @@ const getIsValidBishopMove = ({
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
-  if (origin === destination) {
-    return { isValid, boardUpdates };
-  }
   const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
   const isDiagonalMove = getIsDiagonalMove({ origin, destination });
   const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
@@ -306,9 +332,6 @@ const getIsValidRookMove = ({
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
-  if (origin === destination) {
-    return { isValid, boardUpdates };
-  }
   const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
   const isStraightMove = getIsStraightMove({ origin, destination });
   const isStraightClear = getIsStraightClear({ board, origin, destination });
@@ -338,9 +361,6 @@ const getIsValidQueenMove = ({
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
-  if (origin === destination) {
-    return { isValid, boardUpdates };
-  }
   const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
   const isDiagonalMove = getIsDiagonalMove({ origin, destination });
   const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
@@ -377,71 +397,65 @@ export const getIsValidMove = ({
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
-  switch (piece) {
-    case "P":
-      if (playerTurn === "white") {
+  if (origin === destination) {
+    return { isValid, boardUpdates };
+  }
+  if (playerTurn === "white") {
+    switch (piece) {
+      case "P":
         ({ isValid, boardUpdates } = getIsValidPawnMove({
           player: "white",
           board,
           origin,
           destination,
         }));
-      }
-      break;
-    case "N":
-      // isValid = getIsValidKnightMove({ board, origin, destination });
-      break;
-    case "B":
-      if (playerTurn === "white") {
+        break;
+      case "N":
+        ({ isValid, boardUpdates } = getIsValidKnightMove({ player: "white", board, origin, destination }));
+        break;
+      case "B":
         ({ isValid, boardUpdates } = getIsValidBishopMove({ player: "white", board, origin, destination }));
-      }
-      break;
-    case "R":
-      if (playerTurn === "white") {
+        break;
+      case "R":
         ({ isValid, boardUpdates } = getIsValidRookMove({ player: "white", board, origin, destination }));
-      }
-      break;
-    case "Q":
-      if (playerTurn === "white") {
+        break;
+      case "Q":
         ({ isValid, boardUpdates } = getIsValidQueenMove({ player: "white", board, origin, destination }));
-      }
-      break;
-    case "K":
-      // isValid = getIsValidKingMove({ board, origin, destination });
-      break;
-    case "p":
-      if (playerTurn === "black") {
-        ({ isValid, boardUpdates } = getIsValidPawnMove({
-          player: "black",
-          board,
-          origin,
-          destination,
-        }));
-      }
-      break;
-    case "n":
-      // isValid = getIsValidKnightMove({ board, origin, destination });
-      break;
-    case "b":
-      if (playerTurn === "black") {
+        break;
+      case "K":
+        // ({ isValid, boardUpdates } = getIsValidKingMove({ player: "white", board, origin, destination }));
+        break;
+    }
+  } else {
+    switch (piece) {
+      case "p":
+        if (playerTurn === "black") {
+          ({ isValid, boardUpdates } = getIsValidPawnMove({
+            player: "black",
+            board,
+            origin,
+            destination,
+          }));
+        }
+        break;
+      case "n":
+        ({ isValid, boardUpdates } = getIsValidKnightMove({ player: "black", board, origin, destination }));
+        break;
+      case "b":
         ({ isValid, boardUpdates } = getIsValidBishopMove({ player: "black", board, origin, destination }));
-      }
-      break;
-    case "r":
-      if (playerTurn === "black") {
+        break;
+      case "r":
         ({ isValid, boardUpdates } = getIsValidRookMove({ player: "black", board, origin, destination }));
-      }
-      break;
-    case "q":
-      if (playerTurn === "black") {
+        break;
+      case "q":
         ({ isValid, boardUpdates } = getIsValidQueenMove({ player: "black", board, origin, destination }));
-      }
-      break;
-    case "k":
-      // isValid = getIsValidKingMove({ board, origin, destination });
-      break;
-    default:
-      break;
+        break;
+      case "k":
+        // ({ isValid, boardUpdates } = getIsValidKingMove({ player: "black", board, origin, destination }));
+        break;
+      default:
+        break;
+    }
   }
   return { isValid, boardUpdates };
 };
