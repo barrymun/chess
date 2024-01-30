@@ -382,6 +382,42 @@ const getIsValidQueenMove = ({
   return { isValid, boardUpdates };
 };
 
+const getIsValidKingMove = ({
+  player,
+  board,
+  origin,
+  destination,
+}: {
+  player: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): MoveValidatorResponse => {
+  let isValid: boolean = false;
+  let boardUpdates: Record<number, SanPiece> = {};
+  const isDestinationFriendlyFree = getIsDestinationOccupiedByFriendlyPiece({ player, board, destination });
+  const isDiagonalMove = getIsDiagonalMove({ origin, destination });
+  const isDiagonalMoveOneTile = Math.abs(destination - origin) === tilesPerRow + 1;
+  const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
+  const isDiagonalCapture = getIsCapturingEnemyPiece({ player, board, destination });
+  const isStraightMove = getIsStraightMove({ origin, destination });
+  const isStraightMoveOneTile = Math.abs(destination - origin) === tilesPerRow || Math.abs(destination - origin) === 1;
+  const isStraightClear = getIsStraightClear({ board, origin, destination });
+  const isStraightCapture = getIsCapturingEnemyPiece({ player, board, destination });
+  if (
+    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalMoveOneTile && isDiagonalClear) ||
+    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalMoveOneTile && isDiagonalClear && isDiagonalCapture) ||
+    (isDestinationFriendlyFree && isStraightMove && isStraightMoveOneTile && isStraightClear) ||
+    (isDestinationFriendlyFree && isStraightMove && isStraightMoveOneTile && isStraightClear && isStraightCapture)
+  ) {
+    isValid = true;
+  }
+  if (isValid) {
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: player === "white" ? "K" : "k" };
+  }
+  return { isValid, boardUpdates };
+};
+
 export const getIsValidMove = ({
   piece,
   board,
@@ -423,7 +459,7 @@ export const getIsValidMove = ({
         ({ isValid, boardUpdates } = getIsValidQueenMove({ player: "white", board, origin, destination }));
         break;
       case "K":
-        // ({ isValid, boardUpdates } = getIsValidKingMove({ player: "white", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidKingMove({ player: "white", board, origin, destination }));
         break;
     }
   } else {
@@ -451,7 +487,7 @@ export const getIsValidMove = ({
         ({ isValid, boardUpdates } = getIsValidQueenMove({ player: "black", board, origin, destination }));
         break;
       case "k":
-        // ({ isValid, boardUpdates } = getIsValidKingMove({ player: "black", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidKingMove({ player: "black", board, origin, destination }));
         break;
       default:
         break;
