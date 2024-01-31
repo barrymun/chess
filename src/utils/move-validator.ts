@@ -11,12 +11,31 @@ import {
 
 let isLastMoveVulnerableToEnPassant: boolean = false;
 let enPassantCapturePieceIndex: number | null = null;
-// let lastMoveDestinationIndex: number | null = null;
+let whiteKingHasMoved: boolean = false;
+let blackKingHasMoved: boolean = false;
+let whiteLeftRookHasMoved: boolean = false; // a1
+let whiteRightRookHasMoved: boolean = false; // h1
+let blackLeftRookHasMoved: boolean = false; // a8
+let blackRightRookHasMoved: boolean = false; // h8
 
 interface MoveValidatorResponse {
   isValid: boolean;
   boardUpdates: Record<number, SanPiece>;
 }
+
+const getUpdatedBoardRepresentation = ({
+  board,
+  boardUpdates,
+}: {
+  board: SanPiece[];
+  boardUpdates: Record<number, SanPiece>;
+}): SanPiece[] => {
+  const tempBoard = [...board];
+  Object.entries(boardUpdates).forEach(([index, piece]) => {
+    tempBoard[Number(index)] = piece;
+  });
+  return tempBoard;
+};
 
 const getPlayerMultiplier = (playerTurn: Player): number => (playerTurn === "white" ? -1 : 1);
 
@@ -119,12 +138,10 @@ const getIsStraightClear = ({
   const colStart = origin % tilesPerRow;
   const rowEnd = Math.floor(destination / tilesPerRow);
   const colEnd = destination % tilesPerRow;
-
   if (rowStart === rowEnd) {
-    // Horizontal move
+    // horizontal move
     const start = Math.min(colStart, colEnd);
     const end = Math.max(colStart, colEnd);
-
     for (let col = start + 1; col < end; col++) {
       const position = rowStart * tilesPerRow + col;
       if (board[position] !== " ") {
@@ -132,10 +149,9 @@ const getIsStraightClear = ({
       }
     }
   } else if (colStart === colEnd) {
-    // Vertical move
+    // vertical move
     const start = Math.min(rowStart, rowEnd);
     const end = Math.max(rowStart, rowEnd);
-
     for (let row = start + 1; row < end; row++) {
       const position = row * tilesPerRow + colStart;
       if (board[position] !== " ") {
@@ -143,11 +159,112 @@ const getIsStraightClear = ({
       }
     }
   } else {
-    // Invalid move (not horizontal or vertical)
+    // invalid move (not horizontal or vertical)
     return false;
   }
-
   return true;
+};
+
+const getCanCastle = ({
+  playerTurn,
+  board,
+  origin,
+  destination,
+}: {
+  playerTurn: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}): boolean => {
+  let canCastle: boolean = false;
+  if (playerTurn === "white") {
+    if (
+      origin === 60 &&
+      destination === 62 &&
+      !whiteKingHasMoved &&
+      !whiteRightRookHasMoved &&
+      board[61] === " " &&
+      board[62] === " " &&
+      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 61: "K" } }),
+      }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 61: " ", 62: "K" } }),
+      })
+    ) {
+      canCastle = true;
+    } else if (
+      origin === 60 &&
+      destination === 58 &&
+      !whiteKingHasMoved &&
+      !whiteLeftRookHasMoved &&
+      board[59] === " " &&
+      board[58] === " " &&
+      board[57] === " " &&
+      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 59: "K" } }),
+      }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 59: " ", 58: "K" } }),
+      }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 59: " ", 58: " ", 57: "K" } }),
+      })
+    ) {
+      canCastle = true;
+    }
+  } else if (playerTurn === "black") {
+    if (
+      origin === 4 &&
+      destination === 6 &&
+      !blackKingHasMoved &&
+      !blackRightRookHasMoved &&
+      board[5] === " " &&
+      board[6] === " " &&
+      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 5: "k" } }),
+      }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 5: " ", 6: "k" } }),
+      })
+    ) {
+      canCastle = true;
+    } else if (
+      origin === 4 &&
+      destination === 2 &&
+      !blackKingHasMoved &&
+      !blackLeftRookHasMoved &&
+      board[3] === " " &&
+      board[2] === " " &&
+      board[1] === " " &&
+      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 3: "k" } }),
+      }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 3: " ", 2: "k" } }),
+      }) &&
+      !getIsKingInCheck({
+        playerTurn,
+        board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 3: " ", 2: " ", 1: "k" } }),
+      })
+    ) {
+      canCastle = true;
+    }
+  }
+  return canCastle;
 };
 
 const getIsValidPawnMove = ({
@@ -155,15 +272,15 @@ const getIsValidPawnMove = ({
   board,
   origin,
   destination,
-  canSetEnPassantVariables = true,
-  shouldValidateIsInCheck = true,
+  isSimulatedMove = false,
+  canSetEnPassantVars = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
-  canSetEnPassantVariables?: boolean;
-  shouldValidateIsInCheck?: boolean;
+  isSimulatedMove?: boolean;
+  canSetEnPassantVars?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -183,21 +300,21 @@ const getIsValidPawnMove = ({
   ) {
     // handle special first move
     isValid = true;
-    if (canSetEnPassantVariables) {
+    if (canSetEnPassantVars) {
       isLastMoveVulnerableToEnPassant = true;
       enPassantCapturePieceIndex = destination;
     }
   } else if (origin + multiplier * tilesPerRow === destination && board[destination] === " ") {
     // handle normal move
     isValid = true;
-    if (canSetEnPassantVariables) {
+    if (canSetEnPassantVars) {
       isLastMoveVulnerableToEnPassant = false;
       enPassantCapturePieceIndex = null;
     }
   } else if ((isNormalLeftCapture || isNormalRightCapture) && board[destination] !== " " && isDestinationFriendlyFree) {
     // handle normal left/right capture
     isValid = true;
-    if (canSetEnPassantVariables) {
+    if (canSetEnPassantVars) {
       isLastMoveVulnerableToEnPassant = false;
       enPassantCapturePieceIndex = null;
     }
@@ -218,7 +335,7 @@ const getIsValidPawnMove = ({
       // handle en passant left/right capture
       isValid = true;
       boardUpdates = { ...boardUpdates, [enPassantCapturePieceIndex]: " " };
-      if (canSetEnPassantVariables) {
+      if (canSetEnPassantVars) {
         isLastMoveVulnerableToEnPassant = false;
         enPassantCapturePieceIndex = null;
       }
@@ -227,7 +344,7 @@ const getIsValidPawnMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "P" : "p" };
   }
-  if (shouldValidateIsInCheck) {
+  if (!isSimulatedMove) {
     const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
     if (isInCheck) {
       isValid = false;
@@ -237,21 +354,27 @@ const getIsValidPawnMove = ({
   return { isValid, boardUpdates };
 };
 
-/**
- * check if a pawn move is valid, but cannot set or unset en passant variables
- */
 const getIsValidPawnMoveIgnoreEnPassant = ({
   playerTurn,
   board,
   origin,
   destination,
+  isSimulatedMove = false,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
+  isSimulatedMove?: boolean;
 }): MoveValidatorResponse => {
-  return getIsValidPawnMove({ playerTurn, board, origin, destination, canSetEnPassantVariables: false });
+  return getIsValidPawnMove({
+    playerTurn,
+    board,
+    origin,
+    destination,
+    isSimulatedMove,
+    canSetEnPassantVars: false,
+  });
 };
 
 const getIsValidKnightMove = ({
@@ -259,13 +382,13 @@ const getIsValidKnightMove = ({
   board,
   origin,
   destination,
-  shouldValidateIsInCheck = true,
+  isSimulatedMove = false,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
-  shouldValidateIsInCheck?: boolean;
+  isSimulatedMove?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -286,7 +409,7 @@ const getIsValidKnightMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "N" : "n" };
   }
-  if (shouldValidateIsInCheck) {
+  if (!isSimulatedMove) {
     const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
     if (isInCheck) {
       isValid = false;
@@ -301,13 +424,13 @@ const getIsValidBishopMove = ({
   board,
   origin,
   destination,
-  shouldValidateIsInCheck = true,
+  isSimulatedMove = false,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
-  shouldValidateIsInCheck?: boolean;
+  isSimulatedMove?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -324,7 +447,7 @@ const getIsValidBishopMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "B" : "b" };
   }
-  if (shouldValidateIsInCheck) {
+  if (!isSimulatedMove) {
     const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
     if (isInCheck) {
       isValid = false;
@@ -339,13 +462,13 @@ const getIsValidRookMove = ({
   board,
   origin,
   destination,
-  shouldValidateIsInCheck = true,
+  isSimulatedMove = false,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
-  shouldValidateIsInCheck?: boolean;
+  isSimulatedMove?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -362,7 +485,7 @@ const getIsValidRookMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "R" : "r" };
   }
-  if (shouldValidateIsInCheck) {
+  if (!isSimulatedMove) {
     const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
     if (isInCheck) {
       isValid = false;
@@ -377,13 +500,13 @@ const getIsValidQueenMove = ({
   board,
   origin,
   destination,
-  shouldValidateIsInCheck = true,
+  isSimulatedMove = false,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
-  shouldValidateIsInCheck?: boolean;
+  isSimulatedMove?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -405,7 +528,7 @@ const getIsValidQueenMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "Q" : "q" };
   }
-  if (shouldValidateIsInCheck) {
+  if (!isSimulatedMove) {
     const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
     if (isInCheck) {
       isValid = false;
@@ -420,37 +543,94 @@ const getIsValidKingMove = ({
   board,
   origin,
   destination,
-  shouldValidateIsInCheck = true,
+  isSimulatedMove = false,
+  canSetCastlingVars = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
-  shouldValidateIsInCheck?: boolean;
+  isSimulatedMove?: boolean;
+  canSetCastlingVars?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
+  if (
+    playerTurn === "white" &&
+    origin === 60 &&
+    destination === 62 &&
+    getCanCastle({ playerTurn, board, origin, destination })
+  ) {
+    isValid = true;
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "K", [61]: "R", [63]: " " };
+    if (canSetCastlingVars) {
+      whiteKingHasMoved = true;
+      whiteRightRookHasMoved = true;
+    }
+  } else if (
+    playerTurn === "white" &&
+    origin === 60 &&
+    destination === 58 &&
+    getCanCastle({ playerTurn, board, origin, destination })
+  ) {
+    isValid = true;
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "K", [59]: "R", [56]: " " };
+    if (canSetCastlingVars) {
+      whiteKingHasMoved = true;
+      whiteLeftRookHasMoved = true;
+    }
+  } else if (
+    playerTurn === "black" &&
+    origin === 4 &&
+    destination === 6 &&
+    getCanCastle({ playerTurn, board, origin, destination })
+  ) {
+    isValid = true;
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "k", [5]: "r", [7]: " " };
+    if (canSetCastlingVars) {
+      blackKingHasMoved = true;
+      blackRightRookHasMoved = true;
+    }
+  } else if (
+    playerTurn === "black" &&
+    origin === 4 &&
+    destination === 2 &&
+    getCanCastle({ playerTurn, board, origin, destination })
+  ) {
+    isValid = true;
+    boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "k", [3]: "r", [0]: " " };
+    if (canSetCastlingVars) {
+      blackKingHasMoved = true;
+      blackLeftRookHasMoved = true;
+    }
+  }
+  if (isValid) {
+    return { isValid, boardUpdates };
+  }
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
   const isDiagonalMove = getIsDiagonalMove({ origin, destination });
-  const isDiagonalMoveOneTile = Math.abs(destination - origin) === tilesPerRow + 1;
   const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
   const isDiagonalCapture = getIsCapturingEnemyPiece({ playerTurn, board, destination });
   const isStraightMove = getIsStraightMove({ origin, destination });
-  const isStraightMoveOneTile = Math.abs(destination - origin) === tilesPerRow || Math.abs(destination - origin) === 1;
   const isStraightClear = getIsStraightClear({ board, origin, destination });
   const isStraightCapture = getIsCapturingEnemyPiece({ playerTurn, board, destination });
+  const isOneTileMove =
+    Math.abs(destination - origin) === tilesPerRow || // vertical move
+    Math.abs(destination - origin) === 1 || // horizontal move
+    Math.abs(destination - origin) === tilesPerRow - 1 || // diagonal move (up-left or up-right)
+    Math.abs(destination - origin) === tilesPerRow + 1; // diagonal move (down-left or down-right)
   if (
-    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalMoveOneTile && isDiagonalClear) ||
-    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalMoveOneTile && isDiagonalClear && isDiagonalCapture) ||
-    (isDestinationFriendlyFree && isStraightMove && isStraightMoveOneTile && isStraightClear) ||
-    (isDestinationFriendlyFree && isStraightMove && isStraightMoveOneTile && isStraightClear && isStraightCapture)
+    (isDestinationFriendlyFree && isDiagonalMove && isOneTileMove && isDiagonalClear) ||
+    (isDestinationFriendlyFree && isDiagonalMove && isOneTileMove && isDiagonalClear && isDiagonalCapture) ||
+    (isDestinationFriendlyFree && isStraightMove && isOneTileMove && isStraightClear) ||
+    (isDestinationFriendlyFree && isStraightMove && isOneTileMove && isStraightClear && isStraightCapture)
   ) {
     isValid = true;
   }
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "K" : "k" };
   }
-  if (shouldValidateIsInCheck) {
+  if (!isSimulatedMove) {
     const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
     if (isInCheck) {
       isValid = false;
@@ -460,20 +640,43 @@ const getIsValidKingMove = ({
   return { isValid, boardUpdates };
 };
 
+const getIsValidKingMoveIgnoreCastling = ({
+  playerTurn,
+  board,
+  origin,
+  destination,
+  isSimulatedMove = false,
+}: {
+  playerTurn: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+  isSimulatedMove?: boolean;
+}): MoveValidatorResponse => {
+  return getIsValidKingMove({
+    playerTurn,
+    board,
+    origin,
+    destination,
+    isSimulatedMove,
+    canSetCastlingVars: false,
+  });
+};
+
 export const getIsValidMove = ({
   piece,
   board,
   playerTurn,
   origin,
   destination,
-  shouldValidateIsInCheck = true,
+  isSimulatedMove = false,
 }: {
   piece: SanPiece;
   board: SanPiece[];
   playerTurn: Player;
   origin: number;
   destination: number;
-  shouldValidateIsInCheck?: boolean;
+  isSimulatedMove?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -488,7 +691,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "N":
@@ -497,7 +700,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "B":
@@ -506,7 +709,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "R":
@@ -515,7 +718,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "Q":
@@ -524,7 +727,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "K":
@@ -533,7 +736,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
     }
@@ -555,7 +758,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "b":
@@ -564,7 +767,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "r":
@@ -573,7 +776,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "q":
@@ -582,7 +785,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       case "k":
@@ -591,7 +794,7 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
-          shouldValidateIsInCheck,
+          isSimulatedMove,
         }));
         break;
       default:
@@ -626,7 +829,7 @@ const getIsKingInCheck = ({ playerTurn, board }: { playerTurn: Player; board: Sa
       playerTurn: opponentPlayerTurn,
       origin: i,
       destination: kingPosition,
-      shouldValidateIsInCheck: false,
+      isSimulatedMove: true,
     });
     if (isValid) {
       isInCheck = true;
@@ -645,11 +848,7 @@ const getWillMovePutKingInCheck = ({
   boardUpdates: Record<number, SanPiece>;
   playerTurn: Player;
 }): boolean => {
-  const tempBoard = [...board];
-  Object.entries(boardUpdates).forEach(([index, piece]) => {
-    tempBoard[Number(index)] = piece;
-  });
-  return getIsKingInCheck({ playerTurn, board: tempBoard });
+  return getIsKingInCheck({ playerTurn, board: getUpdatedBoardRepresentation({ board, boardUpdates }) });
 };
 
 export const getIsStalemate = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
@@ -687,11 +886,13 @@ export const getAllValidPieceMoves = ({
         board,
         origin,
         destination,
+        isSimulatedMove,
       }: {
         playerTurn: Player;
         board: SanPiece[];
         origin: number;
         destination: number;
+        isSimulatedMove?: boolean;
       }) => MoveValidatorResponse)
     | null = null;
   if (
@@ -723,7 +924,7 @@ export const getAllValidPieceMoves = ({
       break;
     case "K":
     case "k":
-      validMovesFn = getIsValidKingMove;
+      validMovesFn = getIsValidKingMoveIgnoreCastling;
       break;
     default:
       break;
@@ -742,7 +943,7 @@ export const getAllValidPieceMoves = ({
   return res;
 };
 
-export const checkCanMakeMove = ({
+export const computeCanMakeMove = ({
   piece,
   board,
   playerTurn,
@@ -762,5 +963,30 @@ export const checkCanMakeMove = ({
   ) {
     return { isValid: false, boardUpdates: {} };
   }
-  return getIsValidMove({ piece, board, playerTurn, origin, destination });
+  const res = getIsValidMove({ piece, board, playerTurn, origin, destination });
+  if (res.isValid) {
+    switch (origin) {
+      case 0:
+        blackRightRookHasMoved = true;
+        break;
+      case 7:
+        blackLeftRookHasMoved = true;
+        break;
+      case 4:
+        blackKingHasMoved = true;
+        break;
+      case 56:
+        whiteLeftRookHasMoved = true;
+        break;
+      case 63:
+        whiteRightRookHasMoved = true;
+        break;
+      case 60:
+        whiteKingHasMoved = true;
+        break;
+      default:
+        break;
+    }
+  }
+  return res;
 };
