@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
 import { useGameState } from "hooks";
-import { getAllValidPieceMoves, getIsValidMove, pieceSize } from "utils";
+import { checkCanMakeMove, getAllValidPieceMoves, pieceSize } from "utils";
 
 let isMouseDown: boolean = false;
 let originIndex: number | null = null;
@@ -78,7 +78,7 @@ const ChessBoard = () => {
         clearSelectionContext();
         return;
       }
-      const { isValid, boardUpdates } = getIsValidMove({
+      const { isValid, boardUpdates } = checkCanMakeMove({
         piece: board[originIndex],
         board,
         playerTurn,

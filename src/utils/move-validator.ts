@@ -192,18 +192,71 @@ const getIsStraightClear = ({
   return isStraightClear;
 };
 
+const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): number => {
+  let kingPosition: number | null = null;
+  const kingPiece = playerTurn === "white" ? "K" : "k";
+  for (let i = 0; i < totalTiles; i++) {
+    if (board[i] === kingPiece) {
+      kingPosition = i;
+    }
+  }
+  if (kingPosition === null) {
+    throw new Error("King not found");
+  }
+  return kingPosition;
+};
+
+const getIsKingInCheck = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
+  let isInCheck: boolean = false;
+  const kingPosition = getKingPosition({ playerTurn, board });
+  const opponentPlayerTurn = playerTurn === "white" ? "black" : "white";
+  for (let i = 0; i < totalTiles; i++) {
+    const { isValid } = getIsValidMove({
+      piece: board[i],
+      board,
+      playerTurn: opponentPlayerTurn,
+      origin: i,
+      destination: kingPosition,
+      shouldValidateIsInCheck: false,
+    });
+    if (isValid) {
+      isInCheck = true;
+      break;
+    }
+  }
+  return isInCheck;
+};
+
+const getWillMovePutKingInCheck = ({
+  board,
+  boardUpdates,
+  playerTurn,
+}: {
+  board: SanPiece[];
+  boardUpdates: Record<number, SanPiece>;
+  playerTurn: Player;
+}): boolean => {
+  const tempBoard = [...board];
+  Object.entries(boardUpdates).forEach(([index, piece]) => {
+    tempBoard[Number(index)] = piece;
+  });
+  return getIsKingInCheck({ playerTurn, board: tempBoard });
+};
+
 const getIsValidPawnMove = ({
   playerTurn,
   board,
   origin,
   destination,
   canSetEnPassantVariables = true,
+  shouldValidateIsInCheck = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
   canSetEnPassantVariables?: boolean;
+  shouldValidateIsInCheck?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -267,7 +320,13 @@ const getIsValidPawnMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "P" : "p" };
   }
-  // lastMoveDestinationIndex = destination;
+  if (shouldValidateIsInCheck) {
+    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    if (isInCheck) {
+      isValid = false;
+      boardUpdates = {};
+    }
+  }
   return { isValid, boardUpdates };
 };
 
@@ -293,11 +352,13 @@ const getIsValidKnightMove = ({
   board,
   origin,
   destination,
+  shouldValidateIsInCheck = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
+  shouldValidateIsInCheck?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -318,6 +379,13 @@ const getIsValidKnightMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "N" : "n" };
   }
+  if (shouldValidateIsInCheck) {
+    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    if (isInCheck) {
+      isValid = false;
+      boardUpdates = {};
+    }
+  }
   return { isValid, boardUpdates };
 };
 
@@ -326,11 +394,13 @@ const getIsValidBishopMove = ({
   board,
   origin,
   destination,
+  shouldValidateIsInCheck = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
+  shouldValidateIsInCheck?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -347,6 +417,13 @@ const getIsValidBishopMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "B" : "b" };
   }
+  if (shouldValidateIsInCheck) {
+    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    if (isInCheck) {
+      isValid = false;
+      boardUpdates = {};
+    }
+  }
   return { isValid, boardUpdates };
 };
 
@@ -355,11 +432,13 @@ const getIsValidRookMove = ({
   board,
   origin,
   destination,
+  shouldValidateIsInCheck = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
+  shouldValidateIsInCheck?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -376,6 +455,13 @@ const getIsValidRookMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "R" : "r" };
   }
+  if (shouldValidateIsInCheck) {
+    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    if (isInCheck) {
+      isValid = false;
+      boardUpdates = {};
+    }
+  }
   return { isValid, boardUpdates };
 };
 
@@ -384,11 +470,13 @@ const getIsValidQueenMove = ({
   board,
   origin,
   destination,
+  shouldValidateIsInCheck = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
+  shouldValidateIsInCheck?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -410,6 +498,13 @@ const getIsValidQueenMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "Q" : "q" };
   }
+  if (shouldValidateIsInCheck) {
+    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    if (isInCheck) {
+      isValid = false;
+      boardUpdates = {};
+    }
+  }
   return { isValid, boardUpdates };
 };
 
@@ -418,11 +513,13 @@ const getIsValidKingMove = ({
   board,
   origin,
   destination,
+  shouldValidateIsInCheck = true,
 }: {
   playerTurn: Player;
   board: SanPiece[];
   origin: number;
   destination: number;
+  shouldValidateIsInCheck?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -446,6 +543,13 @@ const getIsValidKingMove = ({
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "K" : "k" };
   }
+  if (shouldValidateIsInCheck) {
+    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    if (isInCheck) {
+      isValid = false;
+      boardUpdates = {};
+    }
+  }
   return { isValid, boardUpdates };
 };
 
@@ -455,12 +559,14 @@ export const getIsValidMove = ({
   playerTurn,
   origin,
   destination,
+  shouldValidateIsInCheck = true,
 }: {
   piece: SanPiece;
   board: SanPiece[];
   playerTurn: Player;
   origin: number;
   destination: number;
+  shouldValidateIsInCheck?: boolean;
 }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
@@ -475,22 +581,53 @@ export const getIsValidMove = ({
           board,
           origin,
           destination,
+          shouldValidateIsInCheck,
         }));
         break;
       case "N":
-        ({ isValid, boardUpdates } = getIsValidKnightMove({ playerTurn: "white", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidKnightMove({
+          playerTurn: "white",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "B":
-        ({ isValid, boardUpdates } = getIsValidBishopMove({ playerTurn: "white", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidBishopMove({
+          playerTurn: "white",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "R":
-        ({ isValid, boardUpdates } = getIsValidRookMove({ playerTurn: "white", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidRookMove({
+          playerTurn: "white",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "Q":
-        ({ isValid, boardUpdates } = getIsValidQueenMove({ playerTurn: "white", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidQueenMove({
+          playerTurn: "white",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "K":
-        ({ isValid, boardUpdates } = getIsValidKingMove({ playerTurn: "white", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidKingMove({
+          playerTurn: "white",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
     }
   } else {
@@ -506,25 +643,78 @@ export const getIsValidMove = ({
         }
         break;
       case "n":
-        ({ isValid, boardUpdates } = getIsValidKnightMove({ playerTurn: "black", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidKnightMove({
+          playerTurn: "black",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "b":
-        ({ isValid, boardUpdates } = getIsValidBishopMove({ playerTurn: "black", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidBishopMove({
+          playerTurn: "black",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "r":
-        ({ isValid, boardUpdates } = getIsValidRookMove({ playerTurn: "black", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidRookMove({
+          playerTurn: "black",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "q":
-        ({ isValid, boardUpdates } = getIsValidQueenMove({ playerTurn: "black", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidQueenMove({
+          playerTurn: "black",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       case "k":
-        ({ isValid, boardUpdates } = getIsValidKingMove({ playerTurn: "black", board, origin, destination }));
+        ({ isValid, boardUpdates } = getIsValidKingMove({
+          playerTurn: "black",
+          board,
+          origin,
+          destination,
+          shouldValidateIsInCheck,
+        }));
         break;
       default:
         break;
     }
   }
   return { isValid, boardUpdates };
+};
+
+export const checkCanMakeMove = ({
+  piece,
+  board,
+  playerTurn,
+  origin,
+  destination,
+}: {
+  piece: SanPiece;
+  board: SanPiece[];
+  playerTurn: Player;
+  origin: number;
+  destination: number;
+}): MoveValidatorResponse => {
+  if (
+    origin === destination ||
+    (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) ||
+    (playerTurn === "black" && !blackSanPieces.includes(piece as SanPieceBlack))
+  ) {
+    return { isValid: false, boardUpdates: {} };
+  }
+  return getIsValidMove({ piece, board, playerTurn, origin, destination });
 };
 
 export const getAllValidPieceMoves = ({
@@ -551,9 +741,10 @@ export const getAllValidPieceMoves = ({
         destination: number;
       }) => MoveValidatorResponse)
     | null = null;
-  if (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) {
-    return [];
-  } else if (playerTurn === "black" && !blackSanPieces.includes(piece as SanPieceBlack)) {
+  if (
+    (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) ||
+    (playerTurn === "black" && !blackSanPieces.includes(piece as SanPieceBlack))
+  ) {
     return [];
   }
   switch (piece) {
