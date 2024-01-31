@@ -1,7 +1,7 @@
 import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { Player, SanPiece, defaultBoard } from "utils";
+import { Player, SanPiece, defaultBoard, getIsCheckmate, getIsStalemate } from "utils";
 
 const GameStateContext = createContext(
   {} as {
@@ -34,6 +34,10 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     if (isEqual(board, defaultBoard)) {
       return;
     }
+    const oppositePlayerTurn = playerTurn === "white" ? "black" : "white";
+    const isStalemate = getIsStalemate({ board, playerTurn: oppositePlayerTurn });
+    const isCheckmate = getIsCheckmate({ board, playerTurn: oppositePlayerTurn });
+    console.log({ isStalemate, isCheckmate });
     setPlayerTurn((prevPlayerTurn) => (prevPlayerTurn === "white" ? "black" : "white"));
   }, [board]);
 

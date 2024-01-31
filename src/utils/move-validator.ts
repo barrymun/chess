@@ -51,9 +51,13 @@ const getIsCapturingEnemyPiece = ({
 };
 
 const getIsDiagonalMove = ({ origin, destination }: { origin: number; destination: number }): boolean => {
-  return (
-    Math.abs(destination - origin) % (tilesPerRow - 1) === 0 || Math.abs(destination - origin) % (tilesPerRow + 1) === 0
-  );
+  const originRow = Math.floor(origin / tilesPerRow);
+  const originCol = origin % tilesPerRow;
+  const destRow = Math.floor(destination / tilesPerRow);
+  const destCol = destination % tilesPerRow;
+  const rowDiff = Math.abs(destRow - originRow);
+  const colDiff = Math.abs(destCol - originCol);
+  return rowDiff === colDiff;
 };
 
 const getIsDiagonalClear = ({
@@ -78,54 +82,28 @@ const getIsDiagonalClear = ({
   if (direction === null) {
     return false;
   }
-  let start = origin;
-  let end = destination;
-  if (end < start) {
-    start = destination;
-    end = origin;
+  let current = origin;
+  while (current !== destination) {
+    if (direction === "up-left") {
+      current -= tilesPerRow + 1;
+    } else if (direction === "up-right") {
+      current -= tilesPerRow - 1;
+    } else if (direction === "down-left") {
+      current += tilesPerRow - 1;
+    } else if (direction === "down-right") {
+      current += tilesPerRow + 1;
+    }
+    if (board[current] !== " " && current !== origin && current !== destination) {
+      return false;
+    }
   }
-  let isDiagonalClear: boolean = true;
-  switch (direction) {
-    case "up-left":
-      for (let i = start; i <= end; i = i + tilesPerRow + 1) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isDiagonalClear = false;
-        }
-      }
-      break;
-    case "up-right":
-      for (let i = start; i <= end; i = i + tilesPerRow - 1) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isDiagonalClear = false;
-        }
-      }
-      break;
-    case "down-left":
-      for (let i = start; i <= end; i = i + tilesPerRow - 1) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isDiagonalClear = false;
-        }
-      }
-      break;
-    case "down-right":
-      for (let i = start; i <= end; i = i + tilesPerRow + 1) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isDiagonalClear = false;
-        }
-      }
-      break;
-    default:
-      break;
-  }
-  return isDiagonalClear;
+  return true;
 };
 
 const getIsStraightMove = ({ origin, destination }: { origin: number; destination: number }): boolean => {
-  return (
-    Math.abs(destination - origin) % tilesPerRow === 0 ||
-    Math.abs(destination - origin) <= tilesPerRow ||
-    Math.abs(destination - origin) % tilesPerRow === 0
-  );
+  const rowDifference = Math.abs(Math.floor(destination / tilesPerRow) - Math.floor(origin / tilesPerRow));
+  const colDifference = Math.abs((destination % tilesPerRow) - (origin % tilesPerRow));
+  return (rowDifference > 0 && colDifference === 0) || (rowDifference === 0 && colDifference > 0);
 };
 
 const getIsStraightClear = ({
@@ -137,110 +115,39 @@ const getIsStraightClear = ({
   origin: number;
   destination: number;
 }): boolean => {
-  let direction: "up" | "down" | "left" | "right" | null = null;
-  if (origin < destination && (destination - origin) % tilesPerRow === 0) {
-    direction = "down";
-  } else if (origin > destination && (destination - origin) % tilesPerRow === 0) {
-    direction = "up";
-  } else if (origin < destination && destination < origin + tilesPerRow - 1) {
-    direction = "right";
-  } else if (origin > destination && destination < origin + tilesPerRow - 1) {
-    direction = "left";
-  }
-  if (direction === null) {
+  const rowStart = Math.floor(origin / tilesPerRow);
+  const colStart = origin % tilesPerRow;
+  const rowEnd = Math.floor(destination / tilesPerRow);
+  const colEnd = destination % tilesPerRow;
+
+  if (rowStart === rowEnd) {
+    // Horizontal move
+    const start = Math.min(colStart, colEnd);
+    const end = Math.max(colStart, colEnd);
+
+    for (let col = start + 1; col < end; col++) {
+      const position = rowStart * tilesPerRow + col;
+      if (board[position] !== " ") {
+        return false;
+      }
+    }
+  } else if (colStart === colEnd) {
+    // Vertical move
+    const start = Math.min(rowStart, rowEnd);
+    const end = Math.max(rowStart, rowEnd);
+
+    for (let row = start + 1; row < end; row++) {
+      const position = row * tilesPerRow + colStart;
+      if (board[position] !== " ") {
+        return false;
+      }
+    }
+  } else {
+    // Invalid move (not horizontal or vertical)
     return false;
   }
-  let start = origin;
-  let end = destination;
-  if (end < start) {
-    start = destination;
-    end = origin;
-  }
-  let isStraightClear: boolean = true;
-  switch (direction) {
-    case "up":
-      for (let i = start; i <= end; i += tilesPerRow) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isStraightClear = false;
-        }
-      }
-      break;
-    case "down":
-      for (let i = end; i >= start; i -= tilesPerRow) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isStraightClear = false;
-        }
-      }
-      break;
-    case "left":
-      for (let i = end; i >= start; i -= 1) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isStraightClear = false;
-        }
-      }
-      break;
-    case "right":
-      for (let i = start; i <= end; i += 1) {
-        if (board[i] !== " " && i !== origin && i !== destination) {
-          isStraightClear = false;
-        }
-      }
-      break;
-    default:
-      break;
-  }
-  return isStraightClear;
-};
 
-const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): number => {
-  let kingPosition: number | null = null;
-  const kingPiece = playerTurn === "white" ? "K" : "k";
-  for (let i = 0; i < totalTiles; i++) {
-    if (board[i] === kingPiece) {
-      kingPosition = i;
-    }
-  }
-  if (kingPosition === null) {
-    throw new Error("King not found");
-  }
-  return kingPosition;
-};
-
-const getIsKingInCheck = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
-  let isInCheck: boolean = false;
-  const kingPosition = getKingPosition({ playerTurn, board });
-  const opponentPlayerTurn = playerTurn === "white" ? "black" : "white";
-  for (let i = 0; i < totalTiles; i++) {
-    const { isValid } = getIsValidMove({
-      piece: board[i],
-      board,
-      playerTurn: opponentPlayerTurn,
-      origin: i,
-      destination: kingPosition,
-      shouldValidateIsInCheck: false,
-    });
-    if (isValid) {
-      isInCheck = true;
-      break;
-    }
-  }
-  return isInCheck;
-};
-
-const getWillMovePutKingInCheck = ({
-  board,
-  boardUpdates,
-  playerTurn,
-}: {
-  board: SanPiece[];
-  boardUpdates: Record<number, SanPiece>;
-  playerTurn: Player;
-}): boolean => {
-  const tempBoard = [...board];
-  Object.entries(boardUpdates).forEach(([index, piece]) => {
-    tempBoard[Number(index)] = piece;
-  });
-  return getIsKingInCheck({ playerTurn, board: tempBoard });
+  return true;
 };
 
 const getIsValidPawnMove = ({
@@ -694,27 +601,73 @@ export const getIsValidMove = ({
   return { isValid, boardUpdates };
 };
 
-export const checkCanMakeMove = ({
-  piece,
-  board,
-  playerTurn,
-  origin,
-  destination,
-}: {
-  piece: SanPiece;
-  board: SanPiece[];
-  playerTurn: Player;
-  origin: number;
-  destination: number;
-}): MoveValidatorResponse => {
-  if (
-    origin === destination ||
-    (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) ||
-    (playerTurn === "black" && !blackSanPieces.includes(piece as SanPieceBlack))
-  ) {
-    return { isValid: false, boardUpdates: {} };
+const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): number => {
+  let kingPosition: number | null = null;
+  const kingPiece = playerTurn === "white" ? "K" : "k";
+  for (let i = 0; i < totalTiles; i++) {
+    if (board[i] === kingPiece) {
+      kingPosition = i;
+    }
   }
-  return getIsValidMove({ piece, board, playerTurn, origin, destination });
+  if (kingPosition === null) {
+    throw new Error("King not found");
+  }
+  return kingPosition;
+};
+
+const getIsKingInCheck = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
+  let isInCheck: boolean = false;
+  const kingPosition = getKingPosition({ playerTurn, board });
+  const opponentPlayerTurn = playerTurn === "white" ? "black" : "white";
+  for (let i = 0; i < totalTiles; i++) {
+    const { isValid } = getIsValidMove({
+      piece: board[i],
+      board,
+      playerTurn: opponentPlayerTurn,
+      origin: i,
+      destination: kingPosition,
+      shouldValidateIsInCheck: false,
+    });
+    if (isValid) {
+      isInCheck = true;
+      break;
+    }
+  }
+  return isInCheck;
+};
+
+const getWillMovePutKingInCheck = ({
+  board,
+  boardUpdates,
+  playerTurn,
+}: {
+  board: SanPiece[];
+  boardUpdates: Record<number, SanPiece>;
+  playerTurn: Player;
+}): boolean => {
+  const tempBoard = [...board];
+  Object.entries(boardUpdates).forEach(([index, piece]) => {
+    tempBoard[Number(index)] = piece;
+  });
+  return getIsKingInCheck({ playerTurn, board: tempBoard });
+};
+
+export const getIsStalemate = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
+  let isCheckmate: boolean = true;
+  for (let i = 0; i < totalTiles; i++) {
+    if (board[i] !== " " && board[i] !== "K" && board[i] !== "k") {
+      const validMoves = getAllValidPieceMoves({ piece: board[i], playerTurn, board, origin: i });
+      if (validMoves.length > 0) {
+        isCheckmate = false;
+        break;
+      }
+    }
+  }
+  return isCheckmate;
+};
+
+export const getIsCheckmate = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
+  return getIsKingInCheck({ playerTurn, board }) && getIsStalemate({ playerTurn, board });
 };
 
 export const getAllValidPieceMoves = ({
@@ -787,4 +740,27 @@ export const getAllValidPieceMoves = ({
   }
   console.log(res);
   return res;
+};
+
+export const checkCanMakeMove = ({
+  piece,
+  board,
+  playerTurn,
+  origin,
+  destination,
+}: {
+  piece: SanPiece;
+  board: SanPiece[];
+  playerTurn: Player;
+  origin: number;
+  destination: number;
+}): MoveValidatorResponse => {
+  if (
+    origin === destination ||
+    (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) ||
+    (playerTurn === "black" && !blackSanPieces.includes(piece as SanPieceBlack))
+  ) {
+    return { isValid: false, boardUpdates: {} };
+  }
+  return getIsValidMove({ piece, board, playerTurn, origin, destination });
 };
