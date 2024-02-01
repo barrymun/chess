@@ -10,7 +10,7 @@ let selectedPiece: HTMLDivElement | null = null;
 
 const ChessBoard = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const { board, playerTurn, updateBoard } = useGameState();
+  const { boardState, playerTurn, setBoardState } = useGameState();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
@@ -20,7 +20,12 @@ const ChessBoard = () => {
     isMouseDown = true;
     originIndex = position;
     selectedPiece = target;
-    getAllValidPieceMoves({ piece: board[originIndex], board, playerTurn, origin: position });
+    getAllValidPieceMoves({
+      ...boardState,
+      piece: boardState.board[originIndex],
+      playerTurn,
+      origin: position,
+    });
   };
 
   const movePiece = (e: MouseEvent) => {
@@ -78,25 +83,29 @@ const ChessBoard = () => {
         clearSelectionContext();
         return;
       }
-      const { isValid, boardUpdates } = computeCanMakeMove({
-        piece: board[originIndex],
-        board,
+      const canMakeMoveResponse = computeCanMakeMove({
+        ...boardState,
+        piece: boardState.board[originIndex],
         playerTurn,
         origin: originIndex,
         destination: destinationIndex,
       });
-      if (!isValid || Object.keys(boardUpdates).length === 0) {
+      if (!canMakeMoveResponse.isValid || Object.keys(canMakeMoveResponse.boardUpdates).length === 0) {
         clearSelectionContext();
         return;
       }
-      updateBoard(boardUpdates);
+      setBoardState((prevBoardState) => ({
+        ...prevBoardState,
+        ...canMakeMoveResponse,
+        board: prevBoardState.board.map((piece, index) => canMakeMoveResponse.boardUpdates[index] ?? piece),
+      }));
     },
-    [board, playerTurn],
+    [boardState, playerTurn],
   );
 
   useEffect(() => {
     clearSelectionContext();
-  }, [board]);
+  }, [boardState]);
 
   useEffect(() => {
     window.addEventListener("mousemove", movePiece);
@@ -105,12 +114,12 @@ const ChessBoard = () => {
       window.removeEventListener("mousemove", movePiece);
       window.removeEventListener("mouseup", dropPiece);
     };
-  }, [board, playerTurn]);
+  }, [boardState, playerTurn]);
 
   return (
     <div className="bg-chess-board rounded-md truncate">
       <div className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
-        {board.map((_square, index) => (
+        {boardState.board.map((_square, index) => (
           <Tile key={index} position={index} grabPiece={grabPiece} />
         ))}
       </div>

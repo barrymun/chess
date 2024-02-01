@@ -1,4 +1,5 @@
 import {
+  BoardStateProps,
   Player,
   SanPiece,
   SanPieceBlack,
@@ -9,23 +10,13 @@ import {
   whiteSanPieces,
 } from "utils";
 
-let isLastMoveVulnerableToEnPassant: boolean = false;
-let enPassantCapturePieceIndex: number | null = null;
-let whiteKingHasMoved: boolean = false;
-let blackKingHasMoved: boolean = false;
-let whiteLeftRookHasMoved: boolean = false; // a1
-let whiteRightRookHasMoved: boolean = false; // h1
-let blackLeftRookHasMoved: boolean = false; // a8
-let blackRightRookHasMoved: boolean = false; // h8
-
-interface MoveValidatorResponse {
+interface MoveValidatorResponse extends Omit<BoardStateProps, "board"> {
   isValid: boolean;
   boardUpdates: Record<number, SanPiece>;
 }
 
-interface ValidMoveProps {
+interface ValidMoveProps extends BoardStateProps {
   playerTurn: Player;
-  board: SanPiece[];
   origin: number;
   destination: number;
 }
@@ -176,7 +167,19 @@ const getIsStraightClear = ({
   return true;
 };
 
-const getCanCastle = ({ playerTurn, board, origin, destination }: ValidMoveProps): boolean => {
+const getCanCastle = (props: ValidMoveProps): boolean => {
+  const {
+    playerTurn,
+    board,
+    origin,
+    destination,
+    whiteKingHasMoved,
+    whiteRightRookHasMoved,
+    whiteLeftRookHasMoved,
+    blackKingHasMoved,
+    blackRightRookHasMoved,
+    blackLeftRookHasMoved,
+  } = props;
   let canCastle: boolean = false;
   if (playerTurn === "white") {
     if (
@@ -186,13 +189,13 @@ const getCanCastle = ({ playerTurn, board, origin, destination }: ValidMoveProps
       !whiteRightRookHasMoved &&
       board[61] === " " &&
       board[62] === " " &&
-      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck(props) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 61: "K" } }),
       }) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 61: " ", 62: "K" } }),
       })
     ) {
@@ -205,17 +208,17 @@ const getCanCastle = ({ playerTurn, board, origin, destination }: ValidMoveProps
       board[59] === " " &&
       board[58] === " " &&
       board[57] === " " &&
-      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck(props) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 59: "K" } }),
       }) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 59: " ", 58: "K" } }),
       }) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 60: " ", 59: " ", 58: " ", 57: "K" } }),
       })
     ) {
@@ -229,13 +232,13 @@ const getCanCastle = ({ playerTurn, board, origin, destination }: ValidMoveProps
       !blackRightRookHasMoved &&
       board[5] === " " &&
       board[6] === " " &&
-      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck(props) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 5: "k" } }),
       }) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 5: " ", 6: "k" } }),
       })
     ) {
@@ -248,17 +251,17 @@ const getCanCastle = ({ playerTurn, board, origin, destination }: ValidMoveProps
       board[3] === " " &&
       board[2] === " " &&
       board[1] === " " &&
-      !getIsKingInCheck({ playerTurn, board }) &&
+      !getIsKingInCheck(props) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 3: "k" } }),
       }) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 3: " ", 2: "k" } }),
       }) &&
       !getIsKingInCheck({
-        playerTurn,
+        ...props,
         board: getUpdatedBoardRepresentation({ board, boardUpdates: { 4: " ", 3: " ", 2: " ", 1: "k" } }),
       })
     ) {
@@ -268,14 +271,19 @@ const getCanCastle = ({ playerTurn, board, origin, destination }: ValidMoveProps
   return canCastle;
 };
 
-const getIsValidPawnMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-  canSetEnPassantVars = true,
-}: ValidMoveWithSimulatedProps & { canSetEnPassantVars?: boolean }): MoveValidatorResponse => {
+const getIsValidPawnMove = (
+  props: ValidMoveWithSimulatedProps & { canSetEnPassantVars?: boolean },
+): MoveValidatorResponse => {
+  const {
+    playerTurn,
+    board,
+    origin,
+    destination,
+    isSimulatedMove = false,
+    canSetEnPassantVars = true,
+    ...rest
+  } = props;
+  let { isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex } = rest;
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const multiplier = getPlayerMultiplier(playerTurn);
@@ -339,39 +347,21 @@ const getIsValidPawnMove = ({
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "P" : "p" };
   }
   if (!isSimulatedMove) {
-    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    const isInCheck = getWillMovePutKingInCheck({ ...props, boardUpdates });
     if (isInCheck) {
       isValid = false;
       boardUpdates = {};
     }
   }
-  return { isValid, boardUpdates };
+  return { ...rest, isValid, boardUpdates, isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex };
 };
 
-const getIsValidPawnMoveIgnoreEnPassant = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
-  return getIsValidPawnMove({
-    playerTurn,
-    board,
-    origin,
-    destination,
-    isSimulatedMove,
-    canSetEnPassantVars: false,
-  });
+const getIsValidPawnMoveIgnoreEnPassant = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+  return getIsValidPawnMove({ ...props, canSetEnPassantVars: false });
 };
 
-const getIsValidKnightMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+const getIsValidKnightMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+  const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -392,22 +382,17 @@ const getIsValidKnightMove = ({
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "N" : "n" };
   }
   if (!isSimulatedMove) {
-    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    const isInCheck = getWillMovePutKingInCheck({ ...props, boardUpdates });
     if (isInCheck) {
       isValid = false;
       boardUpdates = {};
     }
   }
-  return { isValid, boardUpdates };
+  return { ...props, isValid, boardUpdates };
 };
 
-const getIsValidBishopMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+const getIsValidBishopMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+  const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -424,22 +409,17 @@ const getIsValidBishopMove = ({
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "B" : "b" };
   }
   if (!isSimulatedMove) {
-    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    const isInCheck = getWillMovePutKingInCheck({ ...props, boardUpdates });
     if (isInCheck) {
       isValid = false;
       boardUpdates = {};
     }
   }
-  return { isValid, boardUpdates };
+  return { ...props, isValid, boardUpdates };
 };
 
-const getIsValidRookMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+const getIsValidRookMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+  const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -456,22 +436,17 @@ const getIsValidRookMove = ({
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "R" : "r" };
   }
   if (!isSimulatedMove) {
-    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    const isInCheck = getWillMovePutKingInCheck({ ...props, boardUpdates });
     if (isInCheck) {
       isValid = false;
       boardUpdates = {};
     }
   }
-  return { isValid, boardUpdates };
+  return { ...props, isValid, boardUpdates };
 };
 
-const getIsValidQueenMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+const getIsValidQueenMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+  const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -493,67 +468,51 @@ const getIsValidQueenMove = ({
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "Q" : "q" };
   }
   if (!isSimulatedMove) {
-    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    const isInCheck = getWillMovePutKingInCheck({ ...props, boardUpdates });
     if (isInCheck) {
       isValid = false;
       boardUpdates = {};
     }
   }
-  return { isValid, boardUpdates };
+  return { ...props, isValid, boardUpdates };
 };
 
-const getIsValidKingMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-  canSetCastlingVars = true,
-}: ValidMoveWithSimulatedProps & { canSetCastlingVars?: boolean }): MoveValidatorResponse => {
+const getIsValidKingMove = (
+  props: ValidMoveWithSimulatedProps & { canSetCastlingVars?: boolean },
+): MoveValidatorResponse => {
+  const { playerTurn, board, origin, destination, isSimulatedMove = false, canSetCastlingVars = true, ...rest } = props;
+  let {
+    whiteKingHasMoved,
+    whiteRightRookHasMoved,
+    whiteLeftRookHasMoved,
+    blackKingHasMoved,
+    blackRightRookHasMoved,
+    blackLeftRookHasMoved,
+  } = rest;
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
-  if (
-    playerTurn === "white" &&
-    origin === 60 &&
-    destination === 62 &&
-    getCanCastle({ playerTurn, board, origin, destination })
-  ) {
+  if (playerTurn === "white" && origin === 60 && destination === 62 && getCanCastle(props)) {
     isValid = true;
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "K", [61]: "R", [63]: " " };
     if (canSetCastlingVars) {
       whiteKingHasMoved = true;
       whiteRightRookHasMoved = true;
     }
-  } else if (
-    playerTurn === "white" &&
-    origin === 60 &&
-    destination === 58 &&
-    getCanCastle({ playerTurn, board, origin, destination })
-  ) {
+  } else if (playerTurn === "white" && origin === 60 && destination === 58 && getCanCastle(props)) {
     isValid = true;
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "K", [59]: "R", [56]: " " };
     if (canSetCastlingVars) {
       whiteKingHasMoved = true;
       whiteLeftRookHasMoved = true;
     }
-  } else if (
-    playerTurn === "black" &&
-    origin === 4 &&
-    destination === 6 &&
-    getCanCastle({ playerTurn, board, origin, destination })
-  ) {
+  } else if (playerTurn === "black" && origin === 4 && destination === 6 && getCanCastle(props)) {
     isValid = true;
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "k", [5]: "r", [7]: " " };
     if (canSetCastlingVars) {
       blackKingHasMoved = true;
       blackRightRookHasMoved = true;
     }
-  } else if (
-    playerTurn === "black" &&
-    origin === 4 &&
-    destination === 2 &&
-    getCanCastle({ playerTurn, board, origin, destination })
-  ) {
+  } else if (playerTurn === "black" && origin === 4 && destination === 2 && getCanCastle(props)) {
     isValid = true;
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: "k", [3]: "r", [0]: " " };
     if (canSetCastlingVars) {
@@ -562,7 +521,17 @@ const getIsValidKingMove = ({
     }
   }
   if (isValid) {
-    return { isValid, boardUpdates };
+    return {
+      ...props,
+      whiteKingHasMoved,
+      whiteRightRookHasMoved,
+      whiteLeftRookHasMoved,
+      blackKingHasMoved,
+      blackRightRookHasMoved,
+      blackLeftRookHasMoved,
+      isValid,
+      boardUpdates,
+    };
   }
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
   const isDiagonalMove = getIsDiagonalMove({ origin, destination });
@@ -588,164 +557,74 @@ const getIsValidKingMove = ({
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "K" : "k" };
   }
   if (!isSimulatedMove) {
-    const isInCheck = getWillMovePutKingInCheck({ board, boardUpdates, playerTurn });
+    const isInCheck = getWillMovePutKingInCheck({ ...props, boardUpdates });
     if (isInCheck) {
       isValid = false;
       boardUpdates = {};
     }
   }
-  return { isValid, boardUpdates };
+  return { ...props, isValid, boardUpdates };
 };
 
-const getIsValidKingMoveIgnoreCastling = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
-  return getIsValidKingMove({
-    playerTurn,
-    board,
-    origin,
-    destination,
-    isSimulatedMove,
-    canSetCastlingVars: false,
-  });
+const getIsValidKingMoveIgnoreCastling = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
+  return getIsValidKingMove({ ...props, canSetCastlingVars: false });
 };
 
-export const getIsValidMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  isSimulatedMove = false,
-  piece,
-}: ValidMoveWithSimulatedProps & { piece: SanPiece }): MoveValidatorResponse => {
-  let isValid: boolean = false;
-  let boardUpdates: Record<number, SanPiece> = {};
+export const getIsValidMove = (props: ValidMoveWithSimulatedProps & { piece: SanPiece }): MoveValidatorResponse => {
+  const { piece, ...rest } = props;
+  const { playerTurn, origin, destination } = rest;
+  const isValid: boolean = false;
+  const boardUpdates: Record<number, SanPiece> = {};
   if (origin === destination) {
-    return { isValid, boardUpdates };
+    return { ...props, isValid, boardUpdates };
   }
+  let validMoveResponse: MoveValidatorResponse = { ...props, isValid, boardUpdates };
   if (playerTurn === "white") {
     switch (piece) {
       case "P":
-        ({ isValid, boardUpdates } = getIsValidPawnMove({
-          playerTurn: "white",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidPawnMove(rest);
         break;
       case "N":
-        ({ isValid, boardUpdates } = getIsValidKnightMove({
-          playerTurn: "white",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidKnightMove(rest);
         break;
       case "B":
-        ({ isValid, boardUpdates } = getIsValidBishopMove({
-          playerTurn: "white",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidBishopMove(rest);
         break;
       case "R":
-        ({ isValid, boardUpdates } = getIsValidRookMove({
-          playerTurn: "white",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidRookMove(rest);
         break;
       case "Q":
-        ({ isValid, boardUpdates } = getIsValidQueenMove({
-          playerTurn: "white",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidQueenMove(rest);
         break;
       case "K":
-        ({ isValid, boardUpdates } = getIsValidKingMove({
-          playerTurn: "white",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidKingMove(rest);
         break;
     }
   } else {
     switch (piece) {
       case "p":
-        if (playerTurn === "black") {
-          ({ isValid, boardUpdates } = getIsValidPawnMove({
-            playerTurn: "black",
-            board,
-            origin,
-            destination,
-          }));
-        }
+        validMoveResponse = getIsValidPawnMove(rest);
         break;
       case "n":
-        ({ isValid, boardUpdates } = getIsValidKnightMove({
-          playerTurn: "black",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidKnightMove(rest);
         break;
       case "b":
-        ({ isValid, boardUpdates } = getIsValidBishopMove({
-          playerTurn: "black",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidBishopMove(rest);
         break;
       case "r":
-        ({ isValid, boardUpdates } = getIsValidRookMove({
-          playerTurn: "black",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidRookMove(rest);
         break;
       case "q":
-        ({ isValid, boardUpdates } = getIsValidQueenMove({
-          playerTurn: "black",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidQueenMove(rest);
         break;
       case "k":
-        ({ isValid, boardUpdates } = getIsValidKingMove({
-          playerTurn: "black",
-          board,
-          origin,
-          destination,
-          isSimulatedMove,
-        }));
+        validMoveResponse = getIsValidKingMove(rest);
         break;
       default:
         break;
     }
   }
-  return { isValid, boardUpdates };
+  return validMoveResponse;
 };
 
 const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): number => {
@@ -762,14 +641,15 @@ const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: San
   return kingPosition;
 };
 
-const getIsKingInCheck = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
+const getIsKingInCheck = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
+  const { playerTurn, board } = props;
   let isInCheck: boolean = false;
   const kingPosition = getKingPosition({ playerTurn, board });
   const opponentPlayerTurn = playerTurn === "white" ? "black" : "white";
   for (let i = 0; i < totalTiles; i++) {
     const { isValid } = getIsValidMove({
+      ...props,
       piece: board[i],
-      board,
       playerTurn: opponentPlayerTurn,
       origin: i,
       destination: kingPosition,
@@ -783,23 +663,19 @@ const getIsKingInCheck = ({ playerTurn, board }: { playerTurn: Player; board: Sa
   return isInCheck;
 };
 
-const getWillMovePutKingInCheck = ({
-  board,
-  boardUpdates,
-  playerTurn,
-}: {
-  board: SanPiece[];
-  boardUpdates: Record<number, SanPiece>;
-  playerTurn: Player;
-}): boolean => {
-  return getIsKingInCheck({ playerTurn, board: getUpdatedBoardRepresentation({ board, boardUpdates }) });
+const getWillMovePutKingInCheck = (
+  props: Omit<ValidMoveProps, "origin" | "destination"> & { boardUpdates: Record<number, SanPiece> },
+): boolean => {
+  const { board, boardUpdates } = props;
+  return getIsKingInCheck({ ...props, board: getUpdatedBoardRepresentation({ board, boardUpdates }) });
 };
 
-export const getIsStalemate = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
+export const getIsStalemate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
+  const { board } = props;
   let isCheckmate: boolean = true;
   for (let i = 0; i < totalTiles; i++) {
     if (board[i] !== " " && board[i] !== "K" && board[i] !== "k") {
-      const validMoves = getAllValidPieceMoves({ piece: board[i], playerTurn, board, origin: i });
+      const validMoves = getAllValidPieceMoves({ ...props, piece: board[i], origin: i });
       if (validMoves.length > 0) {
         isCheckmate = false;
         break;
@@ -809,36 +685,14 @@ export const getIsStalemate = ({ playerTurn, board }: { playerTurn: Player; boar
   return isCheckmate;
 };
 
-export const getIsCheckmate = ({ playerTurn, board }: { playerTurn: Player; board: SanPiece[] }): boolean => {
-  return getIsKingInCheck({ playerTurn, board }) && getIsStalemate({ playerTurn, board });
+export const getIsCheckmate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
+  return getIsKingInCheck(props) && getIsStalemate(props);
 };
 
-export const getAllValidPieceMoves = ({
-  piece,
-  playerTurn,
-  board,
-  origin,
-}: {
-  piece: SanPiece;
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-}): number[] => {
-  let validMovesFn:
-    | (({
-        playerTurn,
-        board,
-        origin,
-        destination,
-        isSimulatedMove,
-      }: {
-        playerTurn: Player;
-        board: SanPiece[];
-        origin: number;
-        destination: number;
-        isSimulatedMove?: boolean;
-      }) => MoveValidatorResponse)
-    | null = null;
+export const getAllValidPieceMoves = (props: Omit<ValidMoveProps, "destination"> & { piece: SanPiece }): number[] => {
+  const { piece, ...rest } = props;
+  const { playerTurn } = rest;
+  let validMovesFn: ((props: ValidMoveProps) => MoveValidatorResponse) | null = null;
   if (
     (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) ||
     (playerTurn === "black" && !blackSanPieces.includes(piece as SanPieceBlack))
@@ -878,7 +732,7 @@ export const getAllValidPieceMoves = ({
     return res;
   }
   for (let i = 0; i < totalTiles; i++) {
-    const { isValid } = validMovesFn({ playerTurn, board, origin, destination: i });
+    const { isValid } = validMovesFn({ ...rest, destination: i });
     if (isValid) {
       res = [...res, i];
     }
@@ -887,21 +741,24 @@ export const getAllValidPieceMoves = ({
   return res;
 };
 
-export const computeCanMakeMove = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-  piece,
-}: ValidMoveProps & { piece: SanPiece }): MoveValidatorResponse => {
+export const computeCanMakeMove = (props: ValidMoveProps & { piece: SanPiece }): MoveValidatorResponse => {
+  const { piece, playerTurn, origin, destination, ...rest } = props;
+  let {
+    whiteKingHasMoved,
+    whiteRightRookHasMoved,
+    whiteLeftRookHasMoved,
+    blackKingHasMoved,
+    blackRightRookHasMoved,
+    blackLeftRookHasMoved,
+  } = rest;
   if (
     origin === destination ||
     (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) ||
     (playerTurn === "black" && !blackSanPieces.includes(piece as SanPieceBlack))
   ) {
-    return { isValid: false, boardUpdates: {} };
+    return { ...props, isValid: false, boardUpdates: {} };
   }
-  const res = getIsValidMove({ piece, board, playerTurn, origin, destination });
+  const res = getIsValidMove(props);
   if (res.isValid) {
     switch (origin) {
       case 0:
@@ -926,5 +783,14 @@ export const computeCanMakeMove = ({
         break;
     }
   }
-  return res;
+  return {
+    ...props,
+    ...res,
+    blackRightRookHasMoved,
+    blackLeftRookHasMoved,
+    blackKingHasMoved,
+    whiteLeftRookHasMoved,
+    whiteRightRookHasMoved,
+    whiteKingHasMoved,
+  };
 };

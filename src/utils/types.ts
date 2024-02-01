@@ -41,3 +41,14 @@ export type SanPieceBlack =
   | SanRookBlack
   | SanQueenBlack
   | SanKingBlack;
+export interface BoardStateProps {
+  board: SanPiece[];
+  isLastMoveVulnerableToEnPassant: boolean;
+  enPassantCapturePieceIndex: number | null;
+  whiteKingHasMoved: boolean;
+  blackKingHasMoved: boolean;
+  whiteLeftRookHasMoved: boolean;
+  whiteRightRookHasMoved: boolean;
+  blackLeftRookHasMoved: boolean;
+  blackRightRookHasMoved: boolean;
+}

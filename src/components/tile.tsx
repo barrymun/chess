@@ -10,9 +10,10 @@ interface TileProps {
 
 const Tile: FC<TileProps> = (props) => {
   const { position, grabPiece } = props;
-  const { board } = useGameState();
+  const { boardState } = useGameState();
   const tileColor: TileColor = (Math.floor(position / tilesPerRow) + position) % 2 === 0 ? "light" : "dark";
-  const imgSrc = board[position] !== " " ? `assets/img/${assetSanPieceMap[board[position]]}.png` : null;
+  const imgSrc =
+    boardState.board[position] !== " " ? `assets/img/${assetSanPieceMap[boardState.board[position]]}.png` : null;
 
   return (
     <div className={`w-100 h-100 flex ${tileColor === "light" ? "bg-chess-tile-light" : "bg-inherit"}`}>
