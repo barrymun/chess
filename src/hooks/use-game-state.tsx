@@ -37,7 +37,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     const oppositePlayerTurn = playerTurn === "white" ? "black" : "white";
     const isStalemate = getIsStalemate({ ...boardState, playerTurn: oppositePlayerTurn });
     const isCheckmate = getIsCheckmate({ ...boardState, playerTurn: oppositePlayerTurn });
-    console.log({ isStalemate, isCheckmate });
+    console.log({ isStalemate, isCheckmate }); // TODO: handle game over logic
     setPlayerTurn((prevPlayerTurn) => (prevPlayerTurn === "white" ? "black" : "white"));
   }, [boardState.board]);
 

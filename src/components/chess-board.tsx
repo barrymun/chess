@@ -83,21 +83,21 @@ const ChessBoard = () => {
         clearSelectionContext();
         return;
       }
-      const canMakeMoveResponse = computeCanMakeMove({
+      const { isValid, boardUpdates, ...canMakeMoveResponse } = computeCanMakeMove({
         ...boardState,
         piece: boardState.board[originIndex],
         playerTurn,
         origin: originIndex,
         destination: destinationIndex,
       });
-      if (!canMakeMoveResponse.isValid || Object.keys(canMakeMoveResponse.boardUpdates).length === 0) {
+      if (!isValid || Object.keys(boardUpdates).length === 0) {
         clearSelectionContext();
         return;
       }
       setBoardState((prevBoardState) => ({
         ...prevBoardState,
         ...canMakeMoveResponse,
-        board: prevBoardState.board.map((piece, index) => canMakeMoveResponse.boardUpdates[index] ?? piece),
+        board: prevBoardState.board.map((piece, index) => boardUpdates[index] ?? piece),
       }));
     },
     [boardState, playerTurn],

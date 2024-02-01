@@ -46,9 +46,9 @@ export interface BoardStateProps {
   isLastMoveVulnerableToEnPassant: boolean;
   enPassantCapturePieceIndex: number | null;
   whiteKingHasMoved: boolean;
-  blackKingHasMoved: boolean;
   whiteLeftRookHasMoved: boolean;
   whiteRightRookHasMoved: boolean;
+  blackKingHasMoved: boolean;
   blackLeftRookHasMoved: boolean;
   blackRightRookHasMoved: boolean;
 }
