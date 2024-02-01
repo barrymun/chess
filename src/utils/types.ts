@@ -51,4 +51,5 @@ export interface BoardStateProps {
   blackKingHasMoved: boolean;
   blackLeftRookHasMoved: boolean;
   blackRightRookHasMoved: boolean;
+  pawnPromotionPieceIndex: number | null;
 }

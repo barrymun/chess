@@ -271,6 +271,13 @@ const getCanCastle = (props: ValidMoveProps): boolean => {
   return canCastle;
 };
 
+const getCanPawnPromote = (props: ValidMoveProps): boolean => {
+  const { playerTurn, origin, destination } = props;
+  const multiplier = getPlayerMultiplier(playerTurn);
+  const isPromotionRow = playerTurn === "white" ? 0 : 7;
+  return origin + multiplier * tilesPerRow === destination && Math.floor(destination / tilesPerRow) === isPromotionRow;
+};
+
 const getIsValidPawnMove = (
   props: ValidMoveWithSimulatedProps & { canSetEnPassantVars?: boolean },
 ): MoveValidatorResponse => {
@@ -283,7 +290,7 @@ const getIsValidPawnMove = (
     canSetEnPassantVars = true,
     ...rest
   } = props;
-  let { isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex } = rest;
+  let { isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex, pawnPromotionPieceIndex } = rest;
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const multiplier = getPlayerMultiplier(playerTurn);
@@ -346,6 +353,9 @@ const getIsValidPawnMove = (
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "P" : "p" };
   }
+  if (isValid && getCanPawnPromote(props)) {
+    pawnPromotionPieceIndex = destination;
+  }
   if (!isSimulatedMove) {
     const isInCheck = getWillMovePutKingInCheck({ ...props, boardUpdates });
     if (isInCheck) {
@@ -353,7 +363,14 @@ const getIsValidPawnMove = (
       boardUpdates = {};
     }
   }
-  return { ...rest, isValid, boardUpdates, isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex };
+  return {
+    ...rest,
+    isValid,
+    boardUpdates,
+    isLastMoveVulnerableToEnPassant,
+    enPassantCapturePieceIndex,
+    pawnPromotionPieceIndex,
+  };
 };
 
 const getIsValidPawnMoveIgnoreEnPassant = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
