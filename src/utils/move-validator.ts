@@ -23,6 +23,17 @@ interface MoveValidatorResponse {
   boardUpdates: Record<number, SanPiece>;
 }
 
+interface ValidMoveProps {
+  playerTurn: Player;
+  board: SanPiece[];
+  origin: number;
+  destination: number;
+}
+
+interface ValidMoveWithSimulatedProps extends ValidMoveProps {
+  isSimulatedMove?: boolean;
+}
+
 const getUpdatedBoardRepresentation = ({
   board,
   boardUpdates,
@@ -165,17 +176,7 @@ const getIsStraightClear = ({
   return true;
 };
 
-const getCanCastle = ({
-  playerTurn,
-  board,
-  origin,
-  destination,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-}): boolean => {
+const getCanCastle = ({ playerTurn, board, origin, destination }: ValidMoveProps): boolean => {
   let canCastle: boolean = false;
   if (playerTurn === "white") {
     if (
@@ -274,14 +275,7 @@ const getIsValidPawnMove = ({
   destination,
   isSimulatedMove = false,
   canSetEnPassantVars = true,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-  canSetEnPassantVars?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps & { canSetEnPassantVars?: boolean }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const multiplier = getPlayerMultiplier(playerTurn);
@@ -360,13 +354,7 @@ const getIsValidPawnMoveIgnoreEnPassant = ({
   origin,
   destination,
   isSimulatedMove = false,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   return getIsValidPawnMove({
     playerTurn,
     board,
@@ -383,13 +371,7 @@ const getIsValidKnightMove = ({
   origin,
   destination,
   isSimulatedMove = false,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -425,13 +407,7 @@ const getIsValidBishopMove = ({
   origin,
   destination,
   isSimulatedMove = false,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -463,13 +439,7 @@ const getIsValidRookMove = ({
   origin,
   destination,
   isSimulatedMove = false,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -501,13 +471,7 @@ const getIsValidQueenMove = ({
   origin,
   destination,
   isSimulatedMove = false,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({ playerTurn, board, destination });
@@ -545,14 +509,7 @@ const getIsValidKingMove = ({
   destination,
   isSimulatedMove = false,
   canSetCastlingVars = true,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-  canSetCastlingVars?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps & { canSetCastlingVars?: boolean }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   if (
@@ -646,13 +603,7 @@ const getIsValidKingMoveIgnoreCastling = ({
   origin,
   destination,
   isSimulatedMove = false,
-}: {
-  playerTurn: Player;
-  board: SanPiece[];
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-}): MoveValidatorResponse => {
+}: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   return getIsValidKingMove({
     playerTurn,
     board,
@@ -664,20 +615,13 @@ const getIsValidKingMoveIgnoreCastling = ({
 };
 
 export const getIsValidMove = ({
-  piece,
-  board,
   playerTurn,
+  board,
   origin,
   destination,
   isSimulatedMove = false,
-}: {
-  piece: SanPiece;
-  board: SanPiece[];
-  playerTurn: Player;
-  origin: number;
-  destination: number;
-  isSimulatedMove?: boolean;
-}): MoveValidatorResponse => {
+  piece,
+}: ValidMoveWithSimulatedProps & { piece: SanPiece }): MoveValidatorResponse => {
   let isValid: boolean = false;
   let boardUpdates: Record<number, SanPiece> = {};
   if (origin === destination) {
@@ -944,18 +888,12 @@ export const getAllValidPieceMoves = ({
 };
 
 export const computeCanMakeMove = ({
-  piece,
-  board,
   playerTurn,
+  board,
   origin,
   destination,
-}: {
-  piece: SanPiece;
-  board: SanPiece[];
-  playerTurn: Player;
-  origin: number;
-  destination: number;
-}): MoveValidatorResponse => {
+  piece,
+}: ValidMoveProps & { piece: SanPiece }): MoveValidatorResponse => {
   if (
     origin === destination ||
     (playerTurn === "white" && !whiteSanPieces.includes(piece as SanPieceWhite)) ||
