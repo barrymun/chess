@@ -1,9 +1,10 @@
 import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { PawnPromotionModal } from "components";
+import { GameOverModal, PawnPromotionModal } from "components";
 import {
   BoardStateProps,
+  GameOverProps,
   Player,
   SanBishopBlack,
   SanBishopWhite,
@@ -14,6 +15,7 @@ import {
   SanRookBlack,
   SanRookWhite,
   defaultBoard,
+  defaultGameOverState,
   getIsCheckmate,
   getIsStalemate,
 } from "utils";
@@ -38,6 +40,7 @@ const GameStateContext = createContext(
       | null;
     showPawnPromotionModal: boolean;
     selectedPieceLegalMoves: number[];
+    gameOver: GameOverProps;
     setBoardState: React.Dispatch<React.SetStateAction<BoardStateProps>>;
     setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
     setPawnPromotionPieceSelection: React.Dispatch<React.SetStateAction<
@@ -53,6 +56,7 @@ const GameStateContext = createContext(
     > | null>;
     setShowPawnPromotionModal: React.Dispatch<React.SetStateAction<boolean>>;
     setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
+    setGameOver: React.Dispatch<React.SetStateAction<GameOverProps>>;
   },
 );
 
@@ -83,7 +87,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
   >(null);
   const [showPawnPromotionModal, setShowPawnPromotionModal] = useState<boolean>(false);
   const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<number[]>([]);
-  // const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [gameOver, setGameOver] = useState<GameOverProps>(defaultGameOverState);
 
   useEffect(() => {
     if (isEqual(boardState.board, defaultBoard)) {
@@ -98,7 +102,15 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     const oppositePlayerTurn = playerTurn === "white" ? "black" : "white";
     const isStalemate = getIsStalemate({ ...boardState, playerTurn: oppositePlayerTurn });
     const isCheckmate = getIsCheckmate({ ...boardState, playerTurn: oppositePlayerTurn });
-    console.log({ isStalemate, isCheckmate }); // TODO: handle game over logic
+    if (isStalemate || isCheckmate) {
+      console.log({ isStalemate, isCheckmate });
+      setGameOver({
+        isGameOver: true,
+        winner: isCheckmate ? playerTurn : null,
+        reason: isCheckmate ? "checkmate" : "stalemate",
+      });
+      return;
+    }
     setPlayerTurn((prevPlayerTurn) => (prevPlayerTurn === "white" ? "black" : "white"));
   }, [boardState.board]);
 
@@ -125,11 +137,13 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
+      gameOver,
       setBoardState,
       setPlayerTurn,
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,
       setSelectedPieceLegalMoves,
+      setGameOver,
     }),
     [
       boardState,
@@ -137,11 +151,13 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
+      gameOver,
       setBoardState,
       setPlayerTurn,
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,
       setSelectedPieceLegalMoves,
+      setGameOver,
     ],
   );
 
@@ -149,6 +165,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     <GameStateContext.Provider value={value}>
       {children}
       <PawnPromotionModal />
+      <GameOverModal />
     </GameStateContext.Provider>
   );
 };

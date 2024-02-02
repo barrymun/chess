@@ -53,3 +53,9 @@ export interface BoardStateProps {
   blackRightRookHasMoved: boolean;
   pawnPromotionPieceIndex: number | null;
 }
+// TODO: this will be updated in the future when more game over states are added
+export interface GameOverProps {
+  isGameOver: boolean;
+  winner: Player | null;
+  reason: "checkmate" | "insufficient material" | "stalemate" | "draw";
+}
