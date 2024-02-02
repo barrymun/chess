@@ -754,7 +754,6 @@ export const getAllValidPieceMoves = (props: Omit<ValidMoveProps, "destination">
       res = [...res, i];
     }
   }
-  console.log(res);
   return res;
 };
 

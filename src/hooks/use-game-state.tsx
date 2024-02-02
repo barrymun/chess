@@ -25,8 +25,10 @@ const GameStateContext = createContext(
   {} as {
     boardState: BoardStateProps;
     playerTurn: Player;
+    selectedPieceLegalMoves: number[];
     setBoardState: React.Dispatch<React.SetStateAction<BoardStateProps>>;
     setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
+    setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
   },
 );
 
@@ -56,6 +58,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     | null
   >(null);
   const [showPawnPromotionModal, setShowPawnPromotionModal] = useState<boolean>(false);
+  const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<number[]>([]);
   // const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   useEffect(() => {
@@ -95,10 +98,12 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     () => ({
       boardState,
       playerTurn,
+      selectedPieceLegalMoves,
       setBoardState,
       setPlayerTurn,
+      setSelectedPieceLegalMoves,
     }),
-    [boardState, playerTurn, setBoardState, setPlayerTurn],
+    [boardState, playerTurn, selectedPieceLegalMoves, setBoardState, setPlayerTurn, setSelectedPieceLegalMoves],
   );
 
   return (

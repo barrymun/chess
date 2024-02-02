@@ -10,7 +10,7 @@ let selectedPiece: HTMLDivElement | null = null;
 
 const ChessBoard = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const { boardState, playerTurn, setBoardState } = useGameState();
+  const { boardState, playerTurn, setBoardState, setSelectedPieceLegalMoves } = useGameState();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
@@ -20,12 +20,14 @@ const ChessBoard = () => {
     isMouseDown = true;
     originIndex = position;
     selectedPiece = target;
-    getAllValidPieceMoves({
+    const allValidMoves = getAllValidPieceMoves({
       ...boardState,
       piece: boardState.board[originIndex],
       playerTurn,
       origin: position,
     });
+    console.log(allValidMoves);
+    setSelectedPieceLegalMoves(allValidMoves);
   };
 
   const movePiece = (e: MouseEvent) => {
@@ -61,6 +63,7 @@ const ChessBoard = () => {
 
   const dropPiece = useCallback(
     (e: MouseEvent) => {
+      setSelectedPieceLegalMoves([]);
       if (originIndex === null || selectedPiece === null) {
         return;
       }
