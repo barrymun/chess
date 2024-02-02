@@ -1,6 +1,7 @@
 import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+import { PawnPromotionModal } from "components";
 import {
   BoardStateProps,
   Player,
@@ -25,9 +26,32 @@ const GameStateContext = createContext(
   {} as {
     boardState: BoardStateProps;
     playerTurn: Player;
+    pawnPromotionPieceSelection:
+      | SanBishopBlack
+      | SanBishopWhite
+      | SanKnightBlack
+      | SanKnightWhite
+      | SanQueenBlack
+      | SanQueenWhite
+      | SanRookBlack
+      | SanRookWhite
+      | null;
+    showPawnPromotionModal: boolean;
     selectedPieceLegalMoves: number[];
     setBoardState: React.Dispatch<React.SetStateAction<BoardStateProps>>;
     setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
+    setPawnPromotionPieceSelection: React.Dispatch<React.SetStateAction<
+      | SanBishopBlack
+      | SanBishopWhite
+      | SanKnightBlack
+      | SanKnightWhite
+      | SanQueenBlack
+      | SanQueenWhite
+      | SanRookBlack
+      | SanRookWhite
+      | null
+    > | null>;
+    setShowPawnPromotionModal: React.Dispatch<React.SetStateAction<boolean>>;
     setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
   },
 );
@@ -98,68 +122,33 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     () => ({
       boardState,
       playerTurn,
+      pawnPromotionPieceSelection,
+      showPawnPromotionModal,
       selectedPieceLegalMoves,
       setBoardState,
       setPlayerTurn,
+      setPawnPromotionPieceSelection,
+      setShowPawnPromotionModal,
       setSelectedPieceLegalMoves,
     }),
-    [boardState, playerTurn, selectedPieceLegalMoves, setBoardState, setPlayerTurn, setSelectedPieceLegalMoves],
+    [
+      boardState,
+      playerTurn,
+      pawnPromotionPieceSelection,
+      showPawnPromotionModal,
+      selectedPieceLegalMoves,
+      setBoardState,
+      setPlayerTurn,
+      setPawnPromotionPieceSelection,
+      setShowPawnPromotionModal,
+      setSelectedPieceLegalMoves,
+    ],
   );
 
   return (
     <GameStateContext.Provider value={value}>
       {children}
-      <div
-        className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center"
-        style={{ display: showPawnPromotionModal ? "flex" : "none" }}
-      >
-        <div className="flex justify-center items-center border-2 border-black rounded">
-          <div
-            className="w-100 h-100 hover:cursor-pointer"
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "Q" : "q")}
-          >
-            <div
-              style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "queen-w" : "queen-b"}.png)`,
-              }}
-              className="bg-no-repeat w-100 h-100 bg-contain bg-center"
-            />
-          </div>
-          <div
-            className="w-100 h-100 hover:cursor-pointer"
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "R" : "r")}
-          >
-            <div
-              style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "rook-w" : "rook-b"}.png)`,
-              }}
-              className="bg-no-repeat w-100 h-100 bg-contain bg-center"
-            />
-          </div>
-          <div
-            className="w-100 h-100 hover:cursor-pointer"
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "B" : "b")}
-          >
-            <div
-              style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "bishop-w" : "bishop-b"}.png)`,
-              }}
-              className="bg-no-repeat w-100 h-100 bg-contain bg-center"
-            />
-          </div>
-          <div
-            className="w-100 h-100 hover:cursor-pointer"
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "N" : "n")}
-          >
-            <div
-              style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "knight-w" : "knight-b"}.png)`,
-              }}
-              className="bg-no-repeat w-100 h-100 bg-contain bg-center"
-            />
-          </div>
-        </div>
-      </div>
+      <PawnPromotionModal />
     </GameStateContext.Provider>
   );
 };
