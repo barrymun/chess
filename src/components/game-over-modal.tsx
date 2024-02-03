@@ -9,7 +9,8 @@ const GameOverModal = () => {
 
   if (gameOver.winner === null) {
     return (
-      <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center">
+      // eslint-disable-next-line max-len
+      <div className="fixed z-20 top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center">
         <div className="flex justify-center items-center border-2 border-black rounded">
           <div className="text-4xl font-bold">{gameOver.reason}</div>
         </div>
@@ -19,7 +20,7 @@ const GameOverModal = () => {
 
   return (
     // eslint-disable-next-line max-len
-    <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex flex-col justify-center items-center">
+    <div className="fixed z-20 top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex flex-col justify-center items-center">
       <div className="flex justify-center items-center border-2 border-black rounded">
         <div className="text-4xl font-bold">
           {gameOver.winner === "white" ? "White" : "Black"} Wins by {gameOver.reason}!

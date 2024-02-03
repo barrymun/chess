@@ -470,16 +470,22 @@ const getIsValidQueenMove = (props: ValidMoveWithSimulatedProps): MoveValidatorR
   const isDiagonalMove = getIsDiagonalMove({ origin, destination });
   const isDiagonalClear = getIsDiagonalClear({ board, origin, destination });
   const isDiagonalCapture = getIsCapturingEnemyPiece({ playerTurn, board, destination });
-  const isStraightMove = getIsStraightMove({ origin, destination });
-  const isStraightClear = getIsStraightClear({ board, origin, destination });
-  const isStraightCapture = getIsCapturingEnemyPiece({ playerTurn, board, destination });
   if (
     (isDestinationFriendlyFree && isDiagonalMove && isDiagonalClear) ||
-    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalClear && isDiagonalCapture) ||
-    (isDestinationFriendlyFree && isStraightMove && isStraightClear) ||
-    (isDestinationFriendlyFree && isStraightMove && isStraightClear && isStraightCapture)
+    (isDestinationFriendlyFree && isDiagonalMove && isDiagonalClear && isDiagonalCapture)
   ) {
     isValid = true;
+  }
+  if (!isValid) {
+    const isStraightMove = getIsStraightMove({ origin, destination });
+    const isStraightClear = getIsStraightClear({ board, origin, destination });
+    const isStraightCapture = getIsCapturingEnemyPiece({ playerTurn, board, destination });
+    if (
+      (isDestinationFriendlyFree && isStraightMove && isStraightClear) ||
+      (isDestinationFriendlyFree && isStraightMove && isStraightClear && isStraightCapture)
+    ) {
+      isValid = true;
+    }
   }
   if (isValid) {
     boardUpdates = { ...boardUpdates, [origin]: " ", [destination]: playerTurn === "white" ? "Q" : "q" };

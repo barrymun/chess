@@ -5,7 +5,7 @@ const PawnPromotionModal = () => {
 
   return (
     <div
-      className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center"
+      className="fixed z-20 top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center"
       style={{ display: showPawnPromotionModal ? "flex" : "none" }}
     >
       <div className="flex justify-center items-center border-2 border-black rounded">
