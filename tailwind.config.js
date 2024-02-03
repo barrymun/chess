@@ -8,6 +8,8 @@ module.exports = {
       colors: {
         'chess-board': '#769656',
         'chess-tile-light': '#eeeed2',
+        'icterine': '#F5FF71',
+        'pear': '#BAD731',
       },
       height: {
         '100': '100px',

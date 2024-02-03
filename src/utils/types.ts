@@ -59,3 +59,7 @@ export interface GameOverProps {
   winner: Player | null;
   reason: "checkmate" | "insufficient material" | "stalemate" | "draw";
 }
+export interface LastMoveProps {
+  origin: number;
+  destination: number;
+}

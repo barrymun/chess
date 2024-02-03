@@ -10,7 +10,7 @@ let selectedPiece: HTMLDivElement | null = null;
 
 const ChessBoard = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const { boardState, playerTurn, setBoardState, setSelectedPieceLegalMoves } = useGameState();
+  const { boardState, playerTurn, setBoardState, setLastMovedPiece, setSelectedPieceLegalMoves } = useGameState();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
@@ -97,6 +97,10 @@ const ChessBoard = () => {
         clearSelectionContext();
         return;
       }
+      setLastMovedPiece({
+        origin: originIndex,
+        destination: destinationIndex,
+      });
       setBoardState((prevBoardState) => ({
         ...prevBoardState,
         ...canMakeMoveResponse,

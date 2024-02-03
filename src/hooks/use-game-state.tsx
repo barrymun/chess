@@ -5,6 +5,7 @@ import { GameOverModal, PawnPromotionModal } from "components";
 import {
   BoardStateProps,
   GameOverProps,
+  LastMoveProps,
   Player,
   SanBishopBlack,
   SanBishopWhite,
@@ -27,6 +28,7 @@ interface GameStateProviderProps {
 const GameStateContext = createContext(
   {} as {
     boardState: BoardStateProps;
+    lastMovedPiece: LastMoveProps | null;
     playerTurn: Player;
     pawnPromotionPieceSelection:
       | SanBishopBlack
@@ -42,6 +44,7 @@ const GameStateContext = createContext(
     selectedPieceLegalMoves: number[];
     gameOver: GameOverProps;
     setBoardState: React.Dispatch<React.SetStateAction<BoardStateProps>>;
+    setLastMovedPiece: React.Dispatch<React.SetStateAction<LastMoveProps | null>>;
     setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
     setPawnPromotionPieceSelection: React.Dispatch<React.SetStateAction<
       | SanBishopBlack
@@ -73,6 +76,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     blackRightRookHasMoved: false, // h8
     pawnPromotionPieceIndex: null,
   });
+  const [lastMovedPiece, setLastMovedPiece] = useState<LastMoveProps | null>(null);
   const [playerTurn, setPlayerTurn] = useState<Player>("white");
   const [pawnPromotionPieceSelection, setPawnPromotionPieceSelection] = useState<
     | SanBishopBlack
@@ -133,12 +137,14 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
   const value = useMemo(
     () => ({
       boardState,
+      lastMovedPiece,
       playerTurn,
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
       gameOver,
       setBoardState,
+      setLastMovedPiece,
       setPlayerTurn,
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,
@@ -147,12 +153,14 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     }),
     [
       boardState,
+      lastMovedPiece,
       playerTurn,
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
       gameOver,
       setBoardState,
+      setLastMovedPiece,
       setPlayerTurn,
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,

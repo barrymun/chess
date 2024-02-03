@@ -10,7 +10,7 @@ interface TileProps {
 
 const Tile: FC<TileProps> = (props) => {
   const { position, grabPiece } = props;
-  const { boardState, selectedPieceLegalMoves } = useGameState();
+  const { boardState, lastMovedPiece, selectedPieceLegalMoves } = useGameState();
 
   const tileColor: TileColor = (Math.floor(position / tilesPerRow) + position) % 2 === 0 ? "light" : "dark";
   const imgSrc =
@@ -18,6 +18,12 @@ const Tile: FC<TileProps> = (props) => {
 
   return (
     <div className={`w-100 h-100 flex ${tileColor === "light" ? "bg-chess-tile-light" : "bg-inherit"}`}>
+      {lastMovedPiece !== null && lastMovedPiece.origin === position && (
+        <div className="absolute w-100 h-100 bg-pear" />
+      )}
+      {lastMovedPiece !== null && lastMovedPiece.destination === position && (
+        <div className="absolute w-100 h-100 bg-icterine" />
+      )}
       {selectedPieceLegalMoves.includes(position) && (
         <div className="absolute w-100 h-100 flex justify-center items-center">
           <div className="w-1/3 h-1/3 rounded-full bg-cyan-100" />
@@ -28,7 +34,7 @@ const Tile: FC<TileProps> = (props) => {
           style={{
             backgroundImage: `url(${imgSrc})`,
           }}
-          className="bg-no-repeat w-100 h-100 bg-contain bg-center hover:cursor-grab"
+          className="bg-no-repeat w-100 h-100 bg-contain bg-center z-10 hover:cursor-grab"
           onMouseDown={grabPiece(position)}
         />
       )}
