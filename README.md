@@ -2,6 +2,8 @@
 
 This is a Chess project implemented in TypeScript. It includes move validator functions to validate legal chess moves.
 
+![initial position](screenshots/1.png)
+
 ## Getting Started
 
 To get started with this project, follow these steps:
