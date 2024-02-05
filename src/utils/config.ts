@@ -1,4 +1,4 @@
-import { GameOverProps, SanPiece, SanPieceBlack, SanPieceWhite } from "utils";
+import { BoardStateProps, GameOverProps, SanPiece, SanPieceBlack, SanPieceWhite } from "utils";
 
 export const xLabels = ["a", "b", "c", "d", "e", "f", "g", "h"];
 export const yLabels = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -17,6 +17,18 @@ export const defaultBoard: SanPiece[] = [
 ]
   .join("")
   .split("") as SanPiece[];
+export const defaultBoardState: BoardStateProps = {
+  board: defaultBoard,
+  isLastMoveVulnerableToEnPassant: false,
+  enPassantCapturePieceIndex: null,
+  whiteKingHasMoved: false,
+  whiteLeftRookHasMoved: false, // a1
+  whiteRightRookHasMoved: false, // h1
+  blackKingHasMoved: false,
+  blackLeftRookHasMoved: false, // a8
+  blackRightRookHasMoved: false, // h8
+  pawnPromotionPieceIndex: null,
+};
 export const assetSanPieceMap: Record<SanPiece, string> = {
   P: "pawn-w",
   N: "knight-w",

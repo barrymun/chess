@@ -97,10 +97,8 @@ const ChessBoard = () => {
         clearSelectionContext();
         return;
       }
-      setLastMovedPiece({
-        origin: originIndex,
-        destination: destinationIndex,
-      });
+      // TODO: might move this "setLastMovedPiece" logic out of here and into a useEffect on the game state hook
+      setLastMovedPiece({ origin: originIndex, destination: destinationIndex });
       setBoardState((prevBoardState) => ({
         ...prevBoardState,
         ...canMakeMoveResponse,

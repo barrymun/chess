@@ -16,6 +16,7 @@ import {
   SanRookBlack,
   SanRookWhite,
   defaultBoard,
+  defaultBoardState,
   defaultGameOverState,
   getIsCheckmate,
   getIsStalemate,
@@ -64,18 +65,7 @@ const GameStateContext = createContext(
 );
 
 const GameStateProvider = ({ children }: GameStateProviderProps) => {
-  const [boardState, setBoardState] = useState<BoardStateProps>({
-    board: defaultBoard,
-    isLastMoveVulnerableToEnPassant: false,
-    enPassantCapturePieceIndex: null,
-    whiteKingHasMoved: false,
-    whiteLeftRookHasMoved: false, // a1
-    whiteRightRookHasMoved: false, // h1
-    blackKingHasMoved: false,
-    blackLeftRookHasMoved: false, // a8
-    blackRightRookHasMoved: false, // h8
-    pawnPromotionPieceIndex: null,
-  });
+  const [boardState, setBoardState] = useState<BoardStateProps>(defaultBoardState);
   const [lastMovedPiece, setLastMovedPiece] = useState<LastMoveProps | null>(null);
   const [playerTurn, setPlayerTurn] = useState<Player>("white");
   const [pawnPromotionPieceSelection, setPawnPromotionPieceSelection] = useState<
