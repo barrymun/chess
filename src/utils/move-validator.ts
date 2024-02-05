@@ -695,17 +695,17 @@ const getWillMovePutKingInCheck = (
 
 export const getIsStalemate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
   const { board } = props;
-  let isCheckmate: boolean = true;
+  let isStalemate: boolean = true;
   for (let i = 0; i < totalTiles; i++) {
-    if (board[i] !== " " && board[i] !== "K" && board[i] !== "k") {
+    if (board[i] !== " ") {
       const validMoves = getAllValidPieceMoves({ ...props, piece: board[i], origin: i });
       if (validMoves.length > 0) {
-        isCheckmate = false;
+        isStalemate = false;
         break;
       }
     }
   }
-  return isCheckmate;
+  return isStalemate;
 };
 
 export const getIsCheckmate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {

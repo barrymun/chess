@@ -25,7 +25,7 @@ const Tile: FC<TileProps> = (props) => {
         <div className="absolute w-100 h-100 bg-icterine" />
       )}
       {selectedPieceLegalMoves.includes(position) && (
-        <div className="absolute w-100 h-100 flex justify-center items-center">
+        <div className="absolute z-20 w-100 h-100 flex justify-center items-center">
           <div className="w-1/3 h-1/3 rounded-full bg-cyan-100" />
         </div>
       )}
