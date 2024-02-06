@@ -6,6 +6,7 @@ import {
   BoardStateProps,
   GameOverProps,
   LastMoveProps,
+  MoveHistoryProps,
   Player,
   SanBishopBlack,
   SanBishopWhite,
@@ -18,6 +19,7 @@ import {
   defaultBoard,
   defaultBoardState,
   defaultGameOverState,
+  defaultMoveHistory,
   getIsCheckmate,
   getIsStalemate,
 } from "utils";
@@ -43,8 +45,7 @@ const GameStateContext = createContext(
       | null;
     showPawnPromotionModal: boolean;
     selectedPieceLegalMoves: number[];
-    whiteMoveHistory: LastMoveProps[];
-    blackMoveHistory: LastMoveProps[];
+    moveHistory: MoveHistoryProps;
     gameOver: GameOverProps;
     setBoardState: React.Dispatch<React.SetStateAction<BoardStateProps>>;
     setLastMovedPiece: React.Dispatch<React.SetStateAction<LastMoveProps | null>>;
@@ -62,8 +63,7 @@ const GameStateContext = createContext(
     > | null>;
     setShowPawnPromotionModal: React.Dispatch<React.SetStateAction<boolean>>;
     setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
-    setWhiteMoveHistory: React.Dispatch<React.SetStateAction<LastMoveProps[]>>;
-    setBlackMoveHistory: React.Dispatch<React.SetStateAction<LastMoveProps[]>>;
+    setMoveHistory: React.Dispatch<React.SetStateAction<MoveHistoryProps>>;
     setGameOver: React.Dispatch<React.SetStateAction<GameOverProps>>;
   },
 );
@@ -85,8 +85,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
   >(null);
   const [showPawnPromotionModal, setShowPawnPromotionModal] = useState<boolean>(false);
   const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<number[]>([]);
-  const [whiteMoveHistory, setWhiteMoveHistory] = useState<LastMoveProps[]>([]);
-  const [blackMoveHistory, setBlackMoveHistory] = useState<LastMoveProps[]>([]);
+  const [moveHistory, setMoveHistory] = useState<MoveHistoryProps>(defaultMoveHistory);
   const [gameOver, setGameOver] = useState<GameOverProps>(defaultGameOverState);
 
   useEffect(() => {
@@ -138,8 +137,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
-      whiteMoveHistory,
-      blackMoveHistory,
+      moveHistory,
       gameOver,
       setBoardState,
       setLastMovedPiece,
@@ -147,8 +145,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,
       setSelectedPieceLegalMoves,
-      setWhiteMoveHistory,
-      setBlackMoveHistory,
+      setMoveHistory,
       setGameOver,
     }),
     [
@@ -158,8 +155,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
-      whiteMoveHistory,
-      blackMoveHistory,
+      moveHistory,
       gameOver,
       setBoardState,
       setLastMovedPiece,
@@ -167,8 +163,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,
       setSelectedPieceLegalMoves,
-      setWhiteMoveHistory,
-      setBlackMoveHistory,
+      setMoveHistory,
       setGameOver,
     ],
   );

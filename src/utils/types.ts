@@ -63,3 +63,6 @@ export interface LastMoveProps {
   origin: number;
   destination: number;
 }
+export type MoveHistoryProps = {
+  [T in Player]: LastMoveProps[];
+};

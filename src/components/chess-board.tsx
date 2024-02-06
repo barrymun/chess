@@ -12,15 +12,8 @@ interface ChessBoardProps {}
 
 const ChessBoard: FC<ChessBoardProps> = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const {
-    boardState,
-    playerTurn,
-    setBoardState,
-    setLastMovedPiece,
-    setSelectedPieceLegalMoves,
-    setWhiteMoveHistory,
-    setBlackMoveHistory,
-  } = useGameState();
+  const { boardState, playerTurn, setBoardState, setLastMovedPiece, setSelectedPieceLegalMoves, setMoveHistory } =
+    useGameState();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
@@ -110,11 +103,7 @@ const ChessBoard: FC<ChessBoardProps> = () => {
       // TODO: might move this "setLastMovedPiece" logic out of here and into a useEffect on the game state hook
       const lastMove: LastMoveProps = { origin: originIndex, destination: destinationIndex };
       setLastMovedPiece(lastMove);
-      if (playerTurn === "white") {
-        setWhiteMoveHistory((prevWhiteMoveHistory) => [...prevWhiteMoveHistory, lastMove]);
-      } else {
-        setBlackMoveHistory((prevBlackMoveHistory) => [...prevBlackMoveHistory, lastMove]);
-      }
+      setMoveHistory((mh) => ({ ...mh, [playerTurn]: [...mh[playerTurn], lastMove] }));
       setBoardState((prevBoardState) => ({
         ...prevBoardState,
         ...canMakeMoveResponse,
