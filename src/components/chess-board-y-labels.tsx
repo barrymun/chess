@@ -12,7 +12,7 @@ const ChessBoardYLabels: FC<ChessBoardYLabelsProps> = () => {
           <div
             key={x}
             className="
-              w-8 
+              w-4 
               h-mobile 
               flex 
               justify-center 

@@ -77,8 +77,8 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [ ] validate the chess board to prevent cheating (based on the moves made so far?)
 - [ ] show the pieces that have been captured
 - [ ] show the value of the pieces that have been captured
-- [ ] fix min width settings to use % rather than the set amount of 100px (mobile)
+- [x] fix min width settings to use % rather than the set amount of 100px (mobile)
 - [ ] timed moves (will be added as part of a separate game mode)
 - [x] fix `move-history` component min width to prevent "jumping" issue
-- [ ] fix grab piece issue where the "image" itself is "grabbed"
+- [x] fix grab piece issue where the "image" itself is "grabbed" (desktop)
 - [x] disable right click on piece grab
