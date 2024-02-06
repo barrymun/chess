@@ -18,8 +18,19 @@ const Tile: FC<TileProps> = (props) => {
 
   return (
     <div
-      // eslint-disable-next-line max-len
-      className={`select-none touch-none w-100 h-100 flex ${tileColor === "light" ? "bg-chess-tile-light" : "bg-inherit"}`}
+      className={`
+        select-none 
+        touch-none 
+        w-mobile 
+        h-mobile 
+        flex ${tileColor === "light" ? "bg-chess-tile-light" : "bg-inherit"} 
+        md:w-desktop 
+        md:h-desktop
+        sm:w-desktop-sm
+        sm:h-desktop-sm
+        xs:w-desktop-xs
+        xs:h-desktop-xs
+      `}
       onContextMenu={(e) => {
         // prevent long press context menu
         e.preventDefault();
@@ -28,13 +39,55 @@ const Tile: FC<TileProps> = (props) => {
       }}
     >
       {lastMovedPiece !== null && lastMovedPiece.origin === position && (
-        <div className="absolute w-100 h-100 bg-pear" />
+        <div
+          className="
+            absolute 
+            w-mobile 
+            h-mobile 
+            bg-pear 
+            md:w-desktop 
+            md:h-desktop 
+            sm:w-desktop-sm 
+            sm:h-desktop-sm 
+            xs:w-desktop-xs 
+            xs:h-desktop-xs
+          "
+        />
       )}
       {lastMovedPiece !== null && lastMovedPiece.destination === position && (
-        <div className="absolute w-100 h-100 bg-icterine" />
+        <div
+          className="
+            absolute 
+            w-mobile 
+            h-mobile 
+            bg-icterine 
+            md:w-desktop 
+            md:h-desktop 
+            sm:w-desktop-sm
+            sm:h-desktop-sm 
+            xs:w-desktop-xs
+            xs:h-desktop-xs
+          "
+        />
       )}
       {selectedPieceLegalMoves.includes(position) && (
-        <div className="absolute z-20 w-100 h-100 flex justify-center items-center">
+        <div
+          className="
+            absolute 
+            z-20 
+            w-mobile 
+            h-mobile 
+            flex 
+            justify-center 
+            items-center 
+            md:w-desktop 
+            md:h-desktop 
+            sm:w-desktop-sm
+            sm:h-desktop-sm 
+            xs:w-desktop-xs
+            xs:h-desktop-xs
+          "
+        >
           <div className="w-1/3 h-1/3 rounded-full bg-cyan-100" />
         </div>
       )}
@@ -43,7 +96,21 @@ const Tile: FC<TileProps> = (props) => {
           style={{
             backgroundImage: `url(${imgSrc})`,
           }}
-          className="bg-no-repeat w-100 h-100 bg-contain bg-center z-10 hover:cursor-grab"
+          className="
+            bg-no-repeat 
+            w-mobile 
+            h-mobile 
+            bg-contain 
+            bg-center 
+            z-10 
+            hover:cursor-grab 
+            md:w-desktop 
+            md:h-desktop
+            sm:w-desktop-sm
+            sm:h-desktop-sm
+            xs:w-desktop-xs
+            xs:h-desktop-xs
+          "
           onMouseDown={grabPiece(position)}
           onTouchStart={grabPiece(position)}
         />

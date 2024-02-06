@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'xs': '300px',
+        'xs': '0px',
       },
       colors: {
         'chess-board': '#769656',
@@ -15,10 +15,16 @@ module.exports = {
         'pear': '#BAD731',
       },
       height: {
-        '100': '8vw',
+        'mobile': '8vw',
+        'desktop': '8vh',
+        'desktop-sm': '7vh',
+        'desktop-xs': '6vh',
       },
       width: {
-        '100': '8vw',
+        'mobile': '8vw',
+        'desktop': '8vh',
+        'desktop-sm': '7vh',
+        'desktop-xs': '6vh',
       },
     },
   },

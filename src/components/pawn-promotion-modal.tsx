@@ -14,47 +14,135 @@ const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
     >
       <div className="flex justify-center items-center border-2 border-black rounded">
         <div
-          className="w-100 h-100 hover:cursor-pointer"
+          className="
+            w-mobile 
+            h-mobile 
+            hover:cursor-pointer 
+            md:w-desktop 
+            md:h-desktop 
+            sm:w-desktop-sm 
+            sm:h-desktop-sm 
+            xs:w-desktop-xs 
+            xs:h-desktop-xs
+          "
           onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "Q" : "q")}
         >
           <div
             style={{
               backgroundImage: `url(assets/img/${playerTurn === "white" ? "queen-w" : "queen-b"}.png)`,
             }}
-            className="bg-no-repeat w-100 h-100 bg-contain bg-center"
+            className="
+              bg-no-repeat 
+              w-mobile 
+              h-mobile 
+              bg-contain 
+              bg-center 
+              md:w-desktop 
+              md:h-desktop 
+              sm:w-desktop-sm
+              sm:h-desktop-sm 
+              xs:w-desktop-xs 
+              xs:h-desktop-xs
+            "
           />
         </div>
         <div
-          className="w-100 h-100 hover:cursor-pointer"
+          className="
+            w-mobile 
+            h-mobile 
+            hover:cursor-pointer 
+            md:w-desktop 
+            md:h-desktop 
+            sm:w-desktop-sm
+            sm:h-desktop-sm 
+            xs:w-desktop-xs 
+            xs:h-desktop-xs
+          "
           onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "R" : "r")}
         >
           <div
             style={{
               backgroundImage: `url(assets/img/${playerTurn === "white" ? "rook-w" : "rook-b"}.png)`,
             }}
-            className="bg-no-repeat w-100 h-100 bg-contain bg-center"
+            className="
+              bg-no-repeat 
+              w-mobile 
+              h-mobile 
+              bg-contain 
+              bg-center 
+              md:w-desktop 
+              md:h-desktop 
+              sm:w-desktop-sm
+              sm:h-desktop-sm 
+              xs:w-desktop-xs 
+              xs:h-desktop-xs
+            "
           />
         </div>
         <div
-          className="w-100 h-100 hover:cursor-pointer"
+          className="
+            w-mobile 
+            h-mobile 
+            hover:cursor-pointer 
+            md:w-desktop 
+            md:h-desktop 
+            sm:w-desktop-sm
+            sm:h-desktop-sm 
+            xs:w-desktop-xs 
+            xs:h-desktop-xs
+          "
           onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "B" : "b")}
         >
           <div
             style={{
               backgroundImage: `url(assets/img/${playerTurn === "white" ? "bishop-w" : "bishop-b"}.png)`,
             }}
-            className="bg-no-repeat w-100 h-100 bg-contain bg-center"
+            className="
+              bg-no-repeat 
+              w-mobile 
+              h-mobile 
+              bg-contain 
+              bg-center 
+              md:w-desktop 
+              md:h-desktop 
+              sm:w-desktop-sm
+              sm:h-desktop-sm 
+              xs:w-desktop-xs 
+              xs:h-desktop-xs
+            "
           />
         </div>
         <div
-          className="w-100 h-100 hover:cursor-pointer"
+          className="
+            w-mobile 
+            h-mobile 
+            hover:cursor-pointer 
+            md:w-desktop 
+            md:h-desktop 
+            sm:w-desktop-sm
+            sm:h-desktop-sm 
+            xs:w-desktop-xs 
+            xs:h-desktop-xs
+          "
           onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "N" : "n")}
         >
           <div
             style={{
               backgroundImage: `url(assets/img/${playerTurn === "white" ? "knight-w" : "knight-b"}.png)`,
             }}
-            className="bg-no-repeat w-100 h-100 bg-contain bg-center"
+            className="
+              bg-no-repeat 
+              w-mobile 
+              h-mobile 
+              bg-contain 
+              bg-center 
+              md:w-desktop 
+              md:h-desktop 
+              sm:w-desktop-sm
+              sm:h-desktop-sm 
+              xs:w-desktop-xs 
+              xs:h-desktop-xs
+            "
           />
         </div>
       </div>

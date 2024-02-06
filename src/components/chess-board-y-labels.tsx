@@ -9,7 +9,21 @@ const ChessBoardYLabels: FC<ChessBoardYLabelsProps> = () => {
     <div className="text-white">
       {[...yLabels].reverse().map((x) => {
         return (
-          <div key={x} className="w-8 h-100 flex justify-center items-center select-none">
+          <div
+            key={x}
+            className="
+              w-8 
+              h-mobile 
+              flex 
+              justify-center 
+              items-center 
+              select-none 
+              md:h-desktop 
+              sm:h-desktop-sm 
+              xs:h-desktop-xs
+              xs:text-xs
+            "
+          >
             {x}
           </div>
         );
