@@ -82,3 +82,4 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [x] fix `move-history` component min width to prevent "jumping" issue
 - [x] fix grab piece issue where the "image" itself is "grabbed" (desktop)
 - [x] disable right click on piece grab
+- [x] change favicon and title
