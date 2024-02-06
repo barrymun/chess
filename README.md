@@ -81,3 +81,4 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [ ] timed moves (will be added as part of a separate game mode)
 - [x] fix `move-history` component min width to prevent "jumping" issue
 - [ ] fix grab piece issue where the "image" itself is "grabbed"
+- [x] disable right click on piece grab

@@ -25,6 +25,10 @@ const ChessBoard: FC<ChessBoardProps> = () => {
     useGameState();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
+    // don't do anything if right-clicked
+    if (e.button === 2) {
+      return;
+    }
     const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
     target.style.left = `${clientX - pieceSize / 2}px`;
     target.style.top = `${clientY - pieceSize / 2}px`;
