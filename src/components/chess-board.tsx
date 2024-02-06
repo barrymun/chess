@@ -10,7 +10,6 @@ import {
   getAllValidPieceMoves,
   getIsCheckmate,
   getIsKingInCheck,
-  pieceSize,
 } from "utils";
 
 let isMouseDown: boolean = false;
@@ -24,15 +23,30 @@ const ChessBoard: FC<ChessBoardProps> = () => {
   const { boardState, playerTurn, setBoardState, setLastMovedPiece, setSelectedPieceLegalMoves, setMoveHistory } =
     useGameState();
 
-  const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
-    // don't do anything if right-clicked
-    if (e.button === 2) {
+  const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    // don't do anything if right-clicked or multitouch
+    if (("button" in e && e.button === 2) || ("touches" in e && e.touches.length > 1)) {
       return;
     }
-    const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
-    target.style.left = `${clientX - pieceSize / 2}px`;
-    target.style.top = `${clientY - pieceSize / 2}px`;
+    let clientX: number | null = null;
+    let clientY: number | null = null;
+    if ("clientX" in e && "clientY" in e) {
+      ({ clientX, clientY } = e);
+    } else {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        ({ clientX, clientY } = touch);
+      }
+    }
+    if (clientX === null || clientY === null) {
+      return;
+    }
+    const target = e.target as HTMLDivElement;
+    const targetWidth = target.getBoundingClientRect().width;
+    target.style.left = `${clientX - targetWidth / 2}px`;
+    target.style.top = `${clientY - targetWidth / 2}px`;
     target.style.position = "absolute";
+    target.style.zIndex = "100";
     isMouseDown = true;
     originIndex = position;
     selectedPiece = target;
@@ -46,31 +60,47 @@ const ChessBoard: FC<ChessBoardProps> = () => {
     setSelectedPieceLegalMoves(allValidMoves);
   };
 
-  const movePiece = (e: MouseEvent) => {
+  const movePiece = (e: MouseEvent | TouchEvent) => {
+    e.preventDefault(); // requires "select-none" and "touch-none" classes on tile component
     if (!isMouseDown || selectedPiece === null) {
       return;
     }
-    const { clientX, clientY } = e;
+    let clientX: number | null = null;
+    let clientY: number | null = null;
+    if ("clientX" in e && "clientY" in e) {
+      ({ clientX, clientY } = e);
+    } else {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        ({ clientX, clientY } = touch);
+      }
+    }
+    if (clientX === null || clientY === null) {
+      return;
+    }
+    const target = e.target as HTMLDivElement;
+    const targetWidth = target.getBoundingClientRect().width;
     const maxLeft = boardRef.current!.offsetLeft;
     const maxRight = boardRef.current!.offsetLeft + boardRef.current!.offsetWidth;
     const maxTop = boardRef.current!.offsetTop;
     const maxBottom = boardRef.current!.offsetTop + boardRef.current!.offsetHeight;
     // don't allow piece to be dragged outside of board
-    if (clientX < maxLeft + pieceSize / 4 || clientX > maxRight - pieceSize / 4) {
-      selectedPiece.style.top = `${clientY - pieceSize / 2}px`;
+    if (clientX < maxLeft + targetWidth / 4 || clientX > maxRight - targetWidth / 4) {
+      selectedPiece.style.top = `${clientY - targetWidth / 2}px`;
       return;
     }
-    if (clientY < maxTop + pieceSize / 4 || clientY > maxBottom - pieceSize / 4) {
-      selectedPiece.style.left = `${clientX - pieceSize / 2}px`;
+    if (clientY < maxTop + targetWidth / 4 || clientY > maxBottom - targetWidth / 4) {
+      selectedPiece.style.left = `${clientX - targetWidth / 2}px`;
       return;
     }
-    selectedPiece.style.left = `${clientX - pieceSize / 2}px`;
-    selectedPiece.style.top = `${clientY - pieceSize / 2}px`;
+    selectedPiece.style.left = `${clientX - targetWidth / 2}px`;
+    selectedPiece.style.top = `${clientY - targetWidth / 2}px`;
   };
 
   const clearSelectionContext = () => {
     if (selectedPiece) {
       selectedPiece.style.position = "";
+      selectedPiece.style.zIndex = "";
     }
     isMouseDown = false;
     originIndex = null;
@@ -78,12 +108,26 @@ const ChessBoard: FC<ChessBoardProps> = () => {
   };
 
   const dropPiece = useCallback(
-    (e: MouseEvent) => {
+    (e: MouseEvent | TouchEvent) => {
       setSelectedPieceLegalMoves([]);
       if (originIndex === null || selectedPiece === null) {
+        clearSelectionContext();
         return;
       }
-      const { clientX, clientY } = e;
+      let clientX: number | null = null;
+      let clientY: number | null = null;
+      if ("clientX" in e && "clientY" in e) {
+        ({ clientX, clientY } = e);
+      } else {
+        if (e.changedTouches.length === 1) {
+          const touch = e.changedTouches[0];
+          ({ clientX, clientY } = touch);
+        }
+      }
+      if (clientX === null || clientY === null) {
+        clearSelectionContext();
+        return;
+      }
       let destinationIndex: number | null = null;
       let closestChild: HTMLDivElement | null = null;
       let closestDistance: number = Number.MAX_SAFE_INTEGER;
@@ -91,7 +135,7 @@ const ChessBoard: FC<ChessBoardProps> = () => {
         const { left, top, width, height } = child.getBoundingClientRect();
         const childX = left + width / 2;
         const childY = top + height / 2;
-        const distance = Math.sqrt((clientX - childX) ** 2 + (clientY - childY) ** 2);
+        const distance = Math.sqrt((clientX! - childX) ** 2 + (clientY! - childY) ** 2);
         if (distance < closestDistance) {
           destinationIndex = index;
           closestChild = child as HTMLDivElement;
@@ -154,15 +198,19 @@ const ChessBoard: FC<ChessBoardProps> = () => {
 
   useEffect(() => {
     window.addEventListener("mousemove", movePiece);
+    window.addEventListener("touchmove", movePiece);
     window.addEventListener("mouseup", dropPiece);
+    window.addEventListener("touchend", dropPiece);
     return () => {
       window.removeEventListener("mousemove", movePiece);
+      window.removeEventListener("touchmove", movePiece);
       window.removeEventListener("mouseup", dropPiece);
+      window.removeEventListener("touchend", dropPiece);
     };
   }, [boardState, playerTurn]);
 
   return (
-    <div className="bg-chess-board rounded-md truncate min-w-800">
+    <div className="bg-chess-board rounded-md truncate">
       <div className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
         {boardState.board.map((_square, index) => (
           <Tile key={index} position={index} grabPiece={grabPiece} />

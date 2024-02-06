@@ -9,8 +9,8 @@ const MoveHistory: FC<MoveHistoryProps> = () => {
   const { moveHistory } = useGameState();
   const mergedMoveHistory = mergeMoveHistory(moveHistory);
   return (
-    <div className="rounded-lg shadow-lg overflow-y-scroll h-800 bg-gray-100">
-      <table className="table-auto min-w-44">
+    <div className="rounded-lg shadow-lg overflow-y-scroll bg-gray-100 min-w-44 xs:hidden lg:block">
+      <table className="table-auto w-full">
         <thead>
           <tr>
             <th className="p-2"></th>

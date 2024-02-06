@@ -5,7 +5,7 @@ import { TileColor, assetSanPieceMap, tilesPerRow } from "utils";
 
 interface TileProps {
   position: number;
-  grabPiece: (position: number) => (e: React.MouseEvent<HTMLDivElement>) => void;
+  grabPiece: (position: number) => (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => void;
 }
 
 const Tile: FC<TileProps> = (props) => {
@@ -17,7 +17,16 @@ const Tile: FC<TileProps> = (props) => {
     boardState.board[position] !== " " ? `assets/img/${assetSanPieceMap[boardState.board[position]]}.png` : null;
 
   return (
-    <div className={`w-100 h-100 flex ${tileColor === "light" ? "bg-chess-tile-light" : "bg-inherit"}`}>
+    <div
+      // eslint-disable-next-line max-len
+      className={`select-none touch-none w-100 h-100 flex ${tileColor === "light" ? "bg-chess-tile-light" : "bg-inherit"}`}
+      onContextMenu={(e) => {
+        // prevent long press context menu
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }}
+    >
       {lastMovedPiece !== null && lastMovedPiece.origin === position && (
         <div className="absolute w-100 h-100 bg-pear" />
       )}
@@ -36,6 +45,7 @@ const Tile: FC<TileProps> = (props) => {
           }}
           className="bg-no-repeat w-100 h-100 bg-contain bg-center z-10 hover:cursor-grab"
           onMouseDown={grabPiece(position)}
+          onTouchStart={grabPiece(position)}
         />
       )}
     </div>

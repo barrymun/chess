@@ -46,7 +46,6 @@ export const assetSanPieceMap: Record<SanPiece, string> = {
 };
 export const whiteSanPieces: SanPieceWhite[] = ["P", "N", "B", "R", "Q", "K"];
 export const blackSanPieces: SanPieceBlack[] = ["p", "n", "b", "r", "q", "k"];
-export const pieceSize: number = 100;
 export const defaultMoveHistory: MoveHistoryProps = {
   white: {
     moves: [],

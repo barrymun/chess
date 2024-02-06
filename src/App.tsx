@@ -5,7 +5,7 @@ function App() {
   return (
     <GameStateProvider>
       <div className="flex flex-col">
-        <div className="flex content-center justify-center gap-2 items-stretch">
+        <div className="flex content-center justify-center gap-2">
           <ChessBoardYLabels />
           <ChessBoard />
           <MoveHistory />
