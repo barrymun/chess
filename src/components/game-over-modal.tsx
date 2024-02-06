@@ -1,6 +1,10 @@
+import { FC } from "react";
+
 import { useGameState } from "hooks";
 
-const GameOverModal = () => {
+interface GameOverModalProps {}
+
+const GameOverModal: FC<GameOverModalProps> = () => {
   const { gameOver } = useGameState();
 
   if (!gameOver.isGameOver) {

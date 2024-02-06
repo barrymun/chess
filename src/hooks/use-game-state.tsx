@@ -43,6 +43,8 @@ const GameStateContext = createContext(
       | null;
     showPawnPromotionModal: boolean;
     selectedPieceLegalMoves: number[];
+    whiteMoveHistory: LastMoveProps[];
+    blackMoveHistory: LastMoveProps[];
     gameOver: GameOverProps;
     setBoardState: React.Dispatch<React.SetStateAction<BoardStateProps>>;
     setLastMovedPiece: React.Dispatch<React.SetStateAction<LastMoveProps | null>>;
@@ -60,6 +62,8 @@ const GameStateContext = createContext(
     > | null>;
     setShowPawnPromotionModal: React.Dispatch<React.SetStateAction<boolean>>;
     setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
+    setWhiteMoveHistory: React.Dispatch<React.SetStateAction<LastMoveProps[]>>;
+    setBlackMoveHistory: React.Dispatch<React.SetStateAction<LastMoveProps[]>>;
     setGameOver: React.Dispatch<React.SetStateAction<GameOverProps>>;
   },
 );
@@ -81,6 +85,8 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
   >(null);
   const [showPawnPromotionModal, setShowPawnPromotionModal] = useState<boolean>(false);
   const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<number[]>([]);
+  const [whiteMoveHistory, setWhiteMoveHistory] = useState<LastMoveProps[]>([]);
+  const [blackMoveHistory, setBlackMoveHistory] = useState<LastMoveProps[]>([]);
   const [gameOver, setGameOver] = useState<GameOverProps>(defaultGameOverState);
 
   useEffect(() => {
@@ -132,6 +138,8 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
+      whiteMoveHistory,
+      blackMoveHistory,
       gameOver,
       setBoardState,
       setLastMovedPiece,
@@ -139,6 +147,8 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,
       setSelectedPieceLegalMoves,
+      setWhiteMoveHistory,
+      setBlackMoveHistory,
       setGameOver,
     }),
     [
@@ -148,6 +158,8 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       pawnPromotionPieceSelection,
       showPawnPromotionModal,
       selectedPieceLegalMoves,
+      whiteMoveHistory,
+      blackMoveHistory,
       gameOver,
       setBoardState,
       setLastMovedPiece,
@@ -155,6 +167,8 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       setPawnPromotionPieceSelection,
       setShowPawnPromotionModal,
       setSelectedPieceLegalMoves,
+      setWhiteMoveHistory,
+      setBlackMoveHistory,
       setGameOver,
     ],
   );

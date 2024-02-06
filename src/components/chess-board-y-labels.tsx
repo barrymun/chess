@@ -1,6 +1,10 @@
+import { FC } from "react";
+
 import { yLabels } from "utils";
 
-const ChessBoardYLabels = () => {
+interface ChessBoardYLabelsProps {}
+
+const ChessBoardYLabels: FC<ChessBoardYLabelsProps> = () => {
   return (
     <div className="text-white">
       {[...yLabels].reverse().map((x) => {

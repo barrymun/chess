@@ -1,6 +1,10 @@
+import { FC } from "react";
+
 import { xLabels } from "utils";
 
-const ChessBoardXLabels = () => {
+interface ChessBoardXLabelsProps {}
+
+const ChessBoardXLabels: FC<ChessBoardXLabelsProps> = () => {
   return (
     <div className="flex text-white">
       {xLabels.map((x) => {

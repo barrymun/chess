@@ -13,9 +13,13 @@ module.exports = {
       },
       height: {
         '100': '100px',
+        '800': '800px',
       },
       width: {
         '100': '100px',
+      },
+      minWidth: {
+        '800': '800px',
       },
     },
   },

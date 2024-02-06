@@ -1,6 +1,10 @@
+import { FC } from "react";
+
 import { useGameState } from "hooks";
 
-const PawnPromotionModal = () => {
+interface PawnPromotionModalProps {}
+
+const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
   const { playerTurn, showPawnPromotionModal, setPawnPromotionPieceSelection } = useGameState();
 
   return (

@@ -1,16 +1,26 @@
-import { useCallback, useEffect, useRef } from "react";
+import { FC, useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
 import { useGameState } from "hooks";
-import { computeCanMakeMove, getAllValidPieceMoves, pieceSize } from "utils";
+import { LastMoveProps, computeCanMakeMove, getAllValidPieceMoves, pieceSize } from "utils";
 
 let isMouseDown: boolean = false;
 let originIndex: number | null = null;
 let selectedPiece: HTMLDivElement | null = null;
 
-const ChessBoard = () => {
+interface ChessBoardProps {}
+
+const ChessBoard: FC<ChessBoardProps> = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const { boardState, playerTurn, setBoardState, setLastMovedPiece, setSelectedPieceLegalMoves } = useGameState();
+  const {
+    boardState,
+    playerTurn,
+    setBoardState,
+    setLastMovedPiece,
+    setSelectedPieceLegalMoves,
+    setWhiteMoveHistory,
+    setBlackMoveHistory,
+  } = useGameState();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, target } = e as { target: HTMLDivElement } & React.MouseEvent<HTMLDivElement>;
@@ -98,7 +108,13 @@ const ChessBoard = () => {
         return;
       }
       // TODO: might move this "setLastMovedPiece" logic out of here and into a useEffect on the game state hook
-      setLastMovedPiece({ origin: originIndex, destination: destinationIndex });
+      const lastMove: LastMoveProps = { origin: originIndex, destination: destinationIndex };
+      setLastMovedPiece(lastMove);
+      if (playerTurn === "white") {
+        setWhiteMoveHistory((prevWhiteMoveHistory) => [...prevWhiteMoveHistory, lastMove]);
+      } else {
+        setBlackMoveHistory((prevBlackMoveHistory) => [...prevBlackMoveHistory, lastMove]);
+      }
       setBoardState((prevBoardState) => ({
         ...prevBoardState,
         ...canMakeMoveResponse,
@@ -122,7 +138,7 @@ const ChessBoard = () => {
   }, [boardState, playerTurn]);
 
   return (
-    <div className="bg-chess-board rounded-md truncate">
+    <div className="bg-chess-board rounded-md truncate min-w-800">
       <div className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
         {boardState.board.map((_square, index) => (
           <Tile key={index} position={index} grabPiece={grabPiece} />

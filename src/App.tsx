@@ -1,13 +1,14 @@
-import { ChessBoard, ChessBoardXLabels, ChessBoardYLabels } from "components";
+import { ChessBoard, ChessBoardXLabels, ChessBoardYLabels, MoveHistory } from "components";
 import { GameStateProvider } from "hooks";
 
 function App() {
   return (
     <GameStateProvider>
       <div className="flex flex-col">
-        <div className="flex content-center items-center justify-center gap-2">
+        <div className="flex content-center justify-center gap-2 items-stretch">
           <ChessBoardYLabels />
           <ChessBoard />
+          <MoveHistory />
         </div>
         <div className="flex gap-2">
           <div className="ml-8" />

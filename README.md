@@ -74,3 +74,7 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [ ] different colour themes for different boards and pieces
 - [ ] show all of the moves made so far
 - [ ] validate the chess board to prevent cheating (based on the moves made so far?)
+- [ ] show the pieces that have been captured
+- [ ] show the value of the pieces that have been captured
+- [ ] fix min width settings to use % rather than the set amount of 100px (mobile)
+- [ ] timed moves (will be added as part of a separate game mode)
