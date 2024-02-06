@@ -1,29 +1,16 @@
 import {
-  BoardStateProps,
+  MoveValidatorResponse,
   Player,
   SanPiece,
   SanPieceBlack,
   SanPieceWhite,
+  ValidMoveProps,
+  ValidMoveWithSimulatedProps,
   blackSanPieces,
   tilesPerRow,
   totalTiles,
   whiteSanPieces,
 } from "utils";
-
-interface MoveValidatorResponse extends Omit<BoardStateProps, "board"> {
-  isValid: boolean;
-  boardUpdates: Record<number, SanPiece>;
-}
-
-interface ValidMoveProps extends BoardStateProps {
-  playerTurn: Player;
-  origin: number;
-  destination: number;
-}
-
-interface ValidMoveWithSimulatedProps extends ValidMoveProps {
-  isSimulatedMove?: boolean;
-}
 
 const getUpdatedBoardRepresentation = ({
   board,
@@ -664,7 +651,7 @@ const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: San
   return kingPosition;
 };
 
-const getIsKingInCheck = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
+export const getIsKingInCheck = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
   const { playerTurn, board } = props;
   let isInCheck: boolean = false;
   const kingPosition = getKingPosition({ playerTurn, board });

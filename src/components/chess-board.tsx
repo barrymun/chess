@@ -2,7 +2,16 @@ import { FC, useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
 import { useGameState } from "hooks";
-import { LastMoveProps, computeCanMakeMove, getAllValidPieceMoves, pieceSize } from "utils";
+import {
+  LastMoveProps,
+  ValidMoveProps,
+  computeCanMakeMove,
+  convertMoveToAlgebraicNotation,
+  getAllValidPieceMoves,
+  getIsCheckmate,
+  getIsKingInCheck,
+  pieceSize,
+} from "utils";
 
 let isMouseDown: boolean = false;
 let originIndex: number | null = null;
@@ -102,8 +111,30 @@ const ChessBoard: FC<ChessBoardProps> = () => {
       }
       // TODO: might move this "setLastMovedPiece" logic out of here and into a useEffect on the game state hook
       const lastMove: LastMoveProps = { origin: originIndex, destination: destinationIndex };
+      const checkAndCheckmateProps: Omit<ValidMoveProps, "origin" | "destination"> = {
+        ...canMakeMoveResponse,
+        board: boardState.board.map((piece, index) => boardUpdates[index] ?? piece),
+        playerTurn: playerTurn === "white" ? "black" : "white",
+      };
+      const isInCheck = getIsKingInCheck(checkAndCheckmateProps);
+      const isCheckmate = getIsCheckmate(checkAndCheckmateProps);
+      const lastMoveAlgebraicNotation = convertMoveToAlgebraicNotation({
+        origin: originIndex,
+        destination: destinationIndex,
+        originPiece: boardState.board[originIndex],
+        destinationPiece: boardState.board[destinationIndex],
+        isInCheck,
+        isCheckmate,
+      });
       setLastMovedPiece(lastMove);
-      setMoveHistory((mh) => ({ ...mh, [playerTurn]: [...mh[playerTurn], lastMove] }));
+      setMoveHistory((mh) => ({
+        ...mh,
+        [playerTurn]: {
+          ...mh[playerTurn],
+          moves: [...mh[playerTurn].moves, lastMove],
+          algebraicNotationMoves: [...mh[playerTurn].algebraicNotationMoves, lastMoveAlgebraicNotation],
+        },
+      }));
       setBoardState((prevBoardState) => ({
         ...prevBoardState,
         ...canMakeMoveResponse,

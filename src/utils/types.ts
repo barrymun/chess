@@ -53,6 +53,20 @@ export interface BoardStateProps {
   blackRightRookHasMoved: boolean;
   pawnPromotionPieceIndex: number | null;
 }
+export interface MoveValidatorResponse extends Omit<BoardStateProps, "board"> {
+  isValid: boolean;
+  boardUpdates: Record<number, SanPiece>;
+}
+
+export interface ValidMoveProps extends BoardStateProps {
+  playerTurn: Player;
+  origin: number;
+  destination: number;
+}
+
+export interface ValidMoveWithSimulatedProps extends ValidMoveProps {
+  isSimulatedMove?: boolean;
+}
 // TODO: this will be updated in the future when more game over states are added
 export interface GameOverProps {
   isGameOver: boolean;
@@ -64,5 +78,8 @@ export interface LastMoveProps {
   destination: number;
 }
 export type MoveHistoryProps = {
-  [T in Player]: LastMoveProps[];
+  [T in Player]: {
+    moves: LastMoveProps[];
+    algebraicNotationMoves: string[];
+  };
 };
