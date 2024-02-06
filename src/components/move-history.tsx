@@ -10,7 +10,7 @@ const MoveHistory: FC<MoveHistoryProps> = () => {
   const mergedMoveHistory = mergeMoveHistory(moveHistory);
   return (
     <div className="rounded-lg shadow-lg overflow-y-scroll h-800 bg-gray-100">
-      <table className="table-auto">
+      <table className="table-auto min-w-44">
         <thead>
           <tr>
             <th className="p-2"></th>
