@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": ["./tsconfig.json", "./client/tsconfig.json"]
+    "project": ["./tsconfig.json", "./client/tsconfig.json", "./server/tsconfig.json"]
   },
   "ignorePatterns": ["node_modules/", "build/", "*.config.js"],
   "plugins": ["@typescript-eslint", "prettier", "import"],
@@ -16,7 +16,7 @@
   "settings": {
     "import/resolver": {
       "typescript": {
-        "project": ["./tsconfig.json", "./client/tsconfig.json"]
+        "project": ["./tsconfig.json", "./client/tsconfig.json", "./server/tsconfig.json"]
       }
     }
   },
