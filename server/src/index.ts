@@ -1,16 +1,23 @@
 import { Server } from "socket.io";
 
-const io = new Server({
-  cors: {
-    origin: "http://localhost:3000",
-  },
-});
+import { initRedisClient } from "./lib/redis";
 
-io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
-  socket.on("disconnect", () => {
-    console.log("user disconnected", socket.id);
+(async () => {
+  await initRedisClient();
+  console.log("Redis client initialized");
+
+  const io = new Server({
+    cors: {
+      origin: "http://localhost:3000",
+    },
   });
-});
 
-io.listen(3001);
+  io.on("connection", (socket) => {
+    console.log("a user connected", socket.id);
+    socket.on("disconnect", () => {
+      console.log("user disconnected", socket.id);
+    });
+  });
+
+  io.listen(3001);
+})();
