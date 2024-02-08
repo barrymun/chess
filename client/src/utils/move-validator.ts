@@ -167,7 +167,7 @@ const getCanCastle = (props: ValidMoveProps): boolean => {
     blackRightRookHasMoved,
     blackLeftRookHasMoved,
   } = props;
-  let canCastle: boolean = false;
+  let canCastle = false;
   if (playerTurn === "white") {
     if (
       origin === 60 &&
@@ -308,7 +308,7 @@ const getIsValidPawnMove = (
     ...rest
   } = props;
   let { isLastMoveVulnerableToEnPassant, enPassantCapturePieceIndex, pawnPromotionPieceIndex } = rest;
-  let isValid: boolean = false;
+  let isValid = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const multiplier = getPlayerMultiplier(playerTurn);
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({
@@ -404,7 +404,7 @@ const getIsValidPawnMoveIgnoreEnPassant = (props: ValidMoveWithSimulatedProps): 
 
 const getIsValidKnightMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
-  let isValid: boolean = false;
+  let isValid = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({
     playerTurn,
@@ -447,7 +447,7 @@ const getIsValidKnightMove = (props: ValidMoveWithSimulatedProps): MoveValidator
 
 const getIsValidBishopMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
-  let isValid: boolean = false;
+  let isValid = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({
     playerTurn,
@@ -486,7 +486,7 @@ const getIsValidBishopMove = (props: ValidMoveWithSimulatedProps): MoveValidator
 
 const getIsValidRookMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
-  let isValid: boolean = false;
+  let isValid = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({
     playerTurn,
@@ -525,7 +525,7 @@ const getIsValidRookMove = (props: ValidMoveWithSimulatedProps): MoveValidatorRe
 
 const getIsValidQueenMove = (props: ValidMoveWithSimulatedProps): MoveValidatorResponse => {
   const { playerTurn, board, origin, destination, isSimulatedMove = false } = props;
-  let isValid: boolean = false;
+  let isValid = false;
   let boardUpdates: Record<number, SanPiece> = {};
   const isDestinationFriendlyFree = getIsDestinationFriendlyFree({
     playerTurn,
@@ -589,7 +589,7 @@ const getIsValidKingMove = (
     blackRightRookHasMoved,
     blackLeftRookHasMoved,
   } = rest;
-  let isValid: boolean = false;
+  let isValid = false;
   let boardUpdates: Record<number, SanPiece> = {};
   if (playerTurn === "white" && origin === 60 && destination === 62 && getCanCastle(props)) {
     isValid = true;
@@ -713,7 +713,7 @@ const getIsValidKingMoveIgnoreCastling = (props: ValidMoveWithSimulatedProps): M
 export const getIsValidMove = (props: ValidMoveWithSimulatedProps & { piece: SanPiece }): MoveValidatorResponse => {
   const { piece, ...rest } = props;
   const { playerTurn, origin, destination } = rest;
-  const isValid: boolean = false;
+  const isValid = false;
   const boardUpdates: Record<number, SanPiece> = {};
   if (origin === destination) {
     return { ...props, isValid, boardUpdates };
@@ -787,7 +787,7 @@ const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: San
 
 export const getIsKingInCheck = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
   const { playerTurn, board } = props;
-  let isInCheck: boolean = false;
+  let isInCheck = false;
   const kingPosition = getKingPosition({ playerTurn, board });
   const opponentPlayerTurn = playerTurn === "white" ? "black" : "white";
   for (let i = 0; i < totalTiles; i++) {
@@ -821,7 +821,7 @@ const getWillMovePutKingInCheck = (
 
 export const getIsStalemate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
   const { board } = props;
-  let isStalemate: boolean = true;
+  let isStalemate = true;
   for (let i = 0; i < totalTiles; i++) {
     if (board[i] !== " ") {
       const validMoves = getAllValidPieceMoves({

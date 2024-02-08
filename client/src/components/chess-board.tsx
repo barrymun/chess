@@ -12,7 +12,7 @@ import {
   getIsKingInCheck,
 } from "utils";
 
-let isMouseDown: boolean = false;
+let isMouseDown = false;
 let originIndex: number | null = null;
 let selectedPiece: HTMLDivElement | null = null;
 

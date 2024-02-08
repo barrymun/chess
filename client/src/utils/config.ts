@@ -2,8 +2,8 @@ import { BoardStateProps, GameOverProps, MoveHistoryProps, SanPiece, SanPieceBla
 
 export const xLabels = ["a", "b", "c", "d", "e", "f", "g", "h"];
 export const yLabels = [1, 2, 3, 4, 5, 6, 7, 8];
-export const totalTiles: number = 64;
-export const tilesPerRow: number = 8;
+export const totalTiles = 64;
+export const tilesPerRow = 8;
 // Standard Algebraic Notation (SAN) 8x8 board
 export const defaultBoard: SanPiece[] = [
   "rnbqkbnr", // 8th rank (black back row)

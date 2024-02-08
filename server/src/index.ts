@@ -1,9 +1,16 @@
-import Koa from "koa";
+import { Server } from "socket.io";
 
-const app = new Koa();
-
-app.use(async (ctx) => {
-  ctx.body = "Hello World";
+const io = new Server({
+  cors: {
+    origin: "http://localhost:3000",
+  },
 });
 
-app.listen(3001);
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
+  socket.on("disconnect", () => {
+    console.log("user disconnected", socket.id);
+  });
+});
+
+io.listen(3001);

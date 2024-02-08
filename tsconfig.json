@@ -11,4 +11,8 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
 }

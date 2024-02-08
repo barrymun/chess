@@ -47,8 +47,8 @@ export const convertMoveToAlgebraicNotation = ({
     }
   }
 
-  let prefix: string = "";
-  let suffix: string = "";
+  let prefix = "";
+  let suffix = "";
   if (originPieceIsPawn) {
     prefix = "";
     if (pieceCaptured) {
