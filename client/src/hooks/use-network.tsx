@@ -39,7 +39,8 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     [socket, setSocket],
   );
 
-  return <NetworkContext.Provider value={value}>{currentPlayer ? children : null}</NetworkContext.Provider>;
+  // return <NetworkContext.Provider value={value}>{currentPlayer ? children : null}</NetworkContext.Provider>;
+  return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
 };
 
 const useNetwork = () => useContext(NetworkContext);
