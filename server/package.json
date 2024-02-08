@@ -5,8 +5,11 @@
   "dependencies": {
     "socket.io": "^4.7.4"
   },
+  "devDependencies": {
+    "typescript": "^4.4.2"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf build && tsc",
     "start": "node build/index.js"
   }
 }

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
-// import { Player } from "utils";
+import { Player } from "utils";
 
 const newSocket = io("http://localhost:3001");
 
@@ -19,7 +19,7 @@ const NetworkContext = createContext(
 const NetworkProvider = ({ children }: NetworkProviderProps) => {
   const isLoaded = useRef(false);
   const [socket, setSocket] = useState<Socket>(newSocket);
-  // const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
     if (isLoaded.current) {
@@ -39,7 +39,7 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     [socket, setSocket],
   );
 
-  return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
+  return <NetworkContext.Provider value={value}>{currentPlayer ? children : null}</NetworkContext.Provider>;
 };
 
 const useNetwork = () => useContext(NetworkContext);

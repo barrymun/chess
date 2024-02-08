@@ -10,7 +10,10 @@
   "scripts": {
     "postinstall": "husky install",
     "lint": "yarn workspace client eslint src/**/*.{ts,tsx} --fix",
-    "test": "yarn workspace client test"
+    "test": "yarn workspace client test",
+    "docker-up": "docker-compose up -d --build",
+    "docker-down": "docker-compose down",
+    "docker-destroy": "docker-compose down -v"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.19.1",
