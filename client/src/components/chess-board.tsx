@@ -1,3 +1,4 @@
+import { Box } from "@radix-ui/themes";
 import { FC, useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
@@ -210,13 +211,15 @@ const ChessBoard: FC<ChessBoardProps> = () => {
   }, [boardState, playerTurn]);
 
   return (
-    <div className="bg-chess-board rounded-md truncate">
-      <div className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
-        {boardState.board.map((_square, index) => (
-          <Tile key={index} position={index} grabPiece={grabPiece} />
-        ))}
-      </div>
-    </div>
+    <Box className="w-full drop-shadow-lg">
+      <Box className="bg-chess-board rounded-md truncate">
+        <Box className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
+          {boardState.board.map((_square, index) => (
+            <Tile key={index} position={index} grabPiece={grabPiece} />
+          ))}
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

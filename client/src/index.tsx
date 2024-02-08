@@ -1,3 +1,4 @@
+import { Theme } from "@radix-ui/themes";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
@@ -5,13 +6,24 @@ import { BrowserRouter } from "react-router-dom";
 import App from "App";
 import reportWebVitals from "reportWebVitals";
 
+import "@radix-ui/themes/styles.css";
 import "index.css";
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <Theme
+        appearance="dark"
+        accentColor="mint"
+        grayColor="gray"
+        panelBackground="solid"
+        scaling="100%"
+        radius="medium"
+        className="w-full h-full"
+      >
+        <App />
+      </Theme>
     </BrowserRouter>
   </React.StrictMode>,
 );
