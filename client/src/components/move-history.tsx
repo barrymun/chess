@@ -1,3 +1,4 @@
+import { Box, Table, Text } from "@radix-ui/themes";
 import { FC } from "react";
 
 import { useGameState } from "hooks";
@@ -9,26 +10,41 @@ const MoveHistory: FC<MoveHistoryProps> = () => {
   const { moveHistory } = useGameState();
   const mergedMoveHistory = mergeMoveHistory(moveHistory);
   return (
-    <div className="rounded-lg shadow-lg overflow-y-scroll bg-gray-100 min-w-44 xs:hidden lg:block">
-      <table className="table-auto w-full">
-        <thead>
-          <tr>
-            <th className="p-2"></th>
-            <th className="p-2">White</th>
-            <th className="p-2">Black</th>
-          </tr>
-        </thead>
-        <tbody className="striped">
+    <Box
+      className="
+        overflow-y-scroll 
+        min-w-44
+        h-mh-table-mobile
+        lg:block
+        md:h-mh-table-desktop  
+        sm:h-mh-table-desktop-sm
+        xs:h-mh-table-desktop-xs
+        xs:hidden 
+      "
+    >
+      <Table.Root variant="surface" className="table-auto">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>
+              <Text>White</Text>
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>
+              <Text>Black</Text>
+            </Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
           {mergedMoveHistory.map((move, index) => (
-            <tr key={index}>
-              <td className="p-2">{`${index + 1}.`}</td>
-              <td className="p-2">{move[0]}</td>
-              <td className="p-2">{move[1]}</td>
-            </tr>
+            <Table.Row key={index}>
+              <Table.ColumnHeaderCell>{`${index + 1}.`}</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>{move[0]}</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>{move[1]}</Table.ColumnHeaderCell>
+            </Table.Row>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </Table.Body>
+      </Table.Root>
+    </Box>
   );
 };
 

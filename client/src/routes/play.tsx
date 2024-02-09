@@ -15,7 +15,7 @@ const Play = () => {
               <MoveHistory />
             </Box>
             <Box className="flex gap-2">
-              <Box className="ml-8" />
+              <Box className="ml-4" />
               <ChessBoardXLabels />
             </Box>
           </Box>

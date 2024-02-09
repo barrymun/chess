@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .striped tr:nth-child(even) {
-    @apply bg-gray-300
-  }
-}
-
 body {
   width: 100vw;
   height: 100vh;

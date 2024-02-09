@@ -1,3 +1,4 @@
+import { Box } from "@radix-ui/themes";
 import { FC } from "react";
 
 import { useGameState } from "hooks";
@@ -17,7 +18,7 @@ const Tile: FC<TileProps> = (props) => {
     boardState.board[position] !== " " ? `assets/img/${assetSanPieceMap[boardState.board[position]]}.png` : null;
 
   return (
-    <div
+    <Box
       className={`
         select-none 
         touch-none 
@@ -39,7 +40,7 @@ const Tile: FC<TileProps> = (props) => {
       }}
     >
       {lastMovedPiece !== null && lastMovedPiece.origin === position && (
-        <div
+        <Box
           className="
             absolute 
             w-mobile 
@@ -55,7 +56,7 @@ const Tile: FC<TileProps> = (props) => {
         />
       )}
       {lastMovedPiece !== null && lastMovedPiece.destination === position && (
-        <div
+        <Box
           className="
             absolute 
             w-mobile 
@@ -71,7 +72,7 @@ const Tile: FC<TileProps> = (props) => {
         />
       )}
       {selectedPieceLegalMoves.includes(position) && (
-        <div
+        <Box
           className="
             absolute 
             z-20 
@@ -88,11 +89,11 @@ const Tile: FC<TileProps> = (props) => {
             xs:h-desktop-xs
           "
         >
-          <div className="w-1/3 h-1/3 rounded-full bg-cyan-100" />
-        </div>
+          <Box className="w-1/3 h-1/3 rounded-full bg-cyan-100" />
+        </Box>
       )}
       {imgSrc && (
-        <div
+        <Box
           style={{
             backgroundImage: `url(${imgSrc})`,
           }}
@@ -115,7 +116,7 @@ const Tile: FC<TileProps> = (props) => {
           onTouchStart={grabPiece(position)}
         />
       )}
-    </div>
+    </Box>
   );
 };
 

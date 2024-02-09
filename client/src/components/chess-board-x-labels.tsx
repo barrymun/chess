@@ -1,3 +1,4 @@
+import { Box, Text } from "@radix-ui/themes";
 import { FC } from "react";
 
 import { xLabels } from "utils";
@@ -6,10 +7,10 @@ interface ChessBoardXLabelsProps {}
 
 const ChessBoardXLabels: FC<ChessBoardXLabelsProps> = () => {
   return (
-    <div className="flex text-white">
+    <Box className="flex">
       {xLabels.map((x) => {
         return (
-          <div
+          <Box
             key={x}
             className="
               w-mobile 
@@ -24,11 +25,11 @@ const ChessBoardXLabels: FC<ChessBoardXLabelsProps> = () => {
               xs:text-xs
             "
           >
-            {x}
-          </div>
+            <Text>{x}</Text>
+          </Box>
         );
       })}
-    </div>
+    </Box>
   );
 };
 
