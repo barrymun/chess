@@ -1,5 +1,6 @@
 import { BoardStateProps, GameOverProps, MoveHistoryProps, SanPiece, SanPieceBlack, SanPieceWhite } from "utils";
 
+export const repoUrl = "https://github.com/barrymun/chess";
 export const xLabels = ["a", "b", "c", "d", "e", "f", "g", "h"];
 export const yLabels = [1, 2, 3, 4, 5, 6, 7, 8];
 export const totalTiles = 64;

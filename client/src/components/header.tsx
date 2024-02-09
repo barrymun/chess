@@ -1,10 +1,11 @@
 import { grayDark } from "@radix-ui/colors";
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
-import { Box, IconButton, Text } from "@radix-ui/themes";
+import { GitHubLogoIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { Box, IconButton, Text, Tooltip } from "@radix-ui/themes";
 import { FC, useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { useTheme } from "hooks";
+import { repoUrl } from "utils";
 
 interface HeaderProps {
   children: React.ReactNode;
@@ -15,7 +16,11 @@ const Header: FC<HeaderProps> = ({ children }) => {
 
   const bgColor = useMemo(() => (appearance === "dark" ? `bg-[${grayDark.gray1}]` : "bg-[#ffffff]"), [appearance]);
 
-  const handleClick = () => {
+  const handleGitHubClick = () => {
+    window.open(repoUrl, "_blank", "noopener noreferrer");
+  };
+
+  const handleAppearanceClick = () => {
     setAppearance(appearance === "dark" ? "light" : "dark");
   };
 
@@ -29,8 +34,21 @@ const Header: FC<HeaderProps> = ({ children }) => {
                 <Link to="/">Chess</Link>
               </Text>
             </Box>
-            <Box>
-              <IconButton onClick={handleClick}>{appearance === "dark" ? <MoonIcon /> : <SunIcon />}</IconButton>
+            <Box className="flex flex-end gap-2">
+              <Box>
+                <Tooltip content="View GitHub" side="bottom">
+                  <IconButton onClick={handleGitHubClick} className="hover:cursor-pointer">
+                    <GitHubLogoIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Box>
+                <Tooltip content="Toggle theme" side="bottom">
+                  <IconButton onClick={handleAppearanceClick} className="hover:cursor-pointer">
+                    {appearance === "dark" ? <MoonIcon /> : <SunIcon />}
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Box>
           </Box>
         </header>
