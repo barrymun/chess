@@ -7,7 +7,7 @@ const Home = () => {
     <Box className="p-4">
       <Card className="w-48">
         <Text>Multiplayer</Text>
-        <Box>
+        <Box className="pt-2">
           <Link to="play">
             <Button asChild>
               <span>

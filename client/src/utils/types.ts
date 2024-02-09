@@ -83,3 +83,4 @@ export type MoveHistoryProps = {
     algebraicNotationMoves: string[];
   };
 };
+export type Appearance = "light" | "dark";

@@ -211,8 +211,8 @@ const ChessBoard: FC<ChessBoardProps> = () => {
   }, [boardState, playerTurn]);
 
   return (
-    <Box className="w-full drop-shadow-lg">
-      <Box className="bg-chess-board rounded-md truncate">
+    <Box className="shadow-lg rounded-md truncate">
+      <Box className="bg-chess-board">
         <Box className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
           {boardState.board.map((_square, index) => (
             <Tile key={index} position={index} grabPiece={grabPiece} />
