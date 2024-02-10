@@ -34,7 +34,7 @@ const Header: FC<HeaderProps> = ({ children }) => {
                 <Link to="/">Chess</Link>
               </Text>
             </Box>
-            <Box className="flex flex-end gap-2">
+            <Box className="flex justify-end gap-2">
               <Box>
                 <Tooltip content="View GitHub" side="bottom">
                   <IconButton onClick={handleGitHubClick} className="hover:cursor-pointer">

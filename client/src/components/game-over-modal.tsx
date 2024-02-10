@@ -1,4 +1,5 @@
-import { FC } from "react";
+import { Box, Button, Dialog, Text } from "@radix-ui/themes";
+import { FC, useCallback } from "react";
 
 import { useGameState } from "hooks";
 
@@ -7,60 +8,45 @@ interface GameOverModalProps {}
 const GameOverModal: FC<GameOverModalProps> = () => {
   const { gameOver } = useGameState();
 
+  const DialogClose = useCallback(
+    () => (
+      <Box className="flex justify-end mt-6">
+        <Button className="hover:cursor-pointer" onClick={() => window.location.reload()}>
+          Play Again
+        </Button>
+      </Box>
+    ),
+    [],
+  );
+
   if (!gameOver.isGameOver) {
     return null;
   }
 
   if (gameOver.winner === null) {
     return (
-      <div
-        className="
-          fixed 
-          z-20 
-          top-0 
-          left-0 
-          w-screen 
-          h-screen 
-          bg-black 
-          bg-opacity-50 
-          flex 
-          justify-center 
-          items-center
-        "
-      >
-        <div className="flex justify-center items-center border-2 border-black rounded">
-          <div className="text-4xl font-bold">{gameOver.reason}</div>
-        </div>
-      </div>
+      <Dialog.Root open>
+        <Dialog.Content>
+          <Dialog.Description>
+            <Text>{gameOver.reason}</Text>
+          </Dialog.Description>
+          <DialogClose />
+        </Dialog.Content>
+      </Dialog.Root>
     );
   }
 
   return (
-    <div
-      className="
-        fixed 
-        z-20 
-        top-0 
-        left-0 
-        w-screen 
-        h-screen 
-        bg-black 
-        bg-opacity-50 
-        flex 
-        flex-col 
-        justify-center 
-        items-center
-      "
-    >
-      <div className="flex justify-center items-center border-2 border-black rounded">
-        <div className="text-4xl font-bold">
-          {gameOver.winner === "white" ? "White" : "Black"} Wins by {gameOver.reason}!
-        </div>
-      </div>
-      <button className="text-4xl font-bold hover:cursor-pointer" onClick={() => window.location.reload()}>
-        Play Again
-      </button>
-    </div>
+    <Dialog.Root open>
+      <Dialog.Content>
+        <Dialog.Description>
+          <Text>
+            {gameOver.winner === "white" ? "White" : "Black"} Wins by {gameOver.reason}!
+          </Text>
+        </Dialog.Description>
+        <DialogClose />
+      </Dialog.Content>
+    </Dialog.Root>
   );
 };
 
