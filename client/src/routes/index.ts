@@ -1,2 +1,3 @@
 export * from "routes/home";
-export * from "routes/play";
+export * from "routes/multiplayer";
+export * from "routes/singleplayer";

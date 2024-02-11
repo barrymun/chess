@@ -1,9 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import { Player } from "utils";
-
-const newSocket = io("http://localhost:3001");
 
 interface NetworkProviderProps {
   children: React.ReactNode;
@@ -11,28 +9,39 @@ interface NetworkProviderProps {
 
 const NetworkContext = createContext(
   {} as {
-    socket: Socket;
-    setSocket: React.Dispatch<React.SetStateAction<Socket>>;
+    isLoaded: boolean;
+    socket: Socket | null;
+    setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
   },
 );
 
 const NetworkProvider = ({ children }: NetworkProviderProps) => {
-  const isLoaded = useRef(false);
-  const [socket, setSocket] = useState<Socket>(newSocket);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
-    if (isLoaded.current) {
-      return;
-    }
-    isLoaded.current = true;
-    socket.on("connect", () => {
-      console.log("Connected to server");
+    const ws = io("http://localhost:3001");
+    ws.on("connect", () => {
+      console.log("connected to server");
+      setIsLoaded(true);
     });
+    ws.on("disconnect", () => {
+      console.log("disconnected from server");
+      setIsLoaded(false);
+    });
+    ws.on("message", (data) => {
+      console.log("message received", data);
+    });
+    setSocket(ws);
+    return () => {
+      ws.disconnect();
+    };
   }, []);
 
   const value = useMemo(
     () => ({
+      isLoaded,
       socket,
       setSocket,
     }),
