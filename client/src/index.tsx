@@ -3,7 +3,8 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "App";
-import { PlayerInfoProvider, ThemeProvider } from "hooks";
+import { Header } from "components";
+import { LocalStorageProvider, PlayerInfoProvider, ThemeProvider } from "hooks";
 import reportWebVitals from "reportWebVitals";
 
 import "@radix-ui/themes/styles.css";
@@ -13,11 +14,15 @@ const root = createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider>
-        <PlayerInfoProvider>
-          <App />
-        </PlayerInfoProvider>
-      </ThemeProvider>
+      <LocalStorageProvider>
+        <ThemeProvider>
+          <Header>
+            <PlayerInfoProvider>
+              <App />
+            </PlayerInfoProvider>
+          </Header>
+        </ThemeProvider>
+      </LocalStorageProvider>
     </BrowserRouter>
   </React.StrictMode>,
 );

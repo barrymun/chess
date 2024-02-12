@@ -1,6 +1,7 @@
 import { Theme } from "@radix-ui/themes";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+import { useLocalStorage } from "hooks";
 import { Appearance } from "utils";
 
 const systemAppearance: Appearance = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -17,15 +18,14 @@ const ThemeContext = createContext(
 );
 
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [appearance, setAppearance] = useState<Appearance>(
-    (localStorage.getItem("appearance") as Appearance) ?? systemAppearance,
-  );
+  const { getValue, setValue } = useLocalStorage();
+  const [appearance, setAppearance] = useState<Appearance>((getValue("appearance") as Appearance) ?? systemAppearance);
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(appearance);
-    localStorage.setItem("appearance", appearance);
+    setValue("appearance", appearance);
   }, [appearance]);
 
   const value = useMemo(
