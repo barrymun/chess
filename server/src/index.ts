@@ -1,16 +1,30 @@
+import { createServer } from "http";
+
+import cors from "cors";
+import express from "express";
 import { Server } from "socket.io";
 
 import { initRedisClient } from "./lib/redis";
+import generatePlayerId from "./routes/generate-player-id";
+import root from "./routes/root";
 
 (async () => {
   await initRedisClient();
   console.log("Redis client initialized");
 
-  const io = new Server({
-    cors: {
-      origin: "http://localhost:3000",
-    },
+  const corsOptions = {
+    origin: "http://localhost:3000",
+  };
+
+  const app = express();
+  const server = createServer(app);
+  const io = new Server(server, {
+    cors: corsOptions,
   });
+
+  app.use(cors(corsOptions));
+  app.get("/", root);
+  app.get("/generate-player-id", generatePlayerId);
 
   io.on("connection", (socket) => {
     console.log("a user connected", socket.id);
@@ -19,5 +33,5 @@ import { initRedisClient } from "./lib/redis";
     });
   });
 
-  io.listen(3001);
+  server.listen(3001);
 })();

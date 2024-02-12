@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { Loader } from "components";
 import { useLocalStorage } from "hooks";
+import { getPlayerId } from "utils";
 
 interface PlayerInfoProviderProps {
   children: React.ReactNode;
@@ -18,12 +18,23 @@ const PlayerInfoProvider = ({ children }: PlayerInfoProviderProps) => {
   const { getValue, setValue } = useLocalStorage();
   const [playerId, setPlayerId] = useState<string | null>(null);
 
-  useEffect(() => {
-    let playerId = getValue("playerId");
-    if (playerId === null) {
-      playerId = uuidv4();
+  const assignPlayerId = useCallback(async () => {
+    console.log(playerId);
+    if (playerId !== null) {
+      return;
     }
-    setPlayerId(playerId);
+    const storedPlayerId = getValue("playerId");
+    let newPlayerId = "";
+    if (storedPlayerId === null) {
+      newPlayerId = await getPlayerId();
+    } else {
+      newPlayerId = storedPlayerId;
+    }
+    setPlayerId(newPlayerId);
+  }, [playerId]);
+
+  useEffect(() => {
+    assignPlayerId();
   }, []);
 
   useEffect(() => {

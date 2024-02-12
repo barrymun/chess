@@ -85,3 +85,6 @@ export type MoveHistoryProps = {
 };
 export type Appearance = "light" | "dark";
 export type LocalStorageKeys = "appearance" | "playerId";
+export interface GetPlayerIdResponse {
+  playerId: string;
+}
