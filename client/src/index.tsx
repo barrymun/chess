@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "App";
-import { ThemeProvider } from "hooks";
+import { PlayerInfoProvider, ThemeProvider } from "hooks";
 import reportWebVitals from "reportWebVitals";
 
 import "@radix-ui/themes/styles.css";
@@ -14,7 +14,9 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-        <App />
+        <PlayerInfoProvider>
+          <App />
+        </PlayerInfoProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
