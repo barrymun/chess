@@ -2,6 +2,8 @@ import { Player } from "common/build/types";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
+import { Loader } from "components";
+
 interface NetworkProviderProps {
   children: React.ReactNode;
 }
@@ -47,8 +49,7 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     [socket, setSocket],
   );
 
-  // return <NetworkContext.Provider value={value}>{currentPlayer ? children : null}</NetworkContext.Provider>;
-  return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
+  return <NetworkContext.Provider value={value}>{isLoaded ? children : <Loader />}</NetworkContext.Provider>;
 };
 
 const useNetwork = () => useContext(NetworkContext);

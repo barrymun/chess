@@ -19,7 +19,6 @@ const PlayerInfoProvider = ({ children }: PlayerInfoProviderProps) => {
   const [playerId, setPlayerId] = useState<string | null>(null);
 
   const assignPlayerId = useCallback(async () => {
-    console.log(playerId);
     if (playerId !== null) {
       return;
     }
