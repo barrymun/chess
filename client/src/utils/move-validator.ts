@@ -1,9 +1,7 @@
+import { Player, SanPiece, SanPieceBlack, SanPieceWhite } from "common/build/types";
+
 import {
   MoveValidatorResponse,
-  Player,
-  SanPiece,
-  SanPieceBlack,
-  SanPieceWhite,
   ValidMoveProps,
   ValidMoveWithSimulatedProps,
   blackSanPieces,

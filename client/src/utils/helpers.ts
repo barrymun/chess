@@ -1,4 +1,6 @@
-import { MoveHistoryProps, SanPiece } from "utils";
+import { SanPiece } from "common/build/types";
+
+import { MoveHistoryProps } from "utils";
 
 export const mergeMoveHistory = (moveHistory: MoveHistoryProps): string[][] => {
   let res: string[][] = [];

@@ -1,4 +1,6 @@
-import { BoardStateProps, GameOverProps, MoveHistoryProps, SanPiece, SanPieceBlack, SanPieceWhite } from "utils";
+import { BoardStateProps, SanPiece, SanPieceBlack, SanPieceWhite } from "common/build/types";
+
+import { GameOverProps, MoveHistoryProps } from "utils";
 
 export const repoUrl = "https://github.com/barrymun/chess";
 export const xLabels = ["a", "b", "c", "d", "e", "f", "g", "h"];

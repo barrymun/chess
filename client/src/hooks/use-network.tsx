@@ -1,7 +1,6 @@
+import { Player } from "common/build/types";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
-
-import { Player } from "utils";
 
 interface NetworkProviderProps {
   children: React.ReactNode;

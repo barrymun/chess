@@ -14,6 +14,7 @@ COPY server/tsconfig.json /usr/src/app/
 
 # Copy local code to the container image
 COPY server/. /usr/src/app/
+COPY common/build/. /usr/src/app/src/common/build/
 
 RUN yarn install
 # RUN yarn install --frozen-lockfile

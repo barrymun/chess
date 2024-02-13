@@ -1,12 +1,5 @@
-import { isEqual } from "lodash";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-
-import { GameOverModal, PawnPromotionModal } from "components";
 import {
   BoardStateProps,
-  GameOverProps,
-  LastMoveProps,
-  MoveHistoryProps,
   Player,
   SanBishopBlack,
   SanBishopWhite,
@@ -16,6 +9,15 @@ import {
   SanQueenWhite,
   SanRookBlack,
   SanRookWhite,
+} from "common/build/types";
+import { isEqual } from "lodash";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+
+import { GameOverModal, PawnPromotionModal } from "components";
+import {
+  GameOverProps,
+  LastMoveProps,
+  MoveHistoryProps,
   defaultBoard,
   defaultBoardState,
   defaultGameOverState,

@@ -1,8 +1,9 @@
 import { Box } from "@radix-ui/themes";
+import { TileColor } from "common/build/types";
 import { FC } from "react";
 
 import { useGameState } from "hooks";
-import { TileColor, assetSanPieceMap, tilesPerRow } from "utils";
+import { assetSanPieceMap, tilesPerRow } from "utils";
 
 interface TileProps {
   position: number;
