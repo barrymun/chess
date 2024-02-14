@@ -1,3 +1,4 @@
+import { defaultBoard, defaultBoardState } from "common/build/config";
 import {
   BoardStateProps,
   Player,
@@ -18,8 +19,6 @@ import {
   GameOverProps,
   LastMoveProps,
   MoveHistoryProps,
-  defaultBoard,
-  defaultBoardState,
   defaultGameOverState,
   defaultMoveHistory,
   getIsCheckmate,

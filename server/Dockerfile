@@ -9,18 +9,17 @@ WORKDIR /usr/src/app
 # Utilize Docker cache to save re-installing dependencies if unchanged
 COPY server/package*.json /usr/src/app/
 COPY yarn.lock /usr/src/app/
-COPY tsconfig.json /usr/src
+COPY tsconfig.json /usr/src/
+COPY common/. /usr/src/common/
 COPY server/tsconfig.json /usr/src/app/
 
 # Copy local code to the container image
 COPY server/. /usr/src/app/
-COPY common/build/. /usr/src/app/src/common/build/
 
 RUN yarn install
 # RUN yarn install --frozen-lockfile
 
 RUN yarn build
-# RUN rm -rf build && ./node_modules/typescript/bin/tsc
 
 EXPOSE 3001
 

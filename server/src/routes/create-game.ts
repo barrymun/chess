@@ -1,13 +1,15 @@
+import { defaultBoardState } from "common/build/config";
 import { Response } from "express";
+import { v4 as uuidv4 } from "uuid";
 
-import { getValue } from "../lib/redis";
-import { CustomReq } from "../utils/types";
+import { getValue, setValue } from "../lib/redis";
+import { CustomReq, GameRecord, PlayerRecord } from "../utils/types";
 
-interface Body {
+interface ReqBody {
   playerId: string;
 }
 
-export default async (req: CustomReq<Body>, res: Response) => {
+export default async (req: CustomReq<ReqBody>, res: Response) => {
   const playerId = req.body.playerId;
   if (playerId === undefined) {
     res.status(400).send("Missing playerId");
@@ -17,9 +19,25 @@ export default async (req: CustomReq<Body>, res: Response) => {
     res.status(400).send("Invalid playerId, must be a string");
     return;
   }
-  const value = await getValue(playerId);
+  const value = await getValue<PlayerRecord>(playerId);
   if (value !== null) {
-    res.status(400).send("PlayerId already exists");
+    const gameRecord = await getValue<GameRecord>(value.gameRecordId);
+    if (gameRecord === null) {
+      res.status(500).send("Game record not found");
+      return;
+    }
+    res.json({ playerId, gameId: value.gameRecordId });
     return;
   }
+  const newGameRecord: GameRecord = {
+    boardState: defaultBoardState,
+  };
+  const newGameId = uuidv4();
+  await setValue<GameRecord>(newGameId, newGameRecord);
+  await setValue<PlayerRecord>(playerId, {
+    playerColour: "white",
+    gameRecordId: newGameId,
+  });
+  res.json({ playerId, gameId: newGameId });
+  return;
 };

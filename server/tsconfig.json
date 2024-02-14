@@ -4,8 +4,8 @@
     "outDir": "./build",
     "lib": ["ES5", "ES6"],
     "target": "ES6",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "baseUrl": "./src"
   },
   "include": [

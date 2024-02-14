@@ -1,4 +1,6 @@
-import { computeCanMakeMove, defaultBoard, defaultBoardState } from "./";
+import { defaultBoard, defaultBoardState } from "common/build/config";
+
+import { computeCanMakeMove } from "utils";
 
 describe("computeCanMakeMove", () => {
   it("should return an invalid move when the piece is not the player's", () => {
