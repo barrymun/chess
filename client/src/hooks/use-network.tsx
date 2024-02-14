@@ -46,6 +46,7 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [gameId, setGameId] = useState<string | null>(null);
   const [gameRecord, setGameRecord] = useState<GameRecord>(defaultGameRecord);
 
   const assignGame = async () => {
@@ -54,6 +55,7 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     }
     const findGameResponse = await findGame(playerId);
     console.log({ findGameResponse });
+    setGameId(findGameResponse.gameId);
     setGameRecord(findGameResponse.gameRecord);
     setIsLoaded(true);
   };
@@ -86,6 +88,16 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
   }, [gameRecord]);
 
   useEffect(() => {
+    if (socket === null || gameId === null) {
+      return;
+    }
+    console.log({ socket, gameId });
+    socket.on(gameId, ({ gameRecord }: { gameRecord: GameRecord }) => {
+      setGameRecord(gameRecord);
+    });
+  }, [socket, gameId]);
+
+  useEffect(() => {
     const ws = io("http://localhost:3001");
     ws.on("connect", () => {
       console.log("connected to server");
@@ -94,10 +106,6 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     ws.on("disconnect", () => {
       console.log("disconnected from server");
       setIsLoaded(false);
-    });
-    ws.on("make-move", ({ gameRecord }: { gameRecord: GameRecord }) => {
-      console.log("make-move", gameRecord);
-      setGameRecord(gameRecord);
     });
     setSocket(ws);
     return () => {

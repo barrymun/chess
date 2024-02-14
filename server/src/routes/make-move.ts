@@ -2,7 +2,7 @@ import { BoardStateProps, GameRecord, LastMoveProps, MoveHistoryProps } from "co
 import { Response } from "express";
 
 import { getValue, setValue } from "lib/redis";
-import { getIo, getSocket } from "lib/socket";
+import { getIo } from "lib/socket";
 import { CustomReq, PlayerRecord } from "utils/types";
 
 interface ReqBody {
@@ -53,9 +53,7 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
     };
     await setValue<GameRecord>(gameRecordId, updatedGameRecord);
 
-    getIo()?.emit("make-move", { gameRecord: updatedGameRecord });
-    // TODO: need to emit the move for the current game only
-    // getSocket()?.emit(`make-move-${playerId}`, { lastMovedPiece, moveHistory, boardState });
+    getIo()?.emit(gameRecordId, { gameRecord: updatedGameRecord });
 
     res.json({ gameRecord: updatedGameRecord });
   } catch (error) {

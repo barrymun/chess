@@ -21,5 +21,6 @@ export interface GetPlayerIdResponse {
 }
 export interface FindGameResponse {
   playerId: string;
+  gameId: string;
   gameRecord: GameRecord;
 }
