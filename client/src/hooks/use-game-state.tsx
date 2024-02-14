@@ -1,6 +1,9 @@
-import { defaultBoard, defaultBoardState } from "common/build/config";
+import { defaultBoard, defaultBoardState, defaultGameOverState, defaultMoveHistory } from "common/build/config";
 import {
   BoardStateProps,
+  GameOverProps,
+  LastMoveProps,
+  MoveHistoryProps,
   Player,
   SanBishopBlack,
   SanBishopWhite,
@@ -15,15 +18,7 @@ import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { GameOverModal, PawnPromotionModal } from "components";
-import {
-  GameOverProps,
-  LastMoveProps,
-  MoveHistoryProps,
-  defaultGameOverState,
-  defaultMoveHistory,
-  getIsCheckmate,
-  getIsStalemate,
-} from "utils";
+import { getIsCheckmate, getIsStalemate } from "utils";
 
 interface GameStateProviderProps {
   children: React.ReactNode;
@@ -111,7 +106,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
       });
       return;
     }
-    setPlayerTurn((prevPlayerTurn) => (prevPlayerTurn === "white" ? "black" : "white"));
+    // setPlayerTurn((prevPlayerTurn) => (prevPlayerTurn === "white" ? "black" : "white"));
   }, [boardState.board]);
 
   useEffect(() => {

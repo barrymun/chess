@@ -53,3 +53,38 @@ export interface BoardStateProps {
   blackRightRookHasMoved: boolean;
   pawnPromotionPieceIndex: number | null;
 }
+export interface LastMoveProps {
+  origin: number;
+  destination: number;
+}
+export type MoveHistoryProps = {
+  [T in Player]: {
+    moves: LastMoveProps[];
+    algebraicNotationMoves: string[];
+  };
+};
+// TODO: this will be updated in the future when more game over states are added
+export interface GameOverProps {
+  isGameOver: boolean;
+  winner: Player | null;
+  reason: "checkmate" | "insufficient material" | "stalemate" | "draw";
+}
+export interface GameRecord {
+  boardState: BoardStateProps;
+  lastMovedPiece: LastMoveProps | null;
+  playerTurn: Player;
+  pawnPromotionPieceSelection:
+    | SanBishopBlack
+    | SanBishopWhite
+    | SanKnightBlack
+    | SanKnightWhite
+    | SanQueenBlack
+    | SanQueenWhite
+    | SanRookBlack
+    | SanRookWhite
+    | null;
+  showPawnPromotionModal: boolean;
+  selectedPieceLegalMoves: number[];
+  moveHistory: MoveHistoryProps;
+  gameOver: GameOverProps;
+}

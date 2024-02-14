@@ -1,10 +1,10 @@
 import { Box } from "@radix-ui/themes";
+import { LastMoveProps } from "common/build/types";
 import { FC, useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
-import { useGameState } from "hooks";
+import { useGameState, useNetwork } from "hooks";
 import {
-  LastMoveProps,
   ValidMoveProps,
   computeCanMakeMove,
   convertMoveToAlgebraicNotation,
@@ -21,8 +21,16 @@ interface ChessBoardProps {}
 
 const ChessBoard: FC<ChessBoardProps> = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const { boardState, playerTurn, setBoardState, setLastMovedPiece, setSelectedPieceLegalMoves, setMoveHistory } =
-    useGameState();
+  const {
+    boardState,
+    playerTurn,
+    moveHistory,
+    setBoardState,
+    setLastMovedPiece,
+    setSelectedPieceLegalMoves,
+    setMoveHistory,
+  } = useGameState();
+  const { makeNetworkMove } = useNetwork();
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     // don't do anything if right-clicked or multitouch
@@ -189,6 +197,24 @@ const ChessBoard: FC<ChessBoardProps> = () => {
         ...canMakeMoveResponse,
         board: prevBoardState.board.map((piece, index) => boardUpdates[index] ?? piece),
       }));
+      if (makeNetworkMove !== undefined) {
+        makeNetworkMove({
+          lastMovedPiece: lastMove,
+          moveHistory: {
+            ...moveHistory,
+            [playerTurn]: {
+              ...moveHistory[playerTurn],
+              moves: [...moveHistory[playerTurn].moves, lastMove],
+              algebraicNotationMoves: [...moveHistory[playerTurn].algebraicNotationMoves, lastMoveAlgebraicNotation],
+            },
+          },
+          boardState: {
+            ...boardState,
+            ...canMakeMoveResponse,
+            board: boardState.board.map((piece, index) => boardUpdates[index] ?? piece),
+          },
+        });
+      }
     },
     [boardState, playerTurn],
   );

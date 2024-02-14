@@ -1,4 +1,4 @@
-import { BoardStateProps, SanPiece } from "utils/types";
+import { BoardStateProps, GameOverProps, GameRecord, MoveHistoryProps, SanPiece } from "utils/types";
 
 // Standard Algebraic Notation (SAN) 8x8 board
 export const defaultBoard: SanPiece[] = [
@@ -24,4 +24,29 @@ export const defaultBoardState: BoardStateProps = {
   blackLeftRookHasMoved: false, // a8
   blackRightRookHasMoved: false, // h8
   pawnPromotionPieceIndex: null,
+};
+export const defaultMoveHistory: MoveHistoryProps = {
+  white: {
+    moves: [],
+    algebraicNotationMoves: [],
+  },
+  black: {
+    moves: [],
+    algebraicNotationMoves: [],
+  },
+};
+export const defaultGameOverState: GameOverProps = {
+  isGameOver: false,
+  winner: null,
+  reason: "draw",
+};
+export const defaultGameRecord: GameRecord = {
+  boardState: defaultBoardState,
+  lastMovedPiece: null,
+  playerTurn: "white",
+  pawnPromotionPieceSelection: null,
+  showPawnPromotionModal: false,
+  selectedPieceLegalMoves: [],
+  moveHistory: defaultMoveHistory,
+  gameOver: defaultGameOverState,
 };
