@@ -4,9 +4,9 @@ import cors from "cors";
 import express from "express";
 import { Server } from "socket.io";
 
-import { initRedisClient } from "./lib/redis";
-import createGame from "./routes/create-game";
-import generatePlayerId from "./routes/generate-player-id";
+import { initRedisClient } from "lib/redis";
+import createGame from "routes/create-game";
+import generatePlayerId from "routes/generate-player-id";
 
 (async () => {
   await initRedisClient();

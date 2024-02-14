@@ -2,8 +2,8 @@ import { defaultBoardState } from "common/build/config";
 import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
-import { getValue, setValue } from "../lib/redis";
-import { CustomReq, GameRecord, PlayerRecord } from "../utils/types";
+import { getValue, setValue } from "lib/redis";
+import { CustomReq, GameRecord, PlayerRecord } from "utils/types";
 
 interface ReqBody {
   playerId: string;

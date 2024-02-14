@@ -70,6 +70,14 @@
           "index",
           "unknown"
         ],
+        "pathGroups": [
+          {
+            "pattern": "utils/**",
+            "group": "internal"
+          }
+        ],
+        "distinctGroup": false,
+        "pathGroupsExcludedImportTypes": ["builtin"],
         "newlines-between": "always",
         "alphabetize": {
           "order": "asc",
