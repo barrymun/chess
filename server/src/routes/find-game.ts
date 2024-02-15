@@ -19,7 +19,6 @@ interface ReqBody {
 export default async (req: CustomReq<ReqBody>, res: Response) => {
   try {
     const playerId = req.body.playerId;
-    console.log({ playerId });
     if (playerId === undefined) {
       res.status(400).send("Missing playerId");
       return;
@@ -30,20 +29,22 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
     }
 
     const playerRecord = await getValue<PlayerRecord>(playerId);
-    console.log({ playerRecord });
     if (playerRecord !== null) {
+      console.log("=====CASE_1=====");
+      console.log({ playerId, playerRecord });
       const gameRecord = await getValue<GameRecord>(playerRecord.gameRecordId);
       if (gameRecord === null) {
         res.status(500).send("Game record not found");
         return;
       }
-      res.json({ playerId, gameId: playerRecord.gameRecordId, gameRecord });
+      res.json({ playerId, playerColour: playerRecord.playerColour, gameId: playerRecord.gameRecordId, gameRecord });
       return;
     }
 
     const gameAvailablePlayerId = await getOldestLookingForGame();
-    console.log({ gameAvailablePlayerId });
     if (gameAvailablePlayerId !== null) {
+      console.log("=====CASE_2=====");
+      console.log({ gameAvailablePlayerId });
       const matchedPlayerRecord = await getValue<PlayerRecord>(gameAvailablePlayerId);
       console.log({ matchedPlayerRecord });
       if (matchedPlayerRecord === null) {
@@ -61,10 +62,11 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
         res.status(500).send("Game record not found");
         return;
       }
-      res.json({ playerId, gameId: matchedPlayerRecord.gameRecordId, gameRecord });
+      res.json({ playerId, playerColour: "black", gameId: matchedPlayerRecord.gameRecordId, gameRecord });
       return;
     }
 
+    console.log("=====CASE_3=====");
     const newGameId = uuidv4();
     const newGameRecord: GameRecord = defaultGameRecord;
     console.log({ newGameRecord });
@@ -74,7 +76,7 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
       gameRecordId: newGameId,
     });
     await addToLookingForGames(playerId);
-    res.json({ playerId, gameId: newGameId, gameRecord: newGameRecord });
+    res.json({ playerId, playerColour: "white", gameId: newGameId, gameRecord: newGameRecord });
     return;
   } catch (error) {
     console.error(error);

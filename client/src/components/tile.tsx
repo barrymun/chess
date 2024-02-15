@@ -1,9 +1,10 @@
 import { Box } from "@radix-ui/themes";
+import { tilesPerRow } from "common/build/config";
 import { TileColor } from "common/build/types";
 import { FC } from "react";
 
-import { useGameState } from "hooks";
-import { assetSanPieceMap, tilesPerRow } from "utils";
+import { useGameState, useNetwork } from "hooks";
+import { assetSanPieceMap, getIsSanPieceMoveable } from "utils";
 
 interface TileProps {
   position: number;
@@ -12,11 +13,24 @@ interface TileProps {
 
 const Tile: FC<TileProps> = (props) => {
   const { position, grabPiece } = props;
-  const { boardState, lastMovedPiece, selectedPieceLegalMoves } = useGameState();
+  const { currentPlayer } = useNetwork();
+  const { isMultiplayer, gameRecord } = useGameState();
 
   const tileColor: TileColor = (Math.floor(position / tilesPerRow) + position) % 2 === 0 ? "light" : "dark";
   const imgSrc =
-    boardState.board[position] !== " " ? `assets/img/${assetSanPieceMap[boardState.board[position]]}.png` : null;
+    gameRecord.boardState.board[position] !== " "
+      ? `assets/img/${assetSanPieceMap[gameRecord.boardState.board[position]]}.png`
+      : null;
+
+  const handleGrabPiece = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (isMultiplayer && currentPlayer !== gameRecord.playerTurn) {
+      return;
+    }
+    if (!getIsSanPieceMoveable({ board: gameRecord.boardState.board, position, playerTurn: gameRecord.playerTurn })) {
+      return;
+    }
+    grabPiece(position)(e);
+  };
 
   return (
     <Box
@@ -40,7 +54,7 @@ const Tile: FC<TileProps> = (props) => {
         return false;
       }}
     >
-      {lastMovedPiece !== null && lastMovedPiece.origin === position && (
+      {gameRecord.lastMovedPiece !== null && gameRecord.lastMovedPiece.origin === position && (
         <Box
           className="
             absolute 
@@ -56,7 +70,7 @@ const Tile: FC<TileProps> = (props) => {
           "
         />
       )}
-      {lastMovedPiece !== null && lastMovedPiece.destination === position && (
+      {gameRecord.lastMovedPiece !== null && gameRecord.lastMovedPiece.destination === position && (
         <Box
           className="
             absolute 
@@ -72,7 +86,7 @@ const Tile: FC<TileProps> = (props) => {
           "
         />
       )}
-      {selectedPieceLegalMoves.includes(position) && (
+      {gameRecord.selectedPieceLegalMoves.includes(position) && (
         <Box
           className="
             absolute 
@@ -113,8 +127,8 @@ const Tile: FC<TileProps> = (props) => {
             xs:w-desktop-xs
             xs:h-desktop-xs
           "
-          onMouseDown={grabPiece(position)}
-          onTouchStart={grabPiece(position)}
+          onMouseDown={handleGrabPiece}
+          onTouchStart={handleGrabPiece}
         />
       )}
     </Box>

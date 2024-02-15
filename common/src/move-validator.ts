@@ -1,14 +1,13 @@
-import { Player, SanPiece, SanPieceBlack, SanPieceWhite } from "common/build/types";
-
+import { blackSanPieces, tilesPerRow, totalTiles, whiteSanPieces } from "./config";
 import {
   MoveValidatorResponse,
+  Player,
+  SanPiece,
+  SanPieceBlack,
+  SanPieceWhite,
   ValidMoveProps,
   ValidMoveWithSimulatedProps,
-  blackSanPieces,
-  tilesPerRow,
-  totalTiles,
-  whiteSanPieces,
-} from "utils";
+} from "./types";
 
 const getUpdatedBoardRepresentation = ({
   board,
@@ -708,7 +707,7 @@ const getIsValidKingMoveIgnoreCastling = (props: ValidMoveWithSimulatedProps): M
   return getIsValidKingMove({ ...props, canSetCastlingVars: false });
 };
 
-export const getIsValidMove = (props: ValidMoveWithSimulatedProps & { piece: SanPiece }): MoveValidatorResponse => {
+const getIsValidMove = (props: ValidMoveWithSimulatedProps & { piece: SanPiece }): MoveValidatorResponse => {
   const { piece, ...rest } = props;
   const { playerTurn, origin, destination } = rest;
   const isValid = false;
@@ -783,7 +782,7 @@ const getKingPosition = ({ playerTurn, board }: { playerTurn: Player; board: San
   return kingPosition;
 };
 
-export const getIsKingInCheck = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
+const getIsKingInCheck = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
   const { playerTurn, board } = props;
   let isInCheck = false;
   const kingPosition = getKingPosition({ playerTurn, board });
@@ -817,7 +816,7 @@ const getWillMovePutKingInCheck = (
   });
 };
 
-export const getIsStalemate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
+const getIsStalemate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
   const { board } = props;
   let isStalemate = true;
   for (let i = 0; i < totalTiles; i++) {
@@ -836,11 +835,11 @@ export const getIsStalemate = (props: Omit<ValidMoveProps, "origin" | "destinati
   return isStalemate;
 };
 
-export const getIsCheckmate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
+const getIsCheckmate = (props: Omit<ValidMoveProps, "origin" | "destination">): boolean => {
   return getIsKingInCheck(props) && getIsStalemate(props);
 };
 
-export const getAllValidPieceMoves = (props: Omit<ValidMoveProps, "destination"> & { piece: SanPiece }): number[] => {
+const getAllValidPieceMoves = (props: Omit<ValidMoveProps, "destination"> & { piece: SanPiece }): number[] => {
   const { piece, ...rest } = props;
   const { playerTurn } = rest;
   let validMovesFn: ((props: ValidMoveProps) => MoveValidatorResponse) | null = null;
@@ -891,7 +890,7 @@ export const getAllValidPieceMoves = (props: Omit<ValidMoveProps, "destination">
   return res;
 };
 
-export const computeCanMakeMove = (props: ValidMoveProps & { piece: SanPiece }): MoveValidatorResponse => {
+const computeCanMakeMove = (props: ValidMoveProps & { piece: SanPiece }): MoveValidatorResponse => {
   const { piece, playerTurn, origin, destination, ...rest } = props;
   let {
     whiteKingHasMoved,
@@ -944,3 +943,5 @@ export const computeCanMakeMove = (props: ValidMoveProps & { piece: SanPiece }):
     whiteKingHasMoved,
   };
 };
+
+export { getIsValidMove, getIsKingInCheck, getIsStalemate, getIsCheckmate, getAllValidPieceMoves, computeCanMakeMove };

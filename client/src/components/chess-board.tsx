@@ -1,17 +1,16 @@
 import { Box } from "@radix-ui/themes";
-import { LastMoveProps } from "common/build/types";
+import {
+  computeCanMakeMove,
+  getAllValidPieceMoves,
+  getIsCheckmate,
+  getIsKingInCheck,
+} from "common/build/move-validator";
+import { GameRecord, LastMoveProps, ValidMoveProps } from "common/build/types";
 import { FC, useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
 import { useGameState, useNetwork } from "hooks";
-import {
-  ValidMoveProps,
-  computeCanMakeMove,
-  convertMoveToAlgebraicNotation,
-  getAllValidPieceMoves,
-  getIsCheckmate,
-  getIsKingInCheck,
-} from "utils";
+import { convertMoveToAlgebraicNotation } from "utils";
 
 let isMouseDown = false;
 let originIndex: number | null = null;
@@ -20,17 +19,10 @@ let selectedPiece: HTMLDivElement | null = null;
 interface ChessBoardProps {}
 
 const ChessBoard: FC<ChessBoardProps> = () => {
-  const boardRef = useRef<HTMLDivElement | null>(null);
-  const {
-    boardState,
-    playerTurn,
-    moveHistory,
-    setBoardState,
-    setLastMovedPiece,
-    setSelectedPieceLegalMoves,
-    setMoveHistory,
-  } = useGameState();
+  const { isMultiplayer, gameRecord, setGameRecord } = useGameState();
   const { makeNetworkMove } = useNetwork();
+
+  const boardRef = useRef<HTMLDivElement | null>(null);
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     // don't do anything if right-clicked or multitouch
@@ -60,13 +52,16 @@ const ChessBoard: FC<ChessBoardProps> = () => {
     originIndex = position;
     selectedPiece = target;
     const allValidMoves = getAllValidPieceMoves({
-      ...boardState,
-      piece: boardState.board[originIndex],
-      playerTurn,
+      ...gameRecord.boardState,
+      piece: gameRecord.boardState.board[originIndex],
+      playerTurn: gameRecord.playerTurn,
       origin: position,
     });
     console.log(allValidMoves);
-    setSelectedPieceLegalMoves(allValidMoves);
+    setGameRecord((prevGameRecord) => ({
+      ...prevGameRecord,
+      selectedPieceLegalMoves: allValidMoves,
+    }));
   };
 
   const movePiece = (e: MouseEvent | TouchEvent) => {
@@ -118,7 +113,10 @@ const ChessBoard: FC<ChessBoardProps> = () => {
 
   const dropPiece = useCallback(
     (e: MouseEvent | TouchEvent) => {
-      setSelectedPieceLegalMoves([]);
+      setGameRecord((prevGameRecord) => ({
+        ...prevGameRecord,
+        selectedPieceLegalMoves: [],
+      }));
       if (originIndex === null || selectedPiece === null) {
         clearSelectionContext();
         return;
@@ -156,9 +154,9 @@ const ChessBoard: FC<ChessBoardProps> = () => {
         return;
       }
       const { isValid, boardUpdates, ...canMakeMoveResponse } = computeCanMakeMove({
-        ...boardState,
-        piece: boardState.board[originIndex],
-        playerTurn,
+        ...gameRecord.boardState,
+        piece: gameRecord.boardState.board[originIndex],
+        playerTurn: gameRecord.playerTurn,
         origin: originIndex,
         destination: destinationIndex,
       });
@@ -170,58 +168,49 @@ const ChessBoard: FC<ChessBoardProps> = () => {
       const lastMove: LastMoveProps = { origin: originIndex, destination: destinationIndex };
       const checkAndCheckmateProps: Omit<ValidMoveProps, "origin" | "destination"> = {
         ...canMakeMoveResponse,
-        board: boardState.board.map((piece, index) => boardUpdates[index] ?? piece),
-        playerTurn: playerTurn === "white" ? "black" : "white",
+        board: gameRecord.boardState.board.map((piece, index) => boardUpdates[index] ?? piece),
+        playerTurn: gameRecord.playerTurn === "white" ? "black" : "white",
       };
       const isInCheck = getIsKingInCheck(checkAndCheckmateProps);
       const isCheckmate = getIsCheckmate(checkAndCheckmateProps);
       const lastMoveAlgebraicNotation = convertMoveToAlgebraicNotation({
         origin: originIndex,
         destination: destinationIndex,
-        originPiece: boardState.board[originIndex],
-        destinationPiece: boardState.board[destinationIndex],
+        originPiece: gameRecord.boardState.board[originIndex],
+        destinationPiece: gameRecord.boardState.board[destinationIndex],
         isInCheck,
         isCheckmate,
       });
-      setLastMovedPiece(lastMove);
-      setMoveHistory((mh) => ({
-        ...mh,
-        [playerTurn]: {
-          ...mh[playerTurn],
-          moves: [...mh[playerTurn].moves, lastMove],
-          algebraicNotationMoves: [...mh[playerTurn].algebraicNotationMoves, lastMoveAlgebraicNotation],
+      const updatedGameRecord: GameRecord = {
+        ...gameRecord,
+        lastMovedPiece: lastMove,
+        moveHistory: {
+          ...gameRecord.moveHistory,
+          [gameRecord.playerTurn]: {
+            moves: [...gameRecord.moveHistory[gameRecord.playerTurn].moves, lastMove],
+            algebraicNotationMoves: [
+              ...gameRecord.moveHistory[gameRecord.playerTurn].algebraicNotationMoves,
+              lastMoveAlgebraicNotation,
+            ],
+          },
         },
-      }));
-      setBoardState((prevBoardState) => ({
-        ...prevBoardState,
-        ...canMakeMoveResponse,
-        board: prevBoardState.board.map((piece, index) => boardUpdates[index] ?? piece),
-      }));
-      if (makeNetworkMove !== undefined) {
-        makeNetworkMove({
-          lastMovedPiece: lastMove,
-          moveHistory: {
-            ...moveHistory,
-            [playerTurn]: {
-              ...moveHistory[playerTurn],
-              moves: [...moveHistory[playerTurn].moves, lastMove],
-              algebraicNotationMoves: [...moveHistory[playerTurn].algebraicNotationMoves, lastMoveAlgebraicNotation],
-            },
-          },
-          boardState: {
-            ...boardState,
-            ...canMakeMoveResponse,
-            board: boardState.board.map((piece, index) => boardUpdates[index] ?? piece),
-          },
-        });
+        boardState: {
+          ...gameRecord.boardState,
+          ...canMakeMoveResponse,
+          board: gameRecord.boardState.board.map((piece, index) => boardUpdates[index] ?? piece),
+        },
+      };
+      setGameRecord(updatedGameRecord);
+      if (isMultiplayer && makeNetworkMove !== undefined) {
+        makeNetworkMove(updatedGameRecord);
       }
     },
-    [boardState, playerTurn],
+    [gameRecord.boardState, gameRecord.playerTurn],
   );
 
   useEffect(() => {
     clearSelectionContext();
-  }, [boardState]);
+  }, [gameRecord.boardState]);
 
   useEffect(() => {
     window.addEventListener("mousemove", movePiece);
@@ -234,13 +223,13 @@ const ChessBoard: FC<ChessBoardProps> = () => {
       window.removeEventListener("mouseup", dropPiece);
       window.removeEventListener("touchend", dropPiece);
     };
-  }, [boardState, playerTurn]);
+  }, [gameRecord.boardState, gameRecord.playerTurn]);
 
   return (
     <Box className="shadow-lg rounded-md truncate">
       <Box className="bg-chess-board">
         <Box className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
-          {boardState.board.map((_square, index) => (
+          {gameRecord.boardState.board.map((_square, index) => (
             <Tile key={index} position={index} grabPiece={grabPiece} />
           ))}
         </Box>

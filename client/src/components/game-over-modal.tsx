@@ -6,7 +6,7 @@ import { useGameState } from "hooks";
 interface GameOverModalProps {}
 
 const GameOverModal: FC<GameOverModalProps> = () => {
-  const { gameOver } = useGameState();
+  const { gameRecord } = useGameState();
 
   const DialogClose = useCallback(
     () => (
@@ -19,16 +19,16 @@ const GameOverModal: FC<GameOverModalProps> = () => {
     [],
   );
 
-  if (!gameOver.isGameOver) {
+  if (!gameRecord.gameOver.isGameOver) {
     return null;
   }
 
-  if (gameOver.winner === null) {
+  if (gameRecord.gameOver.winner === null) {
     return (
       <Dialog.Root open>
         <Dialog.Content>
           <Dialog.Description>
-            <Text>{gameOver.reason}</Text>
+            <Text>{gameRecord.gameOver.reason}</Text>
           </Dialog.Description>
           <DialogClose />
         </Dialog.Content>
@@ -41,7 +41,7 @@ const GameOverModal: FC<GameOverModalProps> = () => {
       <Dialog.Content>
         <Dialog.Description>
           <Text>
-            {gameOver.winner === "white" ? "White" : "Black"} Wins by {gameOver.reason}!
+            {gameRecord.gameOver.winner === "white" ? "White" : "Black"} Wins by {gameRecord.gameOver.reason}!
           </Text>
         </Dialog.Description>
         <DialogClose />

@@ -1,15 +1,23 @@
 import { Box, Dialog, Text } from "@radix-ui/themes";
 import { FC } from "react";
 
-import { useGameState } from "hooks";
+import { useGameState, useNetwork } from "hooks";
 
 interface PawnPromotionModalProps {}
 
 const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
-  const { playerTurn, showPawnPromotionModal, setPawnPromotionPieceSelection } = useGameState();
+  const { isMultiplayer, gameRecord, setGameRecord } = useGameState();
+  const { currentPlayer, makeNetworkMove } = useNetwork();
+
+  const getIsOpen = () => {
+    if (isMultiplayer) {
+      return gameRecord.showPawnPromotionModal && gameRecord.playerTurn === currentPlayer;
+    }
+    return gameRecord.showPawnPromotionModal;
+  };
 
   return (
-    <Dialog.Root open={showPawnPromotionModal}>
+    <Dialog.Root open={getIsOpen()}>
       <Dialog.Content>
         <Dialog.Title>
           <Text>Promote pawn</Text>
@@ -27,11 +35,22 @@ const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
               xs:w-desktop-xs 
               xs:h-desktop-xs
             "
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "Q" : "q")}
+            onClick={() => {
+              setGameRecord((prevGameRecord) => ({
+                ...prevGameRecord,
+                pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "Q" : "q",
+              }));
+              if (isMultiplayer && makeNetworkMove !== undefined) {
+                makeNetworkMove({
+                  ...gameRecord,
+                  pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "Q" : "q",
+                });
+              }
+            }}
           >
             <Box
               style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "queen-w" : "queen-b"}.png)`,
+                backgroundImage: `url(assets/img/${gameRecord.playerTurn === "white" ? "queen-w" : "queen-b"}.png)`,
               }}
               className="
                 bg-no-repeat 
@@ -60,11 +79,22 @@ const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
               xs:w-desktop-xs 
               xs:h-desktop-xs
             "
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "R" : "r")}
+            onClick={() => {
+              setGameRecord((prevGameRecord) => ({
+                ...prevGameRecord,
+                pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "R" : "r",
+              }));
+              if (isMultiplayer && makeNetworkMove !== undefined) {
+                makeNetworkMove({
+                  ...gameRecord,
+                  pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "R" : "r",
+                });
+              }
+            }}
           >
             <Box
               style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "rook-w" : "rook-b"}.png)`,
+                backgroundImage: `url(assets/img/${gameRecord.playerTurn === "white" ? "rook-w" : "rook-b"}.png)`,
               }}
               className="
                 bg-no-repeat 
@@ -93,11 +123,22 @@ const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
               xs:w-desktop-xs 
               xs:h-desktop-xs
             "
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "B" : "b")}
+            onClick={() => {
+              setGameRecord((prevGameRecord) => ({
+                ...prevGameRecord,
+                pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "B" : "b",
+              }));
+              if (isMultiplayer && makeNetworkMove !== undefined) {
+                makeNetworkMove({
+                  ...gameRecord,
+                  pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "B" : "b",
+                });
+              }
+            }}
           >
             <Box
               style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "bishop-w" : "bishop-b"}.png)`,
+                backgroundImage: `url(assets/img/${gameRecord.playerTurn === "white" ? "bishop-w" : "bishop-b"}.png)`,
               }}
               className="
                 bg-no-repeat 
@@ -126,11 +167,22 @@ const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
               xs:w-desktop-xs 
               xs:h-desktop-xs
             "
-            onClick={() => setPawnPromotionPieceSelection(playerTurn === "white" ? "N" : "n")}
+            onClick={() => {
+              setGameRecord((prevGameRecord) => ({
+                ...prevGameRecord,
+                pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "N" : "n",
+              }));
+              if (isMultiplayer && makeNetworkMove !== undefined) {
+                makeNetworkMove({
+                  ...gameRecord,
+                  pawnPromotionPieceSelection: gameRecord.playerTurn === "white" ? "N" : "n",
+                });
+              }
+            }}
           >
             <Box
               style={{
-                backgroundImage: `url(assets/img/${playerTurn === "white" ? "knight-w" : "knight-b"}.png)`,
+                backgroundImage: `url(assets/img/${gameRecord.playerTurn === "white" ? "knight-w" : "knight-b"}.png)`,
               }}
               className="
                 bg-no-repeat 

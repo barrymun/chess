@@ -1,5 +1,4 @@
-import { defaultGameRecord } from "common/build/config";
-import { BoardStateProps, GameRecord, LastMoveProps, MoveHistoryProps, Player } from "common/build/types";
+import { GameRecord, Player } from "common/build/types";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
@@ -15,39 +14,20 @@ const NetworkContext = createContext(
   {} as {
     isLoaded: boolean;
     socket: Socket | null;
+    currentPlayer: Player | null;
     setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
-    makeNetworkMove:
-      | (({
-          lastMovedPiece,
-          moveHistory,
-          boardState,
-        }: {
-          lastMovedPiece: LastMoveProps;
-          moveHistory: MoveHistoryProps;
-          boardState: BoardStateProps;
-        }) => void)
-      | undefined;
+    makeNetworkMove: ((gameRecord: GameRecord) => void) | undefined;
   },
 );
 
 const NetworkProvider = ({ children }: NetworkProviderProps) => {
   const { playerId } = usePlayerInfo();
-  const {
-    setBoardState,
-    setLastMovedPiece,
-    setPlayerTurn,
-    setPawnPromotionPieceSelection,
-    setShowPawnPromotionModal,
-    setSelectedPieceLegalMoves,
-    setMoveHistory,
-    setGameOver,
-  } = useGameState();
+  const { setGameRecord } = useGameState();
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [gameId, setGameId] = useState<string | null>(null);
-  const [gameRecord, setGameRecord] = useState<GameRecord>(defaultGameRecord);
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
 
   const assignGame = async () => {
     if (playerId === null) {
@@ -56,46 +36,27 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     const findGameResponse = await findGame(playerId);
     console.log({ findGameResponse });
     setGameId(findGameResponse.gameId);
+    setCurrentPlayer(findGameResponse.playerColour);
     setGameRecord(findGameResponse.gameRecord);
-    setIsLoaded(true);
   };
 
-  const makeNetworkMove = ({
-    lastMovedPiece,
-    moveHistory,
-    boardState,
-  }: {
-    lastMovedPiece: LastMoveProps;
-    moveHistory: MoveHistoryProps;
-    boardState: BoardStateProps;
-  }) => {
+  const makeNetworkMove = (gameRecord: GameRecord) => {
     if (playerId === null) {
       return;
     }
     console.log("making network move");
-    makeMove({ playerId, lastMovedPiece, moveHistory, boardState });
+    makeMove({ playerId, gameRecord });
   };
 
   useEffect(() => {
-    setBoardState(gameRecord.boardState);
-    setLastMovedPiece(gameRecord.lastMovedPiece);
-    setPlayerTurn(gameRecord.playerTurn);
-    setPawnPromotionPieceSelection(gameRecord.pawnPromotionPieceSelection);
-    setShowPawnPromotionModal(gameRecord.showPawnPromotionModal);
-    setSelectedPieceLegalMoves(gameRecord.selectedPieceLegalMoves);
-    setMoveHistory(gameRecord.moveHistory);
-    setGameOver(gameRecord.gameOver);
-  }, [gameRecord]);
-
-  useEffect(() => {
-    if (socket === null || gameId === null) {
+    if (socket === null || gameId === null || currentPlayer === null) {
       return;
     }
-    console.log({ socket, gameId });
+    setIsLoaded(true);
     socket.on(gameId, ({ gameRecord }: { gameRecord: GameRecord }) => {
       setGameRecord(gameRecord);
     });
-  }, [socket, gameId]);
+  }, [socket, gameId, currentPlayer]);
 
   useEffect(() => {
     const ws = io("http://localhost:3001");
@@ -117,6 +78,7 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     () => ({
       isLoaded,
       socket,
+      currentPlayer,
       setSocket,
       makeNetworkMove,
     }),

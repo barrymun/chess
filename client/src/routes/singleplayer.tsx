@@ -1,7 +1,12 @@
 import { ChessGame } from "components";
+import { GameStateProvider } from "hooks";
 
 const SinglePlayer = () => {
-  return <ChessGame />;
+  return (
+    <GameStateProvider>
+      <ChessGame />
+    </GameStateProvider>
+  );
 };
 
 export { SinglePlayer };

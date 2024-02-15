@@ -1,11 +1,13 @@
 import { ChessGame } from "components";
-import { NetworkProvider } from "hooks";
+import { GameStateProvider, NetworkProvider } from "hooks";
 
 const Multiplayer = () => {
   return (
-    <NetworkProvider>
-      <ChessGame />
-    </NetworkProvider>
+    <GameStateProvider isMultiplayer>
+      <NetworkProvider>
+        <ChessGame />
+      </NetworkProvider>
+    </GameStateProvider>
   );
 };
 

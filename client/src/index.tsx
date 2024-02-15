@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "App";
 import { Header } from "components";
-import { GameStateProvider, LocalStorageProvider, PlayerInfoProvider, ThemeProvider } from "hooks";
+import { LocalStorageProvider, PlayerInfoProvider, ThemeProvider } from "hooks";
 import reportWebVitals from "reportWebVitals";
 
 import "@radix-ui/themes/styles.css";
@@ -18,9 +18,7 @@ root.render(
         <ThemeProvider>
           <Header>
             <PlayerInfoProvider>
-              <GameStateProvider>
-                <App />
-              </GameStateProvider>
+              <App />
             </PlayerInfoProvider>
           </Header>
         </ThemeProvider>

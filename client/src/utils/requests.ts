@@ -1,4 +1,4 @@
-import { BoardStateProps, LastMoveProps, MoveHistoryProps } from "common/build/types";
+import { GameRecord } from "common/build/types";
 
 import { FindGameResponse, GetPlayerIdResponse } from "utils";
 
@@ -23,23 +23,13 @@ export const findGame = async (playerId: string) => {
   return data;
 };
 
-export const makeMove = async ({
-  playerId,
-  lastMovedPiece,
-  moveHistory,
-  boardState,
-}: {
-  playerId: string;
-  lastMovedPiece: LastMoveProps;
-  moveHistory: MoveHistoryProps;
-  boardState: BoardStateProps;
-}) => {
+export const makeMove = async ({ playerId, gameRecord }: { playerId: string; gameRecord: GameRecord }) => {
   const res = await fetch(`${baseUrl}/make-move`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ playerId, lastMovedPiece, moveHistory, boardState }),
+    body: JSON.stringify({ playerId, gameRecord }),
   });
   console.log({ res });
   const data = (await res.json()) as FindGameResponse;

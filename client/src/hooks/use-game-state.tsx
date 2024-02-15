@@ -1,176 +1,93 @@
-import { defaultBoard, defaultBoardState, defaultGameOverState, defaultMoveHistory } from "common/build/config";
-import {
-  BoardStateProps,
-  GameOverProps,
-  LastMoveProps,
-  MoveHistoryProps,
-  Player,
-  SanBishopBlack,
-  SanBishopWhite,
-  SanKnightBlack,
-  SanKnightWhite,
-  SanQueenBlack,
-  SanQueenWhite,
-  SanRookBlack,
-  SanRookWhite,
-} from "common/build/types";
+import { defaultBoard, defaultGameRecord } from "common/build/config";
+import { getIsCheckmate, getIsStalemate } from "common/build/move-validator";
+import { GameRecord } from "common/build/types";
 import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { GameOverModal, PawnPromotionModal } from "components";
-import { getIsCheckmate, getIsStalemate } from "utils";
-
 interface GameStateProviderProps {
+  isMultiplayer?: boolean;
   children: React.ReactNode;
 }
 
 const GameStateContext = createContext(
   {} as {
-    boardState: BoardStateProps;
-    lastMovedPiece: LastMoveProps | null;
-    playerTurn: Player;
-    pawnPromotionPieceSelection:
-      | SanBishopBlack
-      | SanBishopWhite
-      | SanKnightBlack
-      | SanKnightWhite
-      | SanQueenBlack
-      | SanQueenWhite
-      | SanRookBlack
-      | SanRookWhite
-      | null;
-    showPawnPromotionModal: boolean;
-    selectedPieceLegalMoves: number[];
-    moveHistory: MoveHistoryProps;
-    gameOver: GameOverProps;
-    setBoardState: React.Dispatch<React.SetStateAction<BoardStateProps>>;
-    setLastMovedPiece: React.Dispatch<React.SetStateAction<LastMoveProps | null>>;
-    setPlayerTurn: React.Dispatch<React.SetStateAction<Player>>;
-    setPawnPromotionPieceSelection: React.Dispatch<React.SetStateAction<
-      | SanBishopBlack
-      | SanBishopWhite
-      | SanKnightBlack
-      | SanKnightWhite
-      | SanQueenBlack
-      | SanQueenWhite
-      | SanRookBlack
-      | SanRookWhite
-      | null
-    > | null>;
-    setShowPawnPromotionModal: React.Dispatch<React.SetStateAction<boolean>>;
-    setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
-    setMoveHistory: React.Dispatch<React.SetStateAction<MoveHistoryProps>>;
-    setGameOver: React.Dispatch<React.SetStateAction<GameOverProps>>;
+    isMultiplayer: boolean;
+    gameRecord: GameRecord;
+    setGameRecord: React.Dispatch<React.SetStateAction<GameRecord>>;
   },
 );
 
-const GameStateProvider = ({ children }: GameStateProviderProps) => {
-  const [boardState, setBoardState] = useState<BoardStateProps>(defaultBoardState);
-  const [lastMovedPiece, setLastMovedPiece] = useState<LastMoveProps | null>(null);
-  const [playerTurn, setPlayerTurn] = useState<Player>("white");
-  const [pawnPromotionPieceSelection, setPawnPromotionPieceSelection] = useState<
-    | SanBishopBlack
-    | SanBishopWhite
-    | SanKnightBlack
-    | SanKnightWhite
-    | SanQueenBlack
-    | SanQueenWhite
-    | SanRookBlack
-    | SanRookWhite
-    | null
-  >(null);
-  const [showPawnPromotionModal, setShowPawnPromotionModal] = useState<boolean>(false);
-  const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<number[]>([]);
-  const [moveHistory, setMoveHistory] = useState<MoveHistoryProps>(defaultMoveHistory);
-  const [gameOver, setGameOver] = useState<GameOverProps>(defaultGameOverState);
+const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProviderProps) => {
+  const [gameRecord, setGameRecord] = useState<GameRecord>(defaultGameRecord);
 
   useEffect(() => {
-    if (isEqual(boardState.board, defaultBoard)) {
+    if (isMultiplayer) {
       return;
     }
-    if (boardState.pawnPromotionPieceIndex !== null) {
-      console.log({ pi: boardState.pawnPromotionPieceIndex });
-      setShowPawnPromotionModal(true);
-      setPawnPromotionPieceSelection(null);
+
+    if (isEqual(gameRecord.boardState.board, defaultBoard)) {
       return;
     }
-    const oppositePlayerTurn = playerTurn === "white" ? "black" : "white";
-    const isStalemate = getIsStalemate({ ...boardState, playerTurn: oppositePlayerTurn });
-    const isCheckmate = getIsCheckmate({ ...boardState, playerTurn: oppositePlayerTurn });
+    if (gameRecord.boardState.pawnPromotionPieceIndex !== null) {
+      console.log({ pi: gameRecord.boardState.pawnPromotionPieceIndex });
+      setGameRecord((prevGameRecord) => ({
+        ...prevGameRecord,
+        showPawnPromotionModal: true,
+        pawnPromotionPieceSelection: null,
+      }));
+      return;
+    }
+    const oppositePlayerTurn = gameRecord.playerTurn === "white" ? "black" : "white";
+    const isStalemate = getIsStalemate({ ...gameRecord.boardState, playerTurn: oppositePlayerTurn });
+    const isCheckmate = getIsCheckmate({ ...gameRecord.boardState, playerTurn: oppositePlayerTurn });
     if (isStalemate || isCheckmate) {
       console.log({ isStalemate, isCheckmate });
-      setGameOver({
-        isGameOver: true,
-        winner: isCheckmate ? playerTurn : null,
-        reason: isCheckmate ? "checkmate" : "stalemate",
-      });
+      setGameRecord((prevGameRecord) => ({
+        ...prevGameRecord,
+        gameOver: {
+          isGameOver: true,
+          winner: isCheckmate ? gameRecord.playerTurn : null,
+          reason: isCheckmate ? "checkmate" : "stalemate",
+        },
+      }));
       return;
     }
-    // setPlayerTurn((prevPlayerTurn) => (prevPlayerTurn === "white" ? "black" : "white"));
-  }, [boardState.board]);
+    setGameRecord((prevGameRecord) => ({
+      ...prevGameRecord,
+      playerTurn: prevGameRecord.playerTurn === "white" ? "black" : "white",
+    }));
+  }, [gameRecord.boardState.board]);
 
   useEffect(() => {
-    if (pawnPromotionPieceSelection === null) {
+    if (gameRecord.pawnPromotionPieceSelection === null) {
       return;
     }
-    setBoardState((prevBoardState) => ({
-      ...prevBoardState,
-      board: [
-        ...prevBoardState.board.slice(0, prevBoardState.pawnPromotionPieceIndex!),
-        pawnPromotionPieceSelection,
-        ...prevBoardState.board.slice(prevBoardState.pawnPromotionPieceIndex! + 1),
-      ],
-      pawnPromotionPieceIndex: null,
+    setGameRecord((prevGameRecord) => ({
+      ...prevGameRecord,
+      boardState: {
+        ...prevGameRecord.boardState,
+        board: [
+          ...prevGameRecord.boardState.board.slice(0, prevGameRecord.boardState.pawnPromotionPieceIndex!),
+          gameRecord.pawnPromotionPieceSelection!,
+          ...prevGameRecord.boardState.board.slice(prevGameRecord.boardState.pawnPromotionPieceIndex! + 1),
+        ],
+        pawnPromotionPieceIndex: null,
+      },
+      pawnPromotionPieceSelection: null,
+      showPawnPromotionModal: false,
     }));
-    setShowPawnPromotionModal(false);
-  }, [pawnPromotionPieceSelection]);
+  }, [gameRecord.pawnPromotionPieceSelection]);
 
   const value = useMemo(
     () => ({
-      boardState,
-      lastMovedPiece,
-      playerTurn,
-      pawnPromotionPieceSelection,
-      showPawnPromotionModal,
-      selectedPieceLegalMoves,
-      moveHistory,
-      gameOver,
-      setBoardState,
-      setLastMovedPiece,
-      setPlayerTurn,
-      setPawnPromotionPieceSelection,
-      setShowPawnPromotionModal,
-      setSelectedPieceLegalMoves,
-      setMoveHistory,
-      setGameOver,
+      isMultiplayer,
+      gameRecord,
+      setGameRecord,
     }),
-    [
-      boardState,
-      lastMovedPiece,
-      playerTurn,
-      pawnPromotionPieceSelection,
-      showPawnPromotionModal,
-      selectedPieceLegalMoves,
-      moveHistory,
-      gameOver,
-      setBoardState,
-      setLastMovedPiece,
-      setPlayerTurn,
-      setPawnPromotionPieceSelection,
-      setShowPawnPromotionModal,
-      setSelectedPieceLegalMoves,
-      setMoveHistory,
-      setGameOver,
-    ],
+    [gameRecord, setGameRecord],
   );
 
-  return (
-    <GameStateContext.Provider value={value}>
-      {children}
-      <PawnPromotionModal />
-      <GameOverModal />
-    </GameStateContext.Provider>
-  );
+  return <GameStateContext.Provider value={value}>{children}</GameStateContext.Provider>;
 };
 
 const useGameState = () => useContext(GameStateContext);

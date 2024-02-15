@@ -1,4 +1,12 @@
-import { BoardStateProps, GameOverProps, GameRecord, MoveHistoryProps, SanPiece } from "utils/types";
+import {
+  BoardStateProps,
+  GameOverProps,
+  GameRecord,
+  MoveHistoryProps,
+  SanPiece,
+  SanPieceBlack,
+  SanPieceWhite,
+} from "./types";
 
 // Standard Algebraic Notation (SAN) 8x8 board
 export const defaultBoard: SanPiece[] = [
@@ -50,3 +58,7 @@ export const defaultGameRecord: GameRecord = {
   moveHistory: defaultMoveHistory,
   gameOver: defaultGameOverState,
 };
+export const totalTiles = 64;
+export const tilesPerRow = 8;
+export const whiteSanPieces: SanPieceWhite[] = ["P", "N", "B", "R", "Q", "K"];
+export const blackSanPieces: SanPieceBlack[] = ["p", "n", "b", "r", "q", "k"];

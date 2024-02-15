@@ -88,3 +88,15 @@ export interface GameRecord {
   moveHistory: MoveHistoryProps;
   gameOver: GameOverProps;
 }
+export interface ValidMoveProps extends BoardStateProps {
+  playerTurn: Player;
+  origin: number;
+  destination: number;
+}
+export interface ValidMoveWithSimulatedProps extends ValidMoveProps {
+  isSimulatedMove?: boolean;
+}
+export interface MoveValidatorResponse extends Omit<BoardStateProps, "board"> {
+  isValid: boolean;
+  boardUpdates: Record<number, SanPiece>;
+}

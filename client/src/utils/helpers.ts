@@ -1,4 +1,4 @@
-import { MoveHistoryProps, SanPiece } from "common/build/types";
+import { MoveHistoryProps, Player, SanPiece } from "common/build/types";
 
 export const mergeMoveHistory = (moveHistory: MoveHistoryProps): string[][] => {
   let res: string[][] = [];
@@ -67,4 +67,38 @@ export const convertMoveToAlgebraicNotation = ({
     suffix += "+";
   }
   return `${prefix}${suffix}`;
+};
+
+export const getIsSanPieceMoveable = ({
+  board,
+  position,
+  playerTurn,
+}: {
+  board: SanPiece[];
+  position: number;
+  playerTurn: Player;
+}): boolean => {
+  let res = false;
+  const piece = board[position];
+  switch (piece) {
+    case "P":
+    case "N":
+    case "B":
+    case "R":
+    case "Q":
+    case "K":
+      res = playerTurn === "white";
+      break;
+    case "p":
+    case "n":
+    case "b":
+    case "r":
+    case "q":
+    case "k":
+      res = playerTurn === "black";
+      break;
+    default:
+      break;
+  }
+  return res;
 };

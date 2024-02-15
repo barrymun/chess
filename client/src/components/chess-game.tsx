@@ -1,8 +1,18 @@
 import { Box } from "@radix-ui/themes";
+import { FC } from "react";
 
-import { ChessBoard, ChessBoardXLabels, ChessBoardYLabels, MoveHistory } from "components";
+import {
+  ChessBoard,
+  ChessBoardXLabels,
+  ChessBoardYLabels,
+  GameOverModal,
+  MoveHistory,
+  PawnPromotionModal,
+} from "components";
 
-const ChessGame = () => {
+interface ChessGameProps {}
+
+const ChessGame: FC<ChessGameProps> = () => {
   return (
     <Box className="flex justify-center items-center w-full h-full">
       <Box className="flex flex-col">
@@ -16,6 +26,8 @@ const ChessGame = () => {
           <ChessBoardXLabels />
         </Box>
       </Box>
+      <PawnPromotionModal />
+      <GameOverModal />
     </Box>
   );
 };

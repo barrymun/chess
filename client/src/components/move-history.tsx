@@ -7,8 +7,8 @@ import { mergeMoveHistory } from "utils";
 interface MoveHistoryProps {}
 
 const MoveHistory: FC<MoveHistoryProps> = () => {
-  const { moveHistory } = useGameState();
-  const mergedMoveHistory = mergeMoveHistory(moveHistory);
+  const { gameRecord } = useGameState();
+  const mergedMoveHistory = mergeMoveHistory(gameRecord.moveHistory);
   return (
     <Box
       className="
