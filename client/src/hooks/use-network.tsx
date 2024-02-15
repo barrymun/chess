@@ -16,6 +16,7 @@ const NetworkContext = createContext(
     socket: Socket | null;
     currentPlayer: Player | null;
     setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
+    assignGame: (() => void) | undefined;
     makeNetworkMove: ((gameRecord: GameRecord) => void) | undefined;
   },
 );
@@ -80,6 +81,7 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
       socket,
       currentPlayer,
       setSocket,
+      assignGame,
       makeNetworkMove,
     }),
     [socket, setSocket, makeNetworkMove],

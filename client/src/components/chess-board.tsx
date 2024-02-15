@@ -20,7 +20,7 @@ interface ChessBoardProps {}
 
 const ChessBoard: FC<ChessBoardProps> = () => {
   const { isMultiplayer, gameRecord, setGameRecord } = useGameState();
-  const { makeNetworkMove } = useNetwork();
+  const { currentPlayer, makeNetworkMove } = useNetwork();
 
   const boardRef = useRef<HTMLDivElement | null>(null);
 
@@ -144,7 +144,12 @@ const ChessBoard: FC<ChessBoardProps> = () => {
         const childY = top + height / 2;
         const distance = Math.sqrt((clientX! - childX) ** 2 + (clientY! - childY) ** 2);
         if (distance < closestDistance) {
-          destinationIndex = index;
+          if (isMultiplayer && currentPlayer === "black") {
+            // reverse the index for black player
+            destinationIndex = gameRecord.boardState.board.length - 1 - index;
+          } else {
+            destinationIndex = index;
+          }
           closestChild = child as HTMLDivElement;
           closestDistance = distance;
         }
@@ -208,6 +213,20 @@ const ChessBoard: FC<ChessBoardProps> = () => {
     [gameRecord.boardState, gameRecord.playerTurn],
   );
 
+  const getTiles = () => {
+    if (isMultiplayer && currentPlayer === "black") {
+      return gameRecord.boardState.board
+        .slice()
+        .reverse()
+        .map((_square, index) => (
+          <Tile key={index} position={gameRecord.boardState.board.length - 1 - index} grabPiece={grabPiece} />
+        ));
+    }
+    return gameRecord.boardState.board.map((_square, index) => (
+      <Tile key={index} position={index} grabPiece={grabPiece} />
+    ));
+  };
+
   useEffect(() => {
     clearSelectionContext();
   }, [gameRecord.boardState]);
@@ -229,9 +248,7 @@ const ChessBoard: FC<ChessBoardProps> = () => {
     <Box className="shadow-lg rounded-md truncate">
       <Box className="bg-chess-board">
         <Box className="grid grid-cols-8 grid-rows-8" ref={boardRef}>
-          {gameRecord.boardState.board.map((_square, index) => (
-            <Tile key={index} position={index} grabPiece={grabPiece} />
-          ))}
+          {getTiles()}
         </Box>
       </Box>
     </Box>

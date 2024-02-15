@@ -10,6 +10,7 @@ import { getSocket, setIo, setSocket } from "lib/socket";
 import findGame from "routes/find-game";
 import generatePlayerId from "routes/generate-player-id";
 import makeMove from "routes/make-move";
+import quitGame from "routes/quit-game";
 
 (async () => {
   await initRedisClient();
@@ -31,6 +32,7 @@ import makeMove from "routes/make-move";
   app.get("/generate-player-id", generatePlayerId);
   app.post("/find-game", jsonParser, findGame);
   app.post("/make-move", jsonParser, makeMove);
+  app.post("/quit-game", jsonParser, quitGame);
 
   io.on("connection", (s) => {
     setSocket(s);

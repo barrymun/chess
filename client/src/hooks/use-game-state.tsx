@@ -24,7 +24,6 @@ const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProvide
     if (isMultiplayer) {
       return;
     }
-
     if (isEqual(gameRecord.boardState.board, defaultBoard)) {
       return;
     }
@@ -59,6 +58,9 @@ const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProvide
   }, [gameRecord.boardState.board]);
 
   useEffect(() => {
+    if (isMultiplayer) {
+      return;
+    }
     if (gameRecord.pawnPromotionPieceSelection === null) {
       return;
     }

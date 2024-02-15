@@ -11,3 +11,4 @@ export interface FindGameResponse {
   gameId: string;
   gameRecord: GameRecord;
 }
+export interface QuitGameResponse {}

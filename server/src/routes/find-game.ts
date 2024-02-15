@@ -16,9 +16,25 @@ interface ReqBody {
   playerId: string;
 }
 
+const createNewGame = async (playerId: string): Promise<{ gameId: string; gameRecord: GameRecord }> => {
+  console.log("=====CASE_createNewGame=====");
+  const newGameId = uuidv4();
+  const newGameRecord: GameRecord = defaultGameRecord;
+  console.log({ newGameRecord });
+  await setValue<GameRecord>(newGameId, newGameRecord);
+  await setValue<PlayerRecord>(playerId, {
+    playerColour: "white",
+    gameRecordId: newGameId,
+  });
+  await addToLookingForGames(playerId);
+  return { gameId: newGameId, gameRecord: newGameRecord };
+};
+
 export default async (req: CustomReq<ReqBody>, res: Response) => {
   try {
+    console.log("=====CASE_findGame=====");
     const playerId = req.body.playerId;
+    console.log({ playerId });
     if (playerId === undefined) {
       res.status(400).send("Missing playerId");
       return;
@@ -28,20 +44,26 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
       return;
     }
 
+    let gameId: string, gameRecord: GameRecord | null;
+
     const playerRecord = await getValue<PlayerRecord>(playerId);
+    console.log({ playerRecord });
     if (playerRecord !== null) {
       console.log("=====CASE_1=====");
       console.log({ playerId, playerRecord });
-      const gameRecord = await getValue<GameRecord>(playerRecord.gameRecordId);
+      gameId = playerRecord.gameRecordId;
+      gameRecord = await getValue<GameRecord>(gameId);
       if (gameRecord === null) {
-        res.status(500).send("Game record not found");
-        return;
+        console.log("=====CASE_1_gameRecord_not_found=====");
+        // if the game doesn't exist we want to create a new game
+        ({ gameId, gameRecord } = await createNewGame(playerId));
       }
-      res.json({ playerId, playerColour: playerRecord.playerColour, gameId: playerRecord.gameRecordId, gameRecord });
+      res.json({ playerId, playerColour: playerRecord.playerColour, gameId, gameRecord });
       return;
     }
 
     const gameAvailablePlayerId = await getOldestLookingForGame();
+    console.log({ gameAvailablePlayerId });
     if (gameAvailablePlayerId !== null) {
       console.log("=====CASE_2=====");
       console.log({ gameAvailablePlayerId });
@@ -56,28 +78,19 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
         gameRecordId: matchedPlayerRecord.gameRecordId,
       });
       await removeFromLookingForGames(gameAvailablePlayerId);
-      const gameRecord = await getValue<GameRecord>(matchedPlayerRecord.gameRecordId);
+      gameId = matchedPlayerRecord.gameRecordId;
+      gameRecord = await getValue<GameRecord>(matchedPlayerRecord.gameRecordId);
       console.log({ gameRecord });
       if (gameRecord === null) {
         res.status(500).send("Game record not found");
         return;
       }
-      res.json({ playerId, playerColour: "black", gameId: matchedPlayerRecord.gameRecordId, gameRecord });
+      res.json({ playerId, playerColour: "black", gameId, gameRecord });
       return;
     }
 
-    console.log("=====CASE_3=====");
-    const newGameId = uuidv4();
-    const newGameRecord: GameRecord = defaultGameRecord;
-    console.log({ newGameRecord });
-    await setValue<GameRecord>(newGameId, newGameRecord);
-    await setValue<PlayerRecord>(playerId, {
-      playerColour: "white",
-      gameRecordId: newGameId,
-    });
-    await addToLookingForGames(playerId);
-    res.json({ playerId, playerColour: "white", gameId: newGameId, gameRecord: newGameRecord });
-    return;
+    ({ gameId, gameRecord } = await createNewGame(playerId));
+    res.json({ playerId, playerColour: "white", gameId, gameRecord });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal server error");
