@@ -7,5 +7,5 @@ export interface CustomReq<T> extends Request {
 export type RedisSets = "players" | "games" | "lookingForGames";
 export interface PlayerRecord {
   playerColour: Player;
-  gameRecordId: string;
+  gameRecordId: string | null;
 }

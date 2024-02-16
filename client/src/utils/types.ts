@@ -12,3 +12,4 @@ export interface FindGameResponse {
   gameRecord: GameRecord;
 }
 export interface QuitGameResponse {}
+export interface ForfeitGameResponse {}

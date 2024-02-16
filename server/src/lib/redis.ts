@@ -27,9 +27,9 @@ export const setValue = async <T>(key: string, value: T): Promise<void> => {
   await redisClient?.set(key, JSON.stringify(value));
 };
 
-export const deleteKey = async (key: string): Promise<void> => {
-  await redisClient?.del(key);
-};
+// export const deleteKey = async (key: string): Promise<void> => {
+//   await redisClient?.del(key);
+// };
 
 export const addToLookingForGames = async (playerId: string) => {
   try {

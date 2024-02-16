@@ -5,6 +5,7 @@ import {
   ChessBoard,
   ChessBoardXLabels,
   ChessBoardYLabels,
+  ChessGameOptions,
   GameOverModal,
   MoveHistory,
   PawnPromotionModal,
@@ -25,6 +26,7 @@ const ChessGame: FC<ChessGameProps> = () => {
           <Box className="ml-4" />
           <ChessBoardXLabels />
         </Box>
+        <ChessGameOptions />
       </Box>
       <PawnPromotionModal />
       <GameOverModal />

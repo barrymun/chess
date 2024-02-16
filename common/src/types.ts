@@ -67,7 +67,7 @@ export type MoveHistoryProps = {
 export interface GameOverProps {
   isGameOver: boolean;
   winner: Player | null;
-  reason: "checkmate" | "insufficient material" | "stalemate" | "draw";
+  reason: "checkmate" | "insufficient material" | "stalemate" | "draw" | "forfeit";
 }
 export interface GameRecord {
   boardState: BoardStateProps;

@@ -8,6 +8,7 @@ import { Server } from "socket.io";
 import { initRedisClient } from "lib/redis";
 import { getSocket, setIo, setSocket } from "lib/socket";
 import findGame from "routes/find-game";
+import forfeitGame from "routes/forfeit-game";
 import generatePlayerId from "routes/generate-player-id";
 import makeMove from "routes/make-move";
 import quitGame from "routes/quit-game";
@@ -33,6 +34,7 @@ import quitGame from "routes/quit-game";
   app.post("/find-game", jsonParser, findGame);
   app.post("/make-move", jsonParser, makeMove);
   app.post("/quit-game", jsonParser, quitGame);
+  app.post("/forfeit-game", jsonParser, forfeitGame);
 
   io.on("connection", (s) => {
     setSocket(s);

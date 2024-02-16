@@ -31,6 +31,11 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
 
     const { gameRecordId } = playerRecord;
 
+    if (gameRecordId === null) {
+      res.status(400).send("Player is not in a game");
+      return;
+    }
+
     let updatedGameRecord: GameRecord = {
       ...gameRecord,
     };

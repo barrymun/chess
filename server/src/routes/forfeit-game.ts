@@ -40,9 +40,17 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
       return;
     }
 
-    await setValue<GameRecord>(gameRecordId, gameRecord);
+    const updatedGameRecord: GameRecord = {
+      ...gameRecord,
+      gameOver: {
+        isGameOver: true,
+        reason: "forfeit",
+        winner: playerColour === "white" ? "black" : "white", // the other player wins
+      },
+    };
+    await setValue<GameRecord>(gameRecordId, updatedGameRecord);
     await setValue<PlayerRecord>(playerId, { playerColour, gameRecordId: null });
-    getIo()?.emit(gameRecordId, { gameRecord }); // TODO: required?
+    getIo()?.emit(gameRecordId, { gameRecord: updatedGameRecord });
     res.json({});
   } catch (error) {
     console.error(error);

@@ -1,6 +1,6 @@
 import { GameRecord } from "common/build/types";
 
-import { FindGameResponse, GetPlayerIdResponse, QuitGameResponse } from "utils";
+import { FindGameResponse, ForfeitGameResponse, GetPlayerIdResponse, QuitGameResponse } from "utils";
 
 const baseUrl = "http://localhost:3001";
 
@@ -44,5 +44,17 @@ export const quitGame = async (playerId: string) => {
     body: JSON.stringify({ playerId }),
   });
   const data = (await res.json()) as QuitGameResponse;
+  return data;
+};
+
+export const forfeitGame = async (playerId: string) => {
+  const res = await fetch(`${baseUrl}/forfeit-game`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ playerId }),
+  });
+  const data = (await res.json()) as ForfeitGameResponse;
   return data;
 };
