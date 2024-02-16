@@ -1,14 +1,25 @@
 import { Box, Text } from "@radix-ui/themes";
 import { FC } from "react";
 
+import { useGameState, useNetwork } from "hooks";
 import { xLabels } from "utils";
 
 interface ChessBoardXLabelsProps {}
 
 const ChessBoardXLabels: FC<ChessBoardXLabelsProps> = () => {
+  const { isMultiplayer } = useGameState();
+  const { currentPlayer } = useNetwork();
+
+  const getLabels = () => {
+    if (isMultiplayer && currentPlayer === "black") {
+      return [...xLabels].reverse();
+    }
+    return xLabels;
+  };
+
   return (
     <Box className="flex">
-      {xLabels.map((x) => {
+      {getLabels().map((x) => {
         return (
           <Box
             key={x}
