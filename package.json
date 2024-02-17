@@ -12,7 +12,8 @@
     "postinstall": "husky install",
     "lint": "yarn workspace client eslint src/**/*.{ts,tsx} --fix",
     "test": "yarn workspace client test",
-    "docker-up": "docker-compose up -d --build",
+    "common-build": "yarn workspace common build",
+    "docker-up": "yarn common-build && docker-compose up -d --build",
     "docker-down": "docker-compose down",
     "docker-destroy": "docker-compose down -v"
   },
