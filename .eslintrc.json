@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": ["./tsconfig.json", "./client/tsconfig.json", "./server/tsconfig.json"]
   },
   "ignorePatterns": ["node_modules/", "build/", "*.config.js"],
   "plugins": ["@typescript-eslint", "prettier", "import"],
@@ -16,13 +16,20 @@
   "settings": {
     "import/resolver": {
       "typescript": {
-        "project": "./tsconfig.json"
+        "project": ["./tsconfig.json", "./client/tsconfig.json", "./server/tsconfig.json"]
       }
     }
   },
   "rules": {
-    "max-len": ["error", { "code": 120 }],
+    "max-len": [
+      "warn",
+      {
+        "code": 120
+      }
+    ],
     "no-unused-vars": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
@@ -42,7 +49,7 @@
       }
     ],
     "sort-imports": [
-      "error",
+      "warn",
       {
         "ignoreCase": false,
         "ignoreDeclarationSort": true,
@@ -51,7 +58,7 @@
         "allowSeparatedGroups": true
       }
     ],
-    "import/no-unresolved": "warn",
+    "import/no-unresolved": "error",
     "import/order": [
       "warn",
       {
@@ -63,6 +70,14 @@
           "index",
           "unknown"
         ],
+        "pathGroups": [
+          {
+            "pattern": "utils/**",
+            "group": "internal"
+          }
+        ],
+        "distinctGroup": false,
+        "pathGroupsExcludedImportTypes": ["builtin"],
         "newlines-between": "always",
         "alphabetize": {
           "order": "asc",

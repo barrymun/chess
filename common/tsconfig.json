@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./build",
+    "lib": ["ES5", "ES6"],
+    "target": "ES6",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "isolatedModules": true,
+    "noEmit": false,
+    "declaration": true,
+    "baseUrl": "./src"
+  },
+  "include": [
+    "src"
+  ]
+}

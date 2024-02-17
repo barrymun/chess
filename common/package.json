@@ -1,0 +1,12 @@
+{
+  "name": "common",
+  "version": "0.0.2",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "rm -rf build && tsc"
+  }
+}
