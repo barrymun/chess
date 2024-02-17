@@ -1,4 +1,4 @@
-import { GameRecord } from "common/build/types";
+import { GameRecord } from "common";
 import { Response } from "express";
 
 import { getValue, setValue } from "lib/redis";

@@ -1,5 +1,4 @@
-import { defaultGameRecord } from "common/build/config";
-import { GameRecord, Player } from "common/build/types";
+import { GameRecord, Player, defaultGameRecord } from "common";
 import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 

@@ -1,6 +1,5 @@
 import { Box } from "@radix-ui/themes";
-import { tilesPerRow } from "common/build/config";
-import { TileColor } from "common/build/types";
+import { TileColor, tilesPerRow } from "common";
 import { FC } from "react";
 
 import { useGameState, useNetwork } from "hooks";

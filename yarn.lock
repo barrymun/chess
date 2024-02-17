@@ -4305,8 +4305,8 @@ common-tags@^1.8.0:
   resolved "https://registry.yarnpkg.com/common-tags/-/common-tags-1.8.2.tgz#94ebb3c076d26032745fd54face7f688ef5ac9c6"
   integrity sha512-gk/Z852D2Wtb//0I+kRFNKKE9dIIVirjoqPoA1wJU+XePVXZfGeBpk45+A1rKO4Q43prqWBNY/MiIeRLbPWUaA==
 
-"common@file:common":
-  version "0.0.1"
+"common@file:common/build":
+  version "0.0.0"
 
 commondir@^1.0.1:
   version "1.0.1"

@@ -1,6 +1,5 @@
 // TODO: move to "common" tests
-import { defaultBoard, defaultBoardState } from "common/build/config";
-import { computeCanMakeMove } from "common/build/move-validator";
+import { computeCanMakeMove, defaultBoard, defaultBoardState } from "common";
 
 describe("computeCanMakeMove", () => {
   it("should return an invalid move when the piece is not the player's", () => {

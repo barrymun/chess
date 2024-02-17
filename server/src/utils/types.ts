@@ -1,4 +1,4 @@
-import { Player } from "common/build/types";
+import { Player } from "common";
 import { Request } from "express";
 
 export interface CustomReq<T> extends Request {

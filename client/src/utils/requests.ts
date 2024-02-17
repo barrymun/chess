@@ -1,4 +1,4 @@
-import { GameRecord } from "common/build/types";
+import { GameRecord } from "common";
 
 import { FindGameResponse, ForfeitGameResponse, GetPlayerIdResponse, QuitGameResponse } from "utils";
 

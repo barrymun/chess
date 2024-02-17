@@ -1,4 +1,4 @@
-import { GameRecord, Player } from "common/build/types";
+import { GameRecord, Player } from "common";
 
 export type Appearance = "light" | "dark";
 export type LocalStorageKeys = "appearance" | "playerId";

@@ -1,5 +1,4 @@
-import { getIsCheckmate, getIsStalemate } from "common/build/move-validator";
-import { GameRecord, Player } from "common/build/types";
+import { GameRecord, Player, getIsCheckmate, getIsStalemate } from "common";
 import { Response } from "express";
 
 import { getValue, setValue } from "lib/redis";

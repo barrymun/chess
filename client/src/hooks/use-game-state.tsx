@@ -1,6 +1,4 @@
-import { defaultBoard, defaultGameRecord } from "common/build/config";
-import { getIsCheckmate, getIsStalemate } from "common/build/move-validator";
-import { GameRecord } from "common/build/types";
+import { GameRecord, defaultBoard, defaultGameRecord, getIsCheckmate, getIsStalemate } from "common";
 import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 

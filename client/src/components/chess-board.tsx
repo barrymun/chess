@@ -1,11 +1,13 @@
 import { Box } from "@radix-ui/themes";
 import {
+  GameRecord,
+  LastMoveProps,
+  ValidMoveProps,
   computeCanMakeMove,
   getAllValidPieceMoves,
   getIsCheckmate,
   getIsKingInCheck,
-} from "common/build/move-validator";
-import { GameRecord, LastMoveProps, ValidMoveProps } from "common/build/types";
+} from "common";
 import { FC, useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";
