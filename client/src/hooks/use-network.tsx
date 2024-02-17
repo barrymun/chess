@@ -60,7 +60,7 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
   }, [socket, gameId, currentPlayer]);
 
   useEffect(() => {
-    const ws = io("http://localhost:3001");
+    const ws = io(process.env.REACT_APP_API_URL as string);
     ws.on("connect", () => {
       console.log("connected to server");
       assignGame();

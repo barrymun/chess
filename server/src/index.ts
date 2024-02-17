@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { createServer } from "http";
 
 import bodyParser from "body-parser";
@@ -14,11 +16,16 @@ import makeMove from "routes/make-move";
 import quitGame from "routes/quit-game";
 
 (async () => {
+  if (!process.env.CORS_ORIGIN) {
+    throw new Error("CORS_ORIGIN env variable is required");
+  }
+  console.log(process.env.CORS_ORIGIN);
+
   await initRedisClient();
   console.log("Redis client initialized");
 
   const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: process.env.CORS_ORIGIN,
   };
 
   const app = express();

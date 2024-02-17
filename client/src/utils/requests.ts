@@ -2,7 +2,8 @@ import { GameRecord } from "common/build/types";
 
 import { FindGameResponse, ForfeitGameResponse, GetPlayerIdResponse, QuitGameResponse } from "utils";
 
-const baseUrl = "http://localhost:3001";
+const baseUrl = process.env.REACT_APP_API_URL as string;
+console.log({ baseUrl });
 
 export const getPlayerId = async () => {
   const res = await fetch(`${baseUrl}/generate-player-id`);
