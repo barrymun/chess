@@ -228,7 +228,7 @@ const getCanCastle = (props: ValidMoveProps): boolean => {
       origin === 4 &&
       destination === 6 &&
       !blackKingHasMoved &&
-      !blackRightRookHasMoved &&
+      !blackLeftRookHasMoved &&
       board[5] === " " &&
       board[6] === " " &&
       !getIsKingInCheck(props) &&
@@ -252,7 +252,7 @@ const getCanCastle = (props: ValidMoveProps): boolean => {
       origin === 4 &&
       destination === 2 &&
       !blackKingHasMoved &&
-      !blackLeftRookHasMoved &&
+      !blackRightRookHasMoved &&
       board[3] === " " &&
       board[2] === " " &&
       board[1] === " " &&
