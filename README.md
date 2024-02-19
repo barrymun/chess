@@ -20,29 +20,42 @@ git clone https://github.com/barrymun/chess.git
 cd chess
 ```
 
-3. Install the required dependencies:
+3. Build the common module:
+
+```bash
+yarn workspace common build
+```
+
+4. Install the required dependencies:
 
 ```bash
 yarn install
 ```
 
-4. Build the TypeScript code:
+5. Start the Express.js server with Docker:
 
 ```bash
-yarn build
+yarn docker-up
 ```
 
-5. Start the development server:
+&nbsp;&nbsp;&nbsp;Alternatively the express.js server can be started without using Docker:
 
 ```bash
-yarn start
+yarn workspace server build
+yarn workspace server start
 ```
 
-6. Open your web browser and visit `http://localhost:3000` to play the Chess game.
+6. Start the react development server:
+
+```bash
+yarn workspace client start
+```
+
+7. Open your web browser and visit `http://localhost:3000`.
 
 ## Move Validator Functions
 
-The project includes TypeScript functions to validate chess moves. These functions can be found in the `move-validator.ts` file. You can use these functions to ensure that the moves made in the game adhere to the rules of chess.
+The project includes TypeScript functions to validate chess moves. These functions can be found in `common/src/move-validator.ts`. You can use these functions to ensure that the moves made in the game adhere to the rules of chess.
 
 ## Contributing
 
@@ -65,7 +78,7 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [x] show where the last piece was moved from and to with colours?
 - [ ] have the game run through many sample games in the chess db
 - [ ] integrate the stockfish JS engine or something along these lines: https://github.com/nmrugg/stockfish.js
-- [ ] preserve the game state before a reload
+- [ ] preserve the game state before a reload (singleplayer)
 - [x] multiplayer (websockets & redis)
 - [ ] add usernames to multiplayer and specific player matching other than random matching
 - [ ] make the legal dots optional (player can toggle this setting on and off)
@@ -85,3 +98,5 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [x] disable right click on piece grab
 - [x] change favicon and title
 - [ ] fix move history text for promoted pawns
+- [ ] check to see if the user has deleted their playerId from localStorage?
+- [ ] make previous games viewable
