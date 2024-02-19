@@ -8,54 +8,75 @@ This is a Chess project implemented in TypeScript. It includes move validator fu
 
 To get started with this project, follow these steps:
 
-1. Clone the repository to your local machine:
+- Clone the repository to your local machine:
 
-```bash
-git clone https://github.com/barrymun/chess.git
-```
+  ```bash
+  git clone https://github.com/barrymun/chess.git
+  ```
 
-2. Navigate to the project directory:
+- Create a `server/.env/` file and include the following:
 
-```bash
-cd chess
-```
+  ```bash
+  CORS_ORIGIN="http://localhost:3000"
+  ```
 
-3. Build the common module:
+  Create a `client/.env.development` file and include the following:
+  ```bash
+  REACT_APP_API_URL="http://localhost:3001"
+  ```
 
-```bash
-yarn workspace common build
-```
+  If you want to build the client code you will need a `client/.env.production` file.
 
-4. Install the required dependencies:
+- Navigate to the project directory:
 
-```bash
-yarn install
-```
+  ```bash
+  cd chess
+  ```
 
-5. Start the Express.js server with Docker:
+- Build the common module:
 
-```bash
-yarn docker-up
-```
+  ```bash
+  yarn workspace common build
+  ```
 
-&nbsp;&nbsp;&nbsp;Alternatively the express.js server can be started without using Docker:
+- Install the required dependencies:
 
-```bash
-yarn workspace server build
-yarn workspace server start
-```
+  ```bash
+  yarn install
+  ```
 
-6. Start the react development server:
+- Start the Express.js server with Docker:
 
-```bash
-yarn workspace client start
-```
+  ```bash
+  yarn docker-up
+  ```
 
-7. Open your web browser and visit `http://localhost:3000`.
+  Alternatively the express.js server can be started without using Docker:
+
+  ```bash
+  yarn workspace server build
+  yarn workspace server start
+  ```
+
+- Start the react development server:
+
+  ```bash
+  yarn workspace client start
+  ```
+
+- Open your web browser and visit `http://localhost:3000`.
 
 ## Move Validator Functions
 
 The project includes TypeScript functions to validate chess moves. These functions can be found in `common/src/move-validator.ts`. You can use these functions to ensure that the moves made in the game adhere to the rules of chess.
+
+## Testing
+
+`jest` (specifically `ts-jest`) is used for testing. Most of the tests can be found in the `common` package. Run the following command from the root directory:
+
+```bash
+yarn test
+```
 
 ## Contributing
 
