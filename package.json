@@ -11,6 +11,7 @@
   "scripts": {
     "postinstall": "husky install",
     "setup": "node setup.js",
+    "cspell": "cspell --config cspell.json \"**/*.{ts,tsx,js,jsx,json,html}\"",
     "lint": "yarn workspace client lint && yarn workspace server lint",
     "test": "yarn workspace common test",
     "common-build": "yarn workspace common build",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
+    "cspell": "^8.6.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",

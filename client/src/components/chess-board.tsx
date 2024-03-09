@@ -27,7 +27,7 @@ const ChessBoard: FC<ChessBoardProps> = () => {
   const boardRef = useRef<HTMLDivElement | null>(null);
 
   const grabPiece = (position: number) => (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    // don't do anything if right-clicked or multitouch
+    // don't do anything if right-clicked or multi touch
     if (("button" in e && e.button === 2) || ("touches" in e && e.touches.length > 1)) {
       return;
     }
