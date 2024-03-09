@@ -1,0 +1,21 @@
+FROM node:18
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY tsconfig.json /usr/src/
+COPY common/. /usr/src/common/
+
+COPY client/package*.json /usr/src/app/
+COPY yarn.lock /usr/src/app/
+COPY client/tsconfig.json /usr/src/app/
+
+COPY client/. /usr/src/app/
+# this just overrides the default .eslintrc.json file, but need a better solution
+COPY .eslintrc.json /usr/src/app/
+
+RUN yarn install
+
+EXPOSE 3000
+
+CMD [ "yarn", "start" ]

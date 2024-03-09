@@ -3,16 +3,18 @@
   "private": true,
   "version": "0.1.0",
   "license": "MIT",
-  "workspaces":[
+  "workspaces": [
     "client",
     "server",
     "common"
   ],
   "scripts": {
     "postinstall": "husky install",
-    "lint": "yarn workspace client eslint src/**/*.{ts,tsx} --fix",
+    "setup": "node setup.js",
+    "lint": "yarn workspace client lint && yarn workspace server lint",
     "test": "yarn workspace common test",
     "common-build": "yarn workspace common build",
+    "docker-dev-up": "yarn common-build && docker-compose -f docker-compose-dev.yaml up -d --build",
     "docker-up": "yarn common-build && docker-compose up -d --build",
     "docker-down": "docker-compose down",
     "docker-destroy": "docker-compose down -v"
@@ -28,6 +30,7 @@
     "husky": "^8.0.0",
     "lint-staged": "^15.2.0",
     "prettier": "^3.2.4",
-    "typescript": "^4.4.2"
+    "tsx": "^4.7.1",
+    "typescript": "^5.2.2"
   }
 }

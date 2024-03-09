@@ -14,6 +14,12 @@ To get started with this project, follow these steps:
   git clone https://github.com/barrymun/chess.git
   ```
 
+- Run the setup script:
+
+  ```bash
+  yarn run setup
+  ```
+
 - Create a `server/.env/` file and include the following:
 
   ```bash

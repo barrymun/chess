@@ -4,7 +4,7 @@
   "parserOptions": {
     "project": ["./tsconfig.json", "./client/tsconfig.json", "./server/tsconfig.json"]
   },
-  "ignorePatterns": ["node_modules/", "build/", "*.config.js"],
+  "ignorePatterns": ["node_modules/", "build/", "*.config.js", "setup.js"],
   "plugins": ["@typescript-eslint", "prettier", "import"],
   "extends": [
     "eslint:recommended", 
