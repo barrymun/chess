@@ -2,6 +2,7 @@ import { grayDark } from "@radix-ui/colors";
 import { GitHubLogoIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { Box, IconButton, Text, Tooltip } from "@radix-ui/themes";
 import { FC, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { useTheme } from "hooks";
@@ -12,6 +13,7 @@ interface HeaderProps {
 }
 
 const Header: FC<HeaderProps> = ({ children }) => {
+  const { t } = useTranslation();
   const { appearance, setAppearance } = useTheme();
 
   const bgColor = useMemo(() => (appearance === "dark" ? `bg-[${grayDark.gray1}]` : "bg-[#ffffff]"), [appearance]);
@@ -31,7 +33,7 @@ const Header: FC<HeaderProps> = ({ children }) => {
           <Box className="flex items-center justify-between">
             <Box>
               <Text className="text-3xl">
-                <Link to="/">Chess</Link>
+                <Link to="/">{t("name")}</Link>
               </Text>
             </Box>
             <Box className="flex justify-end gap-2">

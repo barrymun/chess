@@ -1,5 +1,6 @@
 import { Box, Table, Text } from "@radix-ui/themes";
 import { FC } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useGameState } from "hooks";
 import { mergeMoveHistory } from "utils";
@@ -7,8 +8,10 @@ import { mergeMoveHistory } from "utils";
 interface MoveHistoryProps {}
 
 const MoveHistory: FC<MoveHistoryProps> = () => {
+  const { t } = useTranslation();
   const { gameRecord } = useGameState();
   const mergedMoveHistory = mergeMoveHistory(gameRecord.moveHistory);
+
   return (
     <Box
       className="
@@ -27,10 +30,10 @@ const MoveHistory: FC<MoveHistoryProps> = () => {
           <Table.Row>
             <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>
-              <Text>White</Text>
+              <Text>{t("players.white")}</Text>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>
-              <Text>Black</Text>
+              <Text>{t("players.black")}</Text>
             </Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>

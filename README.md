@@ -127,3 +127,5 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [ ] fix move history text for promoted pawns
 - [ ] check to see if the user has deleted their playerId from localStorage?
 - [ ] make previous games viewable
+- [x] install spell checker (cspell)
+- [x] support internationalisation (i18n)

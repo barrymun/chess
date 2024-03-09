@@ -1,0 +1,22 @@
+{
+  "name": "Chess",
+  "options": {
+    "single-player": "Singleplayer",
+    "multi-player": "Multiplayer",
+    "play": "Play"
+  },
+  "game-options": {
+    "forfeit": "Forfeit",
+    "forfeit-confirm": "Are you sure you want to forfeit?",
+    "cancel-button": "Cancel",
+    "confirm-button": "Confirm"
+  },
+  "game-over": {
+    "wins-by": "wins by"
+  },
+  "players": {
+    "white": "White",
+    "black": "Black"
+  },
+  "promote-pawn": "Promote pawn"
+}

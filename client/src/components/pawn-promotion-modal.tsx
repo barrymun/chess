@@ -1,11 +1,13 @@
 import { Box, Dialog, Text } from "@radix-ui/themes";
 import { FC } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useGameState, useNetwork } from "hooks";
 
 interface PawnPromotionModalProps {}
 
 const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
+  const { t } = useTranslation();
   const { isMultiplayer, gameRecord, setGameRecord } = useGameState();
   const { currentPlayer, makeNetworkMove } = useNetwork();
 
@@ -20,7 +22,7 @@ const PawnPromotionModal: FC<PawnPromotionModalProps> = () => {
     <Dialog.Root open={getIsOpen()}>
       <Dialog.Content>
         <Dialog.Title>
-          <Text>Promote pawn</Text>
+          <Text>{t("promote-pawn")}</Text>
         </Dialog.Title>
         <Box className="flex justify-center items-center border-2 border-black rounded">
           <Box

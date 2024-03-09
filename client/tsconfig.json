@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "types": ["i18next", "react-i18next"],
     "target": "es5",
     "lib": [
       "dom",
@@ -16,6 +17,7 @@
     "baseUrl": "./src"
   },
   "include": [
-    "src"
+    "src",
+    "@types"
   ]
 }

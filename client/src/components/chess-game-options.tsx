@@ -1,5 +1,6 @@
 import { Box, Button, Dialog, Text } from "@radix-ui/themes";
 import { FC, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import { useGameState, usePlayerInfo } from "hooks";
@@ -8,6 +9,7 @@ import { forfeitGame } from "utils";
 interface ChessGameOptionsProps {}
 
 const ChessGameOptions: FC<ChessGameOptionsProps> = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { playerId } = usePlayerInfo();
   const { isMultiplayer } = useGameState();
@@ -18,17 +20,17 @@ const ChessGameOptions: FC<ChessGameOptionsProps> = () => {
     <>
       <Box className="flex justify-end">
         <Button color="gray" onClick={() => setModalOpen(true)} className="hover:cursor-pointer">
-          <Text>Forfeit</Text>
+          <Text>{t("game-options.forfeit")}</Text>
         </Button>
       </Box>
       <Dialog.Root open={modalOpen}>
         <Dialog.Content>
           <Dialog.Description>
-            <Text>Are you sure you want to forfeit?</Text>
+            <Text>{t("game-options.forfeit-confirm")}</Text>
           </Dialog.Description>
           <Box className="flex justify-end gap-2 mt-6">
             <Button color="gray" className="hover:cursor-pointer" onClick={() => setModalOpen(false)}>
-              Cancel
+              {t("game-options.cancel-button")}
             </Button>
             <Button
               className="hover:cursor-pointer"
@@ -39,7 +41,7 @@ const ChessGameOptions: FC<ChessGameOptionsProps> = () => {
                 navigate("/");
               }}
             >
-              Confirm
+              {t("game-options.confirm-button")}
             </Button>
           </Box>
         </Dialog.Content>

@@ -1,5 +1,6 @@
 import { Box, Button, Dialog, Text } from "@radix-ui/themes";
 import { FC, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import { useGameState, useNetwork, usePlayerInfo } from "hooks";
@@ -8,6 +9,7 @@ import { quitGame } from "utils";
 interface GameOverModalProps {}
 
 const GameOverModal: FC<GameOverModalProps> = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { playerId } = usePlayerInfo();
@@ -69,7 +71,9 @@ const GameOverModal: FC<GameOverModalProps> = () => {
       <Dialog.Content>
         <Dialog.Description>
           <Text>
-            {gameRecord.gameOver.winner === "white" ? "White" : "Black"} Wins by {gameRecord.gameOver.reason}!
+            {gameRecord.gameOver.winner === "white" ? "White" : "Black"}
+            &nbsp;{t("game-over.wins-by")}
+            &nbsp;{gameRecord.gameOver.reason}!
           </Text>
         </Dialog.Description>
         <DialogClose />
