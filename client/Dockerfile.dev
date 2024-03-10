@@ -7,6 +7,7 @@ COPY tsconfig.json /usr/src/
 COPY .eslintrc.json /usr/src/
 
 # copy the common package
+RUN mkdir -p /usr/src/common
 COPY common/. /usr/src/common/
 
 # prepare client and copy files
