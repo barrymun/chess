@@ -1,18 +1,18 @@
 FROM node:18 as node
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
+# copy base files
+COPY package*.json /usr/src/
+COPY yarn.lock /usr/src/
 COPY tsconfig.json /usr/src/
+COPY .eslintrc.json /usr/src/
+
+# copy the common package
 COPY common/. /usr/src/common/
 
-COPY client/package*.json /usr/src/app/
-COPY yarn.lock /usr/src/app/
-COPY client/tsconfig.json /usr/src/app/
-
-COPY client/. /usr/src/app/
-# this just overrides the default .eslintrc.json file, but need a better solution
-COPY .eslintrc.json /usr/src/app/
+# prepare client and copy files
+RUN mkdir -p /usr/src/client
+WORKDIR /usr/src/client
+COPY client/. /usr/src/client/
 
 RUN yarn install
 
@@ -23,7 +23,7 @@ FROM nginx:alpine
 # copy the custom Nginx configuration file to the container
 COPY client/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 # copy the built React app to Nginx's web server directory
-COPY --from=node /usr/src/app/build /usr/share/nginx/html
+COPY --from=node /usr/src/client/build /usr/share/nginx/html
 
 EXPOSE 80
 
