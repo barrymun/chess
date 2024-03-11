@@ -19,10 +19,8 @@ import quitGame from "routes/quit-game";
   if (!process.env.CORS_ORIGIN) {
     throw new Error("CORS_ORIGIN env variable is required");
   }
-  console.log(process.env.CORS_ORIGIN);
 
   await initRedisClient();
-  console.log("Redis client initialized");
 
   const corsOptions = {
     origin: process.env.CORS_ORIGIN,
@@ -45,9 +43,8 @@ import quitGame from "routes/quit-game";
 
   io.on("connection", (s) => {
     setSocket(s);
-    console.log("a user connected", getSocket()?.id);
     getSocket()?.on("disconnect", () => {
-      console.log("user disconnected", getSocket()?.id);
+      // pass
     });
   });
 

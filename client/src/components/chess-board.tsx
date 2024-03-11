@@ -59,7 +59,6 @@ const ChessBoard: FC<ChessBoardProps> = () => {
       playerTurn: gameRecord.playerTurn,
       origin: position,
     });
-    console.log(allValidMoves);
     setGameRecord((prevGameRecord) => ({
       ...prevGameRecord,
       selectedPieceLegalMoves: allValidMoves,

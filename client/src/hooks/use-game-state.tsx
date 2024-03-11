@@ -26,7 +26,6 @@ const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProvide
       return;
     }
     if (gameRecord.boardState.pawnPromotionPieceIndex !== null) {
-      console.log({ pi: gameRecord.boardState.pawnPromotionPieceIndex });
       setGameRecord((prevGameRecord) => ({
         ...prevGameRecord,
         showPawnPromotionModal: true,
@@ -38,7 +37,6 @@ const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProvide
     const isStalemate = getIsStalemate({ ...gameRecord.boardState, playerTurn: oppositePlayerTurn });
     const isCheckmate = getIsCheckmate({ ...gameRecord.boardState, playerTurn: oppositePlayerTurn });
     if (isStalemate || isCheckmate) {
-      console.log({ isStalemate, isCheckmate });
       setGameRecord((prevGameRecord) => ({
         ...prevGameRecord,
         gameOver: {

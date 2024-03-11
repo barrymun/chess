@@ -35,7 +35,6 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
       return;
     }
     const findGameResponse = await findGame(playerId);
-    console.log({ findGameResponse });
     setGameId(findGameResponse.gameId);
     setCurrentPlayer(findGameResponse.playerColour);
     setGameRecord(findGameResponse.gameRecord);
@@ -45,7 +44,6 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
     if (playerId === null) {
       return;
     }
-    console.log("making network move");
     makeMove({ playerId, gameRecord });
   };
 
@@ -62,11 +60,9 @@ const NetworkProvider = ({ children }: NetworkProviderProps) => {
   useEffect(() => {
     const ws = io(process.env.REACT_APP_API_URL as string);
     ws.on("connect", () => {
-      console.log("connected to server");
       assignGame();
     });
     ws.on("disconnect", () => {
-      console.log("disconnected from server");
       setIsLoaded(false);
     });
     setSocket(ws);

@@ -18,11 +18,9 @@ interface ReqBody {
 const createNewGame = async (
   playerId: string,
 ): Promise<{ playerColour: Player; gameId: string; gameRecord: GameRecord }> => {
-  console.log("=====CASE_createNewGame=====");
   const playerColour: Player = "white";
   const newGameId = uuidv4();
   const newGameRecord: GameRecord = defaultGameRecord;
-  console.log({ newGameRecord });
   await setValue<GameRecord>(newGameId, newGameRecord);
   await setValue<PlayerRecord>(playerId, {
     playerColour: playerColour,
@@ -35,9 +33,7 @@ const createNewGame = async (
 const joinExistingGame = async (
   playerId: string,
 ): Promise<{ playerColour: Player; gameId: string; gameRecord: GameRecord } | null> => {
-  console.log("=====CASE_joinExistingGame=====");
   const gameAvailablePlayerId = await getOldestLookingForGame();
-  console.log({ gameAvailablePlayerId });
   if (gameAvailablePlayerId === null || gameAvailablePlayerId === playerId) {
     return null;
   }
@@ -51,7 +47,6 @@ const joinExistingGame = async (
   const gameId = opponentPlayerRecord.gameRecordId;
 
   if (gameId === null) {
-    console.log("=====CASE_2_gameId_null=====");
     // if the opponent player is not in a game, then we can create a new game
     return await createNewGame(playerId);
   }
@@ -75,9 +70,7 @@ const joinExistingGame = async (
 
 export default async (req: CustomReq<ReqBody>, res: Response) => {
   try {
-    console.log("=====CASE_findGame=====");
     const playerId = req.body.playerId;
-    console.log({ playerId });
     if (playerId === undefined) {
       res.status(400).send("Missing playerId");
       return;
@@ -91,12 +84,9 @@ export default async (req: CustomReq<ReqBody>, res: Response) => {
 
     const playerRecord = await getValue<PlayerRecord>(playerId);
     if (playerRecord !== null) {
-      console.log("=====CASE_1=====");
-      console.log({ playerId, playerRecord });
       playerColour = playerRecord.playerColour;
       gameId = playerRecord.gameRecordId;
       if (gameId === null) {
-        console.log("=====CASE_1_gameId_null=====");
         const existingGameAvailable = await joinExistingGame(playerId);
         if (existingGameAvailable !== null) {
           ({ playerColour, gameId, gameRecord } = existingGameAvailable);
