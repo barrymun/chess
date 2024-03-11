@@ -18,5 +18,6 @@
     "white": "White",
     "black": "Black"
   },
-  "promote-pawn": "Promote pawn"
+  "promote-pawn": "Promote pawn",
+  "multiplayer-not-available": "Multiplayer is currently down for maintenance. Please try again later."
 }

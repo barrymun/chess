@@ -17,19 +17,23 @@ const PlayerInfoContext = createContext(
 const PlayerInfoProvider = ({ children }: PlayerInfoProviderProps) => {
   const { getValue, setValue } = useLocalStorage();
   const [playerId, setPlayerId] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const assignPlayerId = useCallback(async () => {
     if (playerId !== null) {
       return;
     }
     const storedPlayerId = getValue("playerId");
-    let newPlayerId = "";
+    let newPlayerId: string | null = null;
     if (storedPlayerId === null) {
       newPlayerId = await getPlayerId();
     } else {
       newPlayerId = storedPlayerId;
     }
-    setPlayerId(newPlayerId);
+    if (playerId) {
+      setPlayerId(newPlayerId);
+    }
+    setIsLoaded(true);
   }, [playerId]);
 
   useEffect(() => {
@@ -49,9 +53,7 @@ const PlayerInfoProvider = ({ children }: PlayerInfoProviderProps) => {
     [playerId],
   );
 
-  return (
-    <PlayerInfoContext.Provider value={value}>{playerId !== null ? children : <Loader />}</PlayerInfoContext.Provider>
-  );
+  return <PlayerInfoContext.Provider value={value}>{isLoaded ? children : <Loader />}</PlayerInfoContext.Provider>;
 };
 
 const usePlayerInfo = () => useContext(PlayerInfoContext);

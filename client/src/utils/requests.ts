@@ -5,9 +5,13 @@ import { FindGameResponse, ForfeitGameResponse, GetPlayerIdResponse, QuitGameRes
 const baseUrl = process.env.REACT_APP_API_URL as string;
 
 export const getPlayerId = async () => {
-  const res = await fetch(`${baseUrl}/generate-player-id`);
-  const { playerId } = (await res.json()) as GetPlayerIdResponse;
-  return playerId;
+  try {
+    const res = await fetch(`${baseUrl}/generate-player-id`);
+    const { playerId } = (await res.json()) as GetPlayerIdResponse;
+    return playerId;
+  } catch (err) {
+    return null;
+  }
 };
 
 export const findGame = async (playerId: string) => {
