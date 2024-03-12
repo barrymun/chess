@@ -105,7 +105,7 @@ This Chess TypeScript project is licensed under the MIT License. See the [LICENS
 - [x] show where the last piece was moved from and to with colours?
 - [ ] have the game run through many sample games in the chess db
 - [ ] integrate the stockfish JS engine or something along these lines: https://github.com/nmrugg/stockfish.js
-- [ ] preserve the game state before a reload (singleplayer)
+- [x] preserve the game state before a reload (singleplayer)
 - [x] multiplayer (websockets & redis)
 - [ ] add usernames to multiplayer and specific player matching other than random matching
 - [ ] make the legal dots optional (player can toggle this setting on and off)

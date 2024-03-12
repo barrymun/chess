@@ -2,6 +2,8 @@ import { GameRecord, defaultBoard, defaultGameRecord, getIsCheckmate, getIsStale
 import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+import { useLocalStorage } from "hooks";
+
 interface GameStateProviderProps {
   isMultiplayer?: boolean;
   children: React.ReactNode;
@@ -16,7 +18,24 @@ const GameStateContext = createContext(
 );
 
 const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProviderProps) => {
-  const [gameRecord, setGameRecord] = useState<GameRecord>(defaultGameRecord);
+  const { getValue, setValue } = useLocalStorage();
+
+  // load singleplayer game record from local storage (if it exists)
+  const [gameRecord, setGameRecord] = useState<GameRecord>(
+    !isMultiplayer && getValue("singleplayerGameRecord") !== null
+      ? JSON.parse(getValue("singleplayerGameRecord")!)
+      : defaultGameRecord,
+  );
+
+  /**
+   * save singleplayer game record to local storage when it changes
+   */
+  useEffect(() => {
+    if (isMultiplayer) {
+      return;
+    }
+    setValue("singleplayerGameRecord", JSON.stringify(gameRecord));
+  }, [gameRecord]);
 
   useEffect(() => {
     if (isMultiplayer) {

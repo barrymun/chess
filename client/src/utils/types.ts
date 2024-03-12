@@ -1,7 +1,7 @@
 import { GameRecord, Player } from "common";
 
 export type Appearance = "light" | "dark";
-export type LocalStorageKeys = "appearance" | "playerId";
+export type LocalStorageKeys = "appearance" | "playerId" | "singleplayerGameRecord";
 export interface GetPlayerIdResponse {
   playerId: string;
 }

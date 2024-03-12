@@ -10,6 +10,7 @@ const LocalStorageContext = createContext(
   {} as {
     getValue(key: LocalStorageKeys): string | null;
     setValue(key: string, value: string): void;
+    removeValue(key: LocalStorageKeys): void;
   },
 );
 
@@ -22,12 +23,17 @@ const LocalStorageProvider = ({ children }: LocalStorageProviderProps) => {
     localStorage.setItem(key, value);
   };
 
+  const removeValue = (key: LocalStorageKeys) => {
+    localStorage.removeItem(key);
+  };
+
   const value = useMemo(
     () => ({
       getValue,
       setValue,
+      removeValue,
     }),
-    [getValue, setValue],
+    [getValue, setValue, removeValue],
   );
 
   return <LocalStorageContext.Provider value={value}>{children}</LocalStorageContext.Provider>;

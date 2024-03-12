@@ -3,7 +3,7 @@ import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-import { useGameState, usePlayerInfo } from "hooks";
+import { useGameState, useLocalStorage, usePlayerInfo } from "hooks";
 import { forfeitGame } from "utils";
 
 interface ChessGameOptionsProps {}
@@ -13,6 +13,7 @@ const ChessGameOptions: FC<ChessGameOptionsProps> = () => {
   const navigate = useNavigate();
   const { playerId } = usePlayerInfo();
   const { isMultiplayer } = useGameState();
+  const { removeValue } = useLocalStorage();
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -38,6 +39,7 @@ const ChessGameOptions: FC<ChessGameOptionsProps> = () => {
                 if (isMultiplayer) {
                   await forfeitGame(playerId!);
                 }
+                removeValue("singleplayerGameRecord");
                 navigate("/");
               }}
             >
