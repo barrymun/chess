@@ -21,7 +21,7 @@ let selectedPiece: HTMLDivElement | null = null;
 interface ChessBoardProps {}
 
 const ChessBoard: FC<ChessBoardProps> = () => {
-  const { isMultiplayer, gameRecord, setGameRecord } = useGameState();
+  const { isMultiplayer, gameRecord, setGameRecord, completeTurn } = useGameState();
   const { currentPlayer, makeNetworkMove } = useNetwork();
 
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -209,6 +209,8 @@ const ChessBoard: FC<ChessBoardProps> = () => {
       setGameRecord(updatedGameRecord);
       if (isMultiplayer && makeNetworkMove !== undefined) {
         makeNetworkMove(updatedGameRecord);
+      } else {
+        completeTurn();
       }
     },
     [gameRecord.boardState, gameRecord.playerTurn],

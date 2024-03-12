@@ -14,6 +14,7 @@ const GameStateContext = createContext(
     isMultiplayer: boolean;
     gameRecord: GameRecord;
     setGameRecord: React.Dispatch<React.SetStateAction<GameRecord>>;
+    completeTurn: () => void;
   },
 );
 
@@ -26,6 +27,16 @@ const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProvide
       ? JSON.parse(getValue("singleplayerGameRecord")!)
       : defaultGameRecord,
   );
+
+  const completeTurn = () => {
+    if (isMultiplayer) {
+      return;
+    }
+    setGameRecord((prevGameRecord) => ({
+      ...prevGameRecord,
+      playerTurn: prevGameRecord.playerTurn === "white" ? "black" : "white",
+    }));
+  };
 
   /**
    * save singleplayer game record to local storage when it changes
@@ -66,10 +77,6 @@ const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProvide
       }));
       return;
     }
-    setGameRecord((prevGameRecord) => ({
-      ...prevGameRecord,
-      playerTurn: prevGameRecord.playerTurn === "white" ? "black" : "white",
-    }));
   }, [gameRecord.boardState.board]);
 
   useEffect(() => {
@@ -100,8 +107,9 @@ const GameStateProvider = ({ isMultiplayer = false, children }: GameStateProvide
       isMultiplayer,
       gameRecord,
       setGameRecord,
+      completeTurn,
     }),
-    [gameRecord, setGameRecord],
+    [isMultiplayer, gameRecord, setGameRecord, completeTurn],
   );
 
   return <GameStateContext.Provider value={value}>{children}</GameStateContext.Provider>;
