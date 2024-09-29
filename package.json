@@ -9,7 +9,6 @@
     "common"
   ],
   "scripts": {
-    "install": "node setup-cloudflare.js",
     "postinstall": "husky install",
     "setup": "node setup.js",
     "cspell": "cspell --config cspell.json \"**/*.{ts,tsx,js,jsx,json,html}\"",
