@@ -5,16 +5,13 @@
   "license": "MIT",
   "workspaces": [
     "client",
-    "server",
-    "common"
+    "server"
   ],
   "scripts": {
     "postinstall": "husky install",
     "setup": "node setup.js",
     "cspell": "cspell --config cspell.json \"**/*.{ts,tsx,js,jsx,json,html}\"",
     "lint": "yarn workspace client lint && yarn workspace server lint",
-    "common-build": "yarn workspace @barrymun/chess-common build",
-    "common-test": "yarn workspace @barrymun/chess-common test",
     "docker-client-up": "docker-compose -f docker-compose-client.yaml up -d --build",
     "docker-dev-up": "docker-compose -f docker-compose-dev.yaml up -d --build",
     "docker-up": "docker-compose up -d --build",
