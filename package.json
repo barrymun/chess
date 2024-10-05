@@ -13,11 +13,11 @@
     "setup": "node setup.js",
     "cspell": "cspell --config cspell.json \"**/*.{ts,tsx,js,jsx,json,html}\"",
     "lint": "yarn workspace client lint && yarn workspace server lint",
-    "test": "yarn workspace common test",
-    "common-build": "yarn workspace common build",
-    "docker-client-up": "yarn common-build && docker-compose -f docker-compose-client.yaml up -d --build",
-    "docker-dev-up": "yarn common-build && docker-compose -f docker-compose-dev.yaml up -d --build",
-    "docker-up": "yarn common-build && docker-compose up -d --build",
+    "common-build": "yarn workspace @barrymun/chess-common build",
+    "common-test": "yarn workspace @barrymun/chess-common test",
+    "docker-client-up": "docker-compose -f docker-compose-client.yaml up -d --build",
+    "docker-dev-up": "docker-compose -f docker-compose-dev.yaml up -d --build",
+    "docker-up": "docker-compose up -d --build",
     "docker-down": "docker-compose down",
     "docker-destroy": "docker-compose down -v"
   },
@@ -39,5 +39,8 @@
   "engines": {
     "node": "20.13.1"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "yarn@1.22.22",
+  "dependencies": {
+    "@barrymun/chess-common": "^0.0.4"
+  }
 }

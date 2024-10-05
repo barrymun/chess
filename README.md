@@ -39,12 +39,6 @@ To get started with this project, follow these steps:
   cd chess
   ```
 
-- Build the common module:
-
-  ```bash
-  yarn workspace common build
-  ```
-
 - Install the required dependencies:
 
   ```bash

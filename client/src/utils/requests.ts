@@ -1,4 +1,4 @@
-import { GameRecord } from "common";
+import { GameRecord } from "@barrymun/chess-common";
 
 import { FindGameResponse, ForfeitGameResponse, GetPlayerIdResponse, QuitGameResponse } from "utils";
 

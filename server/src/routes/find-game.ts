@@ -1,4 +1,4 @@
-import { GameRecord, Player, defaultGameRecord } from "common";
+import { GameRecord, Player, defaultGameRecord } from "@barrymun/chess-common";
 import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 

@@ -1,4 +1,4 @@
-import { MoveHistoryProps, Player, SanPiece } from "common";
+import { MoveHistoryProps, Player, SanPiece } from "@barrymun/chess-common";
 
 export const mergeMoveHistory = (moveHistory: MoveHistoryProps): string[][] => {
   let res: string[][] = [];

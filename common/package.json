@@ -1,7 +1,14 @@
 {
-  "name": "common",
-  "version": "0.0.3",
-  "private": true,
+  "name": "@barrymun/chess-common",
+  "version": "0.0.4",
+  "author": "barrymun",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/barrymun/image-ops.git"
+  },
   "dependencies": {},
   "devDependencies": {
     "@types/jest": "^29.5.12",

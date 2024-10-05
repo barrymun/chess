@@ -1,4 +1,3 @@
-import { Box } from "@radix-ui/themes";
 import {
   GameRecord,
   LastMoveProps,
@@ -7,7 +6,8 @@ import {
   getAllValidPieceMoves,
   getIsCheckmate,
   getIsKingInCheck,
-} from "common";
+} from "@barrymun/chess-common";
+import { Box } from "@radix-ui/themes";
 import { FC, useCallback, useEffect, useRef } from "react";
 
 import { Tile } from "components";

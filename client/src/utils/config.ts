@@ -1,4 +1,4 @@
-import { SanPiece } from "common";
+import { SanPiece } from "@barrymun/chess-common";
 
 export const repoUrl = "https://github.com/barrymun/chess";
 export const xLabels = ["a", "b", "c", "d", "e", "f", "g", "h"];

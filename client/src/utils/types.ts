@@ -1,4 +1,4 @@
-import { GameRecord, Player } from "common";
+import { GameRecord, Player } from "@barrymun/chess-common";
 
 export type Appearance = "light" | "dark";
 export type LocalStorageKeys = "appearance" | "playerId" | "singleplayerGameRecord";

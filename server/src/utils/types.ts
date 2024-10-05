@@ -1,4 +1,4 @@
-import { Player } from "common";
+import { Player } from "@barrymun/chess-common";
 import { Request } from "express";
 
 export interface CustomReq<T> extends Request {

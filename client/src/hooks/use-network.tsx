@@ -1,4 +1,4 @@
-import { GameRecord, Player } from "common";
+import { GameRecord, Player } from "@barrymun/chess-common";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
 

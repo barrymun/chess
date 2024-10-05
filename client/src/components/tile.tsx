@@ -1,5 +1,5 @@
+import { TileColor, tilesPerRow } from "@barrymun/chess-common";
 import { Box } from "@radix-ui/themes";
-import { TileColor, tilesPerRow } from "common";
 import { FC } from "react";
 
 import { useGameState, useNetwork } from "hooks";

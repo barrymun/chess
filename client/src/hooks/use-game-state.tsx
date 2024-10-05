@@ -1,4 +1,4 @@
-import { GameRecord, defaultBoard, defaultGameRecord, getIsCheckmate, getIsStalemate } from "common";
+import { GameRecord, defaultBoard, defaultGameRecord, getIsCheckmate, getIsStalemate } from "@barrymun/chess-common";
 import { isEqual } from "lodash";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 

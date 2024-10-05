@@ -1,4 +1,4 @@
-import { GameRecord, Player, getIsCheckmate, getIsStalemate } from "common";
+import { GameRecord, Player, getIsCheckmate, getIsStalemate } from "@barrymun/chess-common";
 import { Response } from "express";
 
 import { getValue, setValue } from "lib/redis";

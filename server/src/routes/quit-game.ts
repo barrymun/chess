@@ -1,4 +1,4 @@
-import { GameRecord } from "common";
+import { GameRecord } from "@barrymun/chess-common";
 import { Response } from "express";
 
 import { getValue, setValue } from "lib/redis";

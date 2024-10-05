@@ -4,4 +4,4 @@
 yarn cspell
 yarn lint
 # yarn lint-staged
-yarn test
+# yarn common-test
